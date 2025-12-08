@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador CNC - Raspberry Pi</title>
+    <!-- Carga de Tailwind CSS para un diseño moderno y responsive -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Carga de Three.js para la visualización 3D del fresado -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        /* Estilos personalizados para el contenedor 3D */
+        #visualization-container {
+            width: 100%;
+            aspect-ratio: 16 / 9; /* Mantiene una relación de aspecto para la visualización */
+            min-height: 300px;
+            background-color: #1f2937; /* Gris oscuro para el fondo del espacio de trabajo */
+            border-radius: 0.5rem;
+            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+        /* Ocultar scrollbar pero permitir desplazamiento */
+        textarea::-webkit-scrollbar { display: none; }
+        textarea { -ms-overflow-style: none; scrollbar-width: none; }
+        .gcode-textarea {
+            font-family: monospace;
+            line-height: 1.25;
+            min-height: 400px;
+            background-color: #f3f4f6;
+        }
+        /* Estilo para los botones interactivos */
+        .control-btn {
+            transition: all 0.15s ease-in-out;
+            box-shadow: 0 4px #0f766e; /* Sombra para efecto 3D */
+        }
+        .control-btn:active {
+            box-shadow: 0 1px #0f766e;
+            transform: translateY(3px);
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans p-4 sm:p-8">
+
+    <header class="mb-6">
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-blue-600 border-b-4 border-blue-200 pb-2">
+            Simulador CNC y Herramientas de Desarrollo
+        </h1>
+        <p class="text-gray-500 mt-2">Plataforma de visualización 3D, edición de G-Code y control conceptual de auto-nivelado.</p>
+    </header>
+
+    <main class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Columna de G-Code y Controles -->
+        <section class="lg:col-span-1 bg-white p-5 rounded-xl shadow-lg border border-gray-100">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700 flex items-center">
+                <svg class="w-5 h-5 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+                Editor de G-Code
+            </h2>
+            <textarea id="gcode-input" class="gcode-textarea w-full p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Pega tu G-Code aquí... (ej: G0 Z10 F500)"></textarea>
+
+            <div class="mt-4 grid grid-cols-2 gap-3">
+                <button onclick="loadGCode()" class="w-full bg-blue-500 text-white p-3 rounded-lg font-bold hover:bg-blue-600 control-btn shadow-blue-800">Cargar G-Code</button>
+                <button onclick="simulate()" class="w-full bg-teal-500 text-white p-3 rounded-lg font-bold hover:bg-teal-600 control-btn shadow-teal-800">▶️ Simular</button>
+                <button onclick="pauseSimulation()" class="w-full bg-amber-500 text-white p-3 rounded-lg font-bold hover:bg-amber-600 control-btn shadow-amber-800">⏸️ Pausar</button>
+                <button onclick="resetSimulation()" class="w-full bg-red-500 text-white p-3 rounded-lg font-bold hover:bg-red-600 control-btn shadow-red-800">⏹️ Resetear</button>
+            </div>
+        </section>
+
+        <!-- Columna de Visualización 3D y Logs -->
+        <section class="lg:col-span-2 space-y-6">
+            <div class="bg-white p-5 rounded-xl shadow-lg border border-gray-100">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.727A8 8 0 016.343 7.273v0A8.001 8.001 0 004 14v1a8.004 8.004 0 014.243-7.071L12 11l-3.757 3.757A8.004 8.004 0 014 18v1a8 8 0 008 8h1a8 8 0 008-8v-1a8 8 0 01-2.343-5.273z"></path></svg>
+                    Visualización 3D del Fresado
+                </h2>
+                <div id="visualization-container">
+                    <!-- El canvas de Three.js se insertará aquí -->
+                </div>
+            </div>
+
+            <!-- Sección de Herramientas Avanzadas: Auto-Nivelado -->
+            <div class="bg-white p-5 rounded-xl shadow-lg border border-gray-100">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1h2a1 1 0 001-1V7zM5 7a1 1 0 00-1-1H3a1 1 0 00-1 1v2a1 1 0 001 1h2a1 1 0 001-1V7zM14 14a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1h2a1 1 0 001-1v-2z"></path></svg>
+                    Auto-Nivelado (Conceptual)
+                </h2>
+                <p class="text-sm text-gray-500 mb-3">Simula la creación de la malla de compensación para superficies irregulares.</p>
+
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <input type="number" id="mesh-size" value="9" min="3" class="p-2 border rounded-lg text-center" placeholder="Puntos de Malla (ej: 9)">
+                    <button onclick="simulateProbing()" class="bg-purple-500 text-white p-3 rounded-lg font-bold hover:bg-purple-600 control-btn shadow-purple-800 col-span-2 sm:col-span-3">
+                        Simular Sondaje y Malla
+                    </button>
+                </div>
+                <div id="probing-log" class="mt-4 p-3 bg-gray-100 rounded-lg text-sm overflow-auto max-h-40">
+                    <!-- Logs del proceso de auto-nivelado aquí -->
+                    <p class="text-gray-500">Log de sondaje listo.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // --- Variables Globales ---
+        let scene, camera, renderer, tool, materialGeometry, material;
+        let animationFrameId = null;
+        let isSimulating = false;
+        let gcodeCommands = [];
+        let currentCommandIndex = 0;
+        let currentPosition = { x: 0, y: 0, z: 0 };
+        const CONTAINER = document.getElementById('visualization-container');
+
+        // --- Configuración Inicial de Three.js ---
+        function initThreeJS() {
+            // Escena
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x1f2937);
+
+            // Cámara
+            camera = new THREE.PerspectiveCamera(75, CONTAINER.clientWidth / CONTAINER.clientHeight, 0.1, 1000);
+            camera.position.set(20, 30, 40); // Posición inicial para perspectiva
+
+            // Renderizador
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(CONTAINER.clientWidth, CONTAINER.clientHeight);
+            CONTAINER.appendChild(renderer.domElement);
+
+            // Dimensiones del espacio de trabajo simulado (ej: 100x100x20)
+            const WORKSPACE_SIZE = 50;
+            const WORKSPACE_HEIGHT = 10;
+
+            // Suelo/Plataforma (el material a fresar)
+            const floorGeometry = new THREE.BoxGeometry(WORKSPACE_SIZE, WORKSPACE_HEIGHT, WORKSPACE_SIZE);
+            materialGeometry = new THREE.MeshPhongMaterial({ color: 0x6b7280, transparent: true, opacity: 0.8 });
+            material = new THREE.Mesh(floorGeometry, materialGeometry);
+            material.position.y = -WORKSPACE_HEIGHT / 2; // Lo sitúa con Z=0 en la superficie superior
+            scene.add(material);
+
+            // Ejes de coordenadas (Visualización)
+            const axesHelper = new THREE.AxesHelper(WORKSPACE_SIZE * 1.5);
+            scene.add(axesHelper);
+
+            // Herramienta CNC (simulada como una esfera)
+            const toolGeometry = new THREE.SphereGeometry(1, 32, 32);
+            const toolMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+            tool = new THREE.Mesh(toolGeometry, toolMaterial);
+            tool.position.set(0, 0, 0);
+            scene.add(tool);
+
+            // Luces
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(50, 50, 50);
+            scene.add(directionalLight);
+
+            // Orbit Controls (Para mover la cámara con el ratón/tacto) - Se usaría un script externo, pero para este ejercicio, simularemos un simple control de cámara.
+            // Para una aplicación real, se cargaría OrbitControls.js.
+            // Aquí, simplemente agregamos un listener de redimensionamiento
+            window.addEventListener('resize', onWindowResize, false);
+            onWindowResize();
+        }
+
+        // --- Manejo de Redimensionamiento ---
+        function onWindowResize() {
+            if (!camera || !renderer) return;
+            camera.aspect = CONTAINER.clientWidth / CONTAINER.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(CONTAINER.clientWidth, CONTAINER.clientHeight);
+        }
+
+        // --- Loop de Renderizado (Animación) ---
+        function animate() {
+            animationFrameId = requestAnimationFrame(animate);
+
+            // Simulación del movimiento (implementación conceptual)
+            if (isSimulating && gcodeCommands.length > 0) {
+                processNextCommand();
+            }
+
+            // Simple rotación de la cámara para que el usuario pueda ver el modelo
+            camera.position.x = 20 * Math.sin(Date.now() * 0.0001);
+            camera.position.z = 20 * Math.cos(Date.now() * 0.0001);
+            camera.lookAt(new THREE.Vector3(0, 0, 0));
+
+
+            renderer.render(scene, camera);
+        }
+
+        // --- Funciones de Control de Simulación ---
+
+        // Carga y parsea el G-Code
+        function loadGCode() {
+            const gcodeText = document.getElementById('gcode-input').value;
+            if (gcodeText.trim() === "") {
+                showMessage("ERROR: El área de G-Code está vacía.", 'bg-red-500');
+                return;
+            }
+            gcodeCommands = gcodeText.toUpperCase().split('\n')
+                .map(line => line.trim())
+                .filter(line => line.length > 0 && !line.startsWith(';')); // Filtra comentarios y líneas vacías
+
+            currentCommandIndex = 0;
+            resetToolPosition();
+            showMessage(`G-Code cargado. ${gcodeCommands.length} comandos listos.`, 'bg-green-500');
+        }
+
+        // Inicia la simulación
+        function simulate() {
+            if (gcodeCommands.length === 0) {
+                showMessage("ERROR: Primero carga el G-Code.", 'bg-red-500');
+                return;
+            }
+            isSimulating = true;
+            showMessage("Simulación iniciada...", 'bg-teal-500');
+        }
+
+        // Pausa la simulación
+        function pauseSimulation() {
+            isSimulating = false;
+            showMessage("Simulación pausada.", 'bg-amber-500');
+        }
+
+        // Resetea la simulación
+        function resetSimulation() {
+            isSimulating = false;
+            currentCommandIndex = 0;
+            resetToolPosition();
+            // Esto limpiaría el rastro de la herramienta en una implementación completa
+            showMessage("Simulación reiniciada.", 'bg-blue-500');
+        }
+
+        function resetToolPosition() {
+             currentPosition = { x: 0, y: 0, z: 0 };
+             if (tool) tool.position.set(0, 0, 0);
+        }
+
+
+        // Procesa el siguiente comando G-Code (simplificado)
+        function processNextCommand() {
+            if (currentCommandIndex >= gcodeCommands.length) {
+                isSimulating = false;
+                showMessage("Simulación completada.", 'bg-indigo-500');
+                return;
+            }
+
+            const command = gcodeCommands[currentCommandIndex];
+            // Aquí se haría un parseo real de los valores X, Y, Z, F (Feedrate)
+            const parts = command.match(/([GXM])(\d+(\.\d+)?)/g) || [];
+
+            let nextPos = { ...currentPosition };
+            let isMovement = false;
+
+            parts.forEach(part => {
+                const type = part.charAt(0);
+                const value = parseFloat(part.substring(1));
+
+                if (type === 'X') { nextPos.x = value; isMovement = true; }
+                if (type === 'Y') { nextPos.y = value; isMovement = true; }
+                if (type === 'Z') { nextPos.z = value; isMovement = true; }
+                // G0 (movimiento rápido) y G1 (movimiento de trabajo)
+                if (type === 'G' && (value === 0 || value === 1)) { isMovement = true; }
+                // M3, M5, etc. (control de husillo/spindle) se ignoran en esta simulación simple.
+            });
+
+            if (isMovement) {
+                // Simulación de movimiento simple (no interpolada, solo salto)
+                tool.position.set(nextPos.x, nextPos.z, nextPos.y); // Nota: En Three.js, Y es vertical. Se mapea Z del CNC a Y de Three.js.
+                currentPosition = nextPos;
+            }
+
+            // Aquí se dibujaría el camino o se modificaría la geometría del material.
+
+            currentCommandIndex++;
+
+            // Control de velocidad de simulación (simulado con un timeout)
+            // Se usa requestAnimationFrame para el renderizado, pero la lógica de comando avanza
+            // más lento para que sea visible (ej. cada 100ms)
+            setTimeout(() => {
+                if (isSimulating) {
+                    // No hacemos nada aquí, solo esperamos el próximo tick de requestAnimationFrame
+                }
+            }, 100);
+        }
+
+        // --- Funciones de Utilidad ---
+
+        function showMessage(message, colorClass) {
+            const container = document.getElementById('probing-log');
+            const logEntry = document.createElement('p');
+            logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logEntry.className = `p-1 rounded ${colorClass} text-white my-1`;
+            container.prepend(logEntry);
+            container.scrollTop = 0; // Mostrar el mensaje más reciente arriba
+        }
+
+        // --- Lógica Conceptual de Auto-Nivelado ---
+
+        function simulateProbing() {
+            const meshSizeInput = document.getElementById('mesh-size');
+            const numPoints = parseInt(meshSizeInput.value) || 9;
+            const size = Math.sqrt(numPoints);
+
+            if (size % 1 !== 0) {
+                showMessage("ERROR: El número de puntos debe ser un cuadrado perfecto (ej: 9, 16, 25).", 'bg-red-500');
+                return;
+            }
+
+            showMessage(`INICIO: Simulando sondaje para una malla de ${size}x${size} (${numPoints} puntos).`, 'bg-purple-600');
+
+            const materialSize = 50; // Basado en el tamaño de la geometría
+            const step = materialSize / (size - 1);
+            let meshData = [];
+
+            for (let i = 0; i < size; i++) {
+                for (let j = 0; j < size; j++) {
+                    const x = i * step - materialSize / 2;
+                    const y = j * step - materialSize / 2;
+
+                    // Simulación de la lectura Z (añadiendo una ligera inclinación/irregularidad)
+                    const simulatedZ = 0.5 * Math.sin(x * 0.5) + 0.3 * Math.cos(y * 0.8) + (i / size) * 1.5;
+
+                    meshData.push({ x: x.toFixed(2), y: y.toFixed(2), z: simulatedZ.toFixed(3) });
+
+                    // Log de sondaje
+                    const logMsg = `Punto (${i + 1}, ${j + 1}): X${x.toFixed(2)} Y${y.toFixed(2)} -> Z${simulatedZ.toFixed(3)}`;
+                    showMessage(logMsg, 'bg-gray-700');
+                }
+            }
+
+            // Aquí se calcularía la matriz de compensación real (bilinear interpolation)
+            showMessage(`FINALIZADO: Malla de compensación conceptual generada con ${numPoints} puntos.`, 'bg-purple-600');
+
+            // En una aplicación real, esta malla se enviaría al firmware (ej. GRBL con soporte ABL)
+            // o se usaría para reescribir/compensar el G-Code antes de la simulación.
+            console.log("Datos de la Malla:", meshData);
+        }
+
+
+        // --- Inicialización al cargar la ventana ---
+        window.onload = function() {
+            initThreeJS();
+            animate();
+        };
+
+    </script>
+</body>
+</html>
