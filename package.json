@@ -1,0 +1,15 @@
+{
+  "name": "rpi-cnc-proj",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Raspberry Pi CNC simulator — lightweight frontend and tooling",
+  "scripts": {
+    "test": "jest --runInBand",
+    "test:unit": "jest tests/ut --runInBand",
+    "test:integration": "jest tests/it --runInBand",
+    "test:e2e": "jest tests/e2e --runInBand"
+  },
+  "devDependencies": {
+    "jest": "^29.6.1"
+  }
+}
