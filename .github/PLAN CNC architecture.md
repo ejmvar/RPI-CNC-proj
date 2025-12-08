@@ -117,3 +117,9 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
 - Use git commits to track major phase completions.
 - AI agents should check this file before proposing new features to avoid duplicate work.
 
+### Mandatory testing policy for all tasks
+- Every task or feature MUST include relevant tests (unit/integration/e2e) — add tests under `./tests/{ut|it|e2e}/...`.
+- Rerun the test suite after each change and do not merge or commit changes that break tests.
+- When creating module code, add unit tests in `tests/ut/{module}/...` and integration/e2e tests when multiple modules or front-end behavior must be validated.
+
+

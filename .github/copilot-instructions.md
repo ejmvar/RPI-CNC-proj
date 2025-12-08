@@ -28,6 +28,21 @@ Developer workflows (what works now)
   - Or use any static server (e.g. `npx serve .`).
 - There are no test, build, or CI scripts in the repository — do not look for `package.json`, `Makefile`, or test runners.
 
+Testing
+
+- This project adopts an automated test policy: every new feature or task must include tests (unit/integration/e2e) where appropriate and tests must be run after each change.
+- Test layout: `./tests/ut/` (unit), `./tests/it/` (integration), `./tests/e2e/` (end-to-end / smoke tests).
+- Run tests locally with:
+
+```
+npm test
+npm run test:unit
+npm run test:integration
+npm run test:e2e
+```
+
+When proposing code changes, include one or more tests demonstrating correctness and run them as part of your change. Automated agents should fail fast and do not commit changes that reduce test coverage or break existing tests.
+
 Project conventions & patterns
 
 - Single-file frontend: changes to UI/logic are made directly inside `front.html` (script tags). Keep edits small and self-contained.
@@ -71,6 +86,7 @@ Notes about repository state
 If anything here is unclear or you'd like the instructions expanded (examples for extracting modules, adding local asset usage, or adding a simple `serve` script), tell me which part to expand.
 
 **Planned Architecture & Modules**
+
 - This repository currently hosts a lightweight static simulator. The attached design notes (`.github/PLAN CNC architecture.md`) recommend splitting future work into separate modules to keep concerns isolated and enable optional features.
 - Suggested module folders (scaffolded in `modules/`):
   - `modules/gcode/` — G‑Code parsing, transformation, and toolpath utilities.
