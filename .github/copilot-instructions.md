@@ -93,6 +93,13 @@ If anything here is unclear or you'd like the instructions expanded (examples fo
 - Suggested module folders (scaffolded in `modules/`):
   - `modules/gcode/` — G‑Code parsing, transformation, and toolpath utilities.
   - `modules/presentation/` — Three.js visualization helpers, canvas management, and UI components.
+    Phase 2 status
+  - This repo now contains Phase 2 ES modules and browser wrappers for the key pieces of the simulator:
+    - `modules/gcode/parser.mjs` + `Simulator/web/js/gcode-parser.mjs` (G‑Code parsing)
+    - `modules/gcode/transform.mjs` + `Simulator/web/js/gcode-transform.mjs` (mesh compensation / transforms)
+    - `modules/presentation/three-helper.mjs` + `Simulator/web/js/three-helper.mjs` (Three.js scene init)
+    - `modules/presentation/controls.mjs` + `Simulator/web/js/controls.mjs` (lightweight orbit controls)
+  - `front.html` now imports these browser wrappers and exposes them on `window` (useful for interactive debugging).
   - `modules/backend/` — Optional server-side helpers (data export/import, offline asset serving, or firmware gateways).
   - `modules/cli/` — CLI utilities for offline processing, converting G‑Code, or running batch simulations.
 - Configuration: use `modules/modules-config.yml` to enable/disable modules or select between alternate implementations (for example: `gcode: enabled: true`, `presentation: impl: threejs|svg`).

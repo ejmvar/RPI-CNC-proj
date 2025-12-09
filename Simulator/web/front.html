@@ -119,11 +119,15 @@
         import * as THREE_HELPER from './js/three-helper.mjs';
         import * as THREE_CONTROLS from './js/controls.mjs';
         import * as GCODE_TRANSFORM from './js/gcode-transform.mjs';
+        import * as GCODE_TOOLPATH from './js/toolpath.mjs';
+        import * as THREE_MESH from './js/mesh.mjs';
         // expose parser and three helpers to the inline script environment
         window.GCODE_PARSER = GParser;
         window.THREE_HELPER = THREE_HELPER;
         window.THREE_CONTROLS = THREE_CONTROLS;
         window.GCODE_TRANSFORM = GCODE_TRANSFORM;
+        window.GCODE_TOOLPATH = GCODE_TOOLPATH;
+        window.THREE_MESH = THREE_MESH;
     </script>
 
     <script>
@@ -197,7 +201,24 @@
             }
             // Use the browser module parser to normalize lines and filter comments
             if (window.GCODE_PARSER && typeof window.GCODE_PARSER.parse === 'function') {
-                gcodeCommands = window.GCODE_PARSER.parse(gcodeText).map(c => c.raw.trim().toUpperCase());
+                const parsed = window.GCODE_PARSER.parse(gcodeText);
+                gcodeCommands = parsed.map(c => c.raw.trim().toUpperCase());
+
+                // create toolpath points and render into scene if the renderer exists
+                if (window.GCODE_TOOLPATH && typeof window.GCODE_TOOLPATH.parseGCodeToPoints === 'function') {
+                    const points = window.GCODE_TOOLPATH.parseGCodeToPoints(parsed);
+                    window.LAST_TOOLPATH = points; // expose for debugging/tests
+                    if (typeof window.THREE_HELPER !== 'undefined' && scene) {
+                        // remove any previous toolpath lines
+                        const prev = scene.getObjectByName('toolpath-line');
+                        if (prev) scene.remove(prev);
+                        try {
+                            window.GCODE_TOOLPATH.renderToolpath(scene, points);
+                        } catch (e) {
+                            console.warn('renderToolpath failed', e);
+                        }
+                    }
+                }
             } else {
                 // fallback to the prior simple parse
                 gcodeCommands = gcodeText.toUpperCase().split('\n')

@@ -35,13 +35,13 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
 **Goal:** Refactor single-file simulator into modular components.
 
 #### Tasks:
-- [ ] **TODO** — Extract G-Code parser to `modules/gcode/parser.js` (ES module)
-- [ ] **TODO** — Move Three.js initialization to `modules/presentation/three-helper.js`
-- [ ] **TODO** — Create `modules/presentation/controls.js` for camera/orbit controls
-- [ ] **TODO** — Implement `modules/gcode/transform.js` for coordinate transformations
-- [ ] **TODO** — Add bed leveling mesh compensation logic to gcode module
-- [ ] **TODO** — Update `front.html` to use `type="module"` imports
-- [ ] **TODO** — Document module integration patterns in module READMEs
+- [x] **DONE** — Extract G-Code parser to `modules/gcode/parser.mjs` (ES module) + browser wrapper
+- [x] **DONE** — Move Three.js initialization to `modules/presentation/three-helper.mjs` + browser wrapper
+- [x] **DONE** — Create `modules/presentation/controls.mjs` for camera/orbit controls + browser wrapper
+- [x] **DONE** — Implement `modules/gcode/transform.mjs` for coordinate transformations + browser wrapper
+- [x] **DONE** — Add bed leveling mesh compensation logic to gcode module (applyMeshCompensationToGCode)
+- [x] **DONE** — Update `front.html` to import `type="module"` wrappers and expose them on `window`
+- [x] **DONE** — Document module integration patterns in module READMEs
 
 ### Phase 3: Enhanced Visualization & Toolpath [PLANNED]
 **Goal:** Improve 3D visualization with actual toolpath rendering.
