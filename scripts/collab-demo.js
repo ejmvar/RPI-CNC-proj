@@ -13,7 +13,30 @@ const { createWsCollabServer } = require('../modules/backend/collab/ws-server');
 
 const PORT = process.env.PORT || 8001;
 
+const fs = require('fs');
+
 const server = http.createServer((req, res) => {
+  // Serve demo HTML and static JS module for browser testing
+  const u = req.url || '/';
+  if (u === '/' || u === '/demo' || u === '/demo.html') {
+    const html = fs.readFileSync(path.join(__dirname, '..', 'Simulator', 'web', 'demo.html'), 'utf8');
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    res.end(html);
+    return;
+  }
+
+  if (u.startsWith('/js/') || u.startsWith('/static/')) {
+    // map to Simulator/web
+    const servePath = path.join(__dirname, '..', 'Simulator', 'web', u);
+    if (fs.existsSync(servePath)) {
+      const content = fs.readFileSync(servePath);
+      const type = u.endsWith('.mjs') ? 'application/javascript' : 'text/plain';
+      res.writeHead(200, { 'Content-Type': type });
+      res.end(content);
+      return;
+    }
+  }
+
   res.writeHead(200, { 'Content-Type': 'text/plain' });
   res.end('RPI-CNC collab demo server\n');
 });

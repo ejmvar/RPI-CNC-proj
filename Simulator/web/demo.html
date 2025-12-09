@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>RPI-CNC Collab Demo</title>
+    <style>
+      body { font-family: system-ui, sans-serif; padding: 1rem; }
+      #log { white-space: pre-wrap; background:#111; color:#0f0; padding:8px; height:200px; overflow:auto }
+      button { margin-right: 8px }
+    </style>
+  </head>
+  <body>
+    <h1>RPI-CNC Collab Demo</h1>
+    <div>
+      <label>WebSocket URL: <input id="url" value="ws://127.0.0.1:8001/c" size="30"/></label>
+    </div>
+    <div style="margin-top:8px">
+      <button id="connect">Connect</button>
+      <button id="create">Create session s1</button>
+      <button id="join">Join s1</button>
+      <button id="update">Update (a:2)</button>
+    </div>
+
+    <h2>Messages</h2>
+    <div id="log">(log)</div>
+
+    <script type="module">
+      import { createCollabClient } from './js/collab-client.mjs';
+      const log = (s) => { const el = document.getElementById('log'); el.textContent = `${new Date().toISOString()} ${s}\n` + el.textContent; };
+
+      const urlEl = document.getElementById('url');
+      let client = null;
+
+      document.getElementById('connect').addEventListener('click', () => {
+        client = createCollabClient(urlEl.value);
+        client.on('open', () => log('open'));
+        client.on('close', () => log('close'));
+        client.on('sessionUpdated', (msg) => log('sessionUpdated ' + JSON.stringify(msg.state)));
+        client.on('message', (m) => log('message ' + JSON.stringify(m)));
+        try { client.connect(); log('connect() called'); } catch(e) { log('connect-failed ' + e.message); }
+      });
+
+      document.getElementById('create').addEventListener('click', () => { if (client) { client.createSession('s1', { a: 1 }); log('create sent'); } });
+      document.getElementById('join').addEventListener('click', () => { if (client) { client.joinSession('s1', 'browser'); log('join sent'); } });
+      document.getElementById('update').addEventListener('click', () => { if (client) { client.updateSession('s1', { a: 2 }); log('update sent'); } });
+    </script>
+  </body>
+</html>
