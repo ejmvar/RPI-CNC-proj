@@ -16,8 +16,10 @@ export function renderToolpath(scene, points, options = {}) {
   const colors = [];
   points.forEach(pt => {
     positions.push(pt.x, pt.z, pt.y); // CNC Z -> Three Y mapping already used elsewhere
-    // color: G0 rapid moves = blue, G1 cutting = red
-    const color = (pt.type === 'G0') ? [0, 0, 1] : (pt.type === 'G1' ? [1, 0, 0] : [0.5, 0.5, 0.5]);
+    // color by tool if present; otherwise color by move type
+    const toolColors = { 1: [0, 1, 0], 2: [1, 0, 1], 3: [1, 0.5, 0] };
+    const color = (pt.tool != null && toolColors[pt.tool]) ? toolColors[pt.tool]
+      : ((pt.type === 'G0') ? [0, 0, 1] : (pt.type === 'G1' ? [1, 0, 0] : [0.5, 0.5, 0.5]));
     colors.push(...color);
   });
 
