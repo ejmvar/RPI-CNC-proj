@@ -15,7 +15,7 @@ async function main() {
   const gcodeText = fs.readFileSync(gcodeFile, 'utf8');
   const mesh = JSON.parse(fs.readFileSync(meshFile, 'utf8'));
 
-  const mod = await import('../gcode/transform.mjs');
+  const mod = await import('../../gcode/transform.mjs');
   const result = mod.applyMeshCompensationToGCode(gcodeText, mesh);
 
   if (outFlag === '--out' && outFile) {

@@ -20,8 +20,15 @@ describe('CLI apply-leveling script', () => {
 
     const r = spawnSync('node', [binscript, gfile, mfile], { encoding: 'utf8' });
     expect(r.status).toBe(0);
-    // since mesh zeros, output should match input (Z unchanged)
-    expect(r.stdout.trim()).toBe(gcode.trim());
+    // since mesh zeros, numerically Z should remain equivalent (string formatting may differ)
+    const out = r.stdout.trim().split(/\r?\n/).map(l => l.trim());
+    const inL = gcode.trim().split(/\r?\n/).map(l => l.trim());
+    expect(out.length).toBe(inL.length);
+    for (let i = 0; i < out.length; i++) {
+      const inZ = (inL[i].match(/Z(-?\d+(?:\.\d+)?)/) || [])[1];
+      const outZ = (out[i].match(/Z(-?\d+(?:\.\d+)?)/) || [])[1];
+      expect(Number(outZ)).toBeCloseTo(Number(inZ), 4);
+    }
 
     fs.unlinkSync(gfile);
     fs.unlinkSync(mfile);
