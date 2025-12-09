@@ -55,31 +55,62 @@ describe('browser collab e2e (headless browser)', () => {
     const wss = createWsCollabServer(collab, { server, path: '/c' });
     if (!wss) throw new Error('ws bridge not available for e2e');
 
-    // Launch headless browser
+    // Launch headless browser and open two pages to simulate two clients
     const browser = await chromium.launch();
-    const page = await browser.newPage();
+    const page1 = await browser.newPage();
+    const page2 = await browser.newPage();
 
     const demoUrl = `http://127.0.0.1:${port}/demo`;
-    await page.goto(demoUrl);
+    await page1.goto(demoUrl);
+    await page2.goto(demoUrl);
 
-    // connect
-    await page.locator('#connect').click();
+    // set client ids and connect
+    await page1.fill('#client-id', 'p1');
+    await page2.fill('#client-id', 'p2');
+    await page1.locator('#connect').click();
+    await page2.locator('#connect').click();
     // wait for connect log entry
     await page.waitForFunction(() => document.getElementById('log').textContent.includes('open'), { timeout: 5000 });
 
-    // create session
-    await page.locator('#create').click();
+    // create session and ensure it appears in the session list
+    // create session from client1 (owner should be p1)
+    await page1.locator('#create').click();
     await page.waitForFunction(() => document.getElementById('log').textContent.includes('created') || document.getElementById('log').textContent.includes('create sent'), { timeout: 2000 });
+    await page1.waitForFunction(() => document.getElementById('sessions').textContent.includes('s1'), { timeout: 2000 });
 
     // join
-    await page.locator('#join').click();
-    // update
-    await page.locator('#update').click();
+    // client2 joins and updates the session
+    await page2.locator('#join').click();
+    await page2.locator('#update').click();
 
-    // wait for sessionUpdated message in log
-    await page.waitForFunction(() => document.getElementById('log').textContent.includes('sessionUpdated'), { timeout: 5000 });
+    // wait for sessionUpdated message in log and that sessions UI shows updated state
+    // ensure both pages observe the update
+    await page1.waitForFunction(() => document.getElementById('log').textContent.includes('sessionUpdated'), { timeout: 5000 });
+    await page2.waitForFunction(() => document.getElementById('log').textContent.includes('sessionUpdated'), { timeout: 5000 });
+    // sessions should show updated state and owner/present client list
+    await page1.waitForFunction(() => document.getElementById('sessions').textContent.includes('a":2') || document.getElementById('sessions').textContent.includes('a:2'), { timeout: 2000 });
+    await page1.waitForFunction(() => document.getElementById('sessions').textContent.includes('owner: p1') && document.getElementById('sessions').textContent.includes('clients: 2'), { timeout: 2000 });
 
-    await page.close();
+    // reload the page and verify the session list persists in localStorage
+    // reload one page and verify session list persists in localStorage
+    await page1.reload();
+    // ensure demo page loaded and session is present after reload
+    await page1.waitForSelector('#sessions');
+    await page1.waitForFunction(() => document.getElementById('sessions').textContent.includes('s1') && (document.getElementById('sessions').textContent.includes('a":2') || document.getElementById('sessions').textContent.includes('a:2')), { timeout: 2000 });
+
+    // verify editing from page1 updates page2: click edit, set new state, save
+    const sessionItem = await page1.locator('#sessions li', { hasText: 's1' }).first();
+    await sessionItem.locator('button', { hasText: 'Edit' }).click();
+    // find the input and set new JSON
+    const input = sessionItem.locator('input').first();
+    await input.fill('{"a":3,"note":"edited"}');
+    await sessionItem.locator('button', { hasText: 'Save' }).click();
+
+    // ensure page2 sees the edited state
+    await page2.waitForFunction(() => document.getElementById('sessions').textContent.includes('a":3') || document.getElementById('sessions').textContent.includes('a:3'), { timeout: 2000 });
+
+    await page1.close();
+    await page2.close();
     await browser.close();
 
     wss.close();

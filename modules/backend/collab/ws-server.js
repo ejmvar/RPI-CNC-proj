@@ -58,20 +58,29 @@ function createWsCollabServer(collabServer, opts = {}) {
       try {
         if (action === 'create') {
           const { sessionId, initialState } = msg;
-          collabServer.createSession(sessionId, initialState || {});
+          // if clientId present, store owner info in initial state
+          const owner = msg.clientId || null;
+          const state = Object.assign({}, initialState || {}, owner ? { owner } : {});
+          collabServer.createSession(sessionId, state);
           addClientToSession(sessionId, socket, msg.clientId || null);
           // echo created
           socket.send(JSON.stringify({ type: 'created', sessionId }));
+          // broadcast creation to session members (if any) and emit event
+          const s = collabServer.getSession(sessionId);
+          broadcastToSession(sessionId, { type: 'sessionCreated', sessionId, state: s.state, clients: s.clients });
         } else if (action === 'join') {
           const { sessionId, clientId } = msg;
           collabServer.joinSession(sessionId, clientId || null);
           addClientToSession(sessionId, socket, clientId || null);
           socket.send(JSON.stringify({ type: 'joined', sessionId }));
+          // inform other clients in session that a client joined
+          broadcastToSession(sessionId, { type: 'clientJoined', sessionId, clientId: clientId || null });
         } else if (action === 'update') {
           const { sessionId, patch } = msg;
           collabServer.updateSession(sessionId, patch || {});
           // broadcast the update to all clients in session
-          broadcastToSession(sessionId, { type: 'sessionUpdated', sessionId, state: collabServer.getSession(sessionId).state });
+          const s2 = collabServer.getSession(sessionId) || {};
+          broadcastToSession(sessionId, { type: 'sessionUpdated', sessionId, state: s2.state, clients: s2.clients });
         }
       } catch (err) {
         if (socket && typeof socket.send === 'function') socket.send(JSON.stringify({ error: err.message }));
@@ -84,8 +93,21 @@ function createWsCollabServer(collabServer, opts = {}) {
   });
 
   // when server-side collab updates happen, broadcast to clients
+  // when server-side collab updates happen, broadcast to clients
   collabServer.on('sessionUpdated', ({ sessionId, state }) => {
-    broadcastToSession(sessionId, { type: 'sessionUpdated', sessionId, state });
+    const s3 = collabServer.getSession(sessionId) || {};
+    broadcastToSession(sessionId, { type: 'sessionUpdated', sessionId, state: s3.state, clients: s3.clients });
+  });
+
+  // when sessions are created in the collab server, broadcast
+  collabServer.on('sessionCreated', (s) => {
+    broadcastToSession(s.id, { type: 'sessionCreated', sessionId: s.id, state: s.state, clients: s.clients });
+  });
+
+  // when a client joins, broadcast the join to session clients
+  collabServer.on('clientJoined', ({ sessionId, clientId }) => {
+    const s4 = collabServer.getSession(sessionId) || {};
+    broadcastToSession(sessionId, { type: 'clientJoined', sessionId, clientId, clients: s4.clients });
   });
 
   return wss;

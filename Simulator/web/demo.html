@@ -13,12 +13,19 @@
     <h1>RPI-CNC Collab Demo</h1>
     <div>
       <label>WebSocket URL: <input id="url" value="ws://127.0.0.1:8001/c" size="30"/></label>
+      <label style="margin-left: 12px">Client ID: <input id="client-id" value="" size="12"/></label>
+      <button id="clear-store" style="margin-left:12px">Clear persisted sessions</button>
     </div>
     <div style="margin-top:8px">
       <button id="connect">Connect</button>
       <button id="create">Create session s1</button>
       <button id="join">Join s1</button>
       <button id="update">Update (a:2)</button>
+    </div>
+
+    <h2>Active Sessions</h2>
+    <div>
+      <ul id="sessions" style="padding-left:0; list-style:none;">(none)</ul>
     </div>
 
     <h2>Messages</h2>
@@ -31,18 +38,133 @@
       const urlEl = document.getElementById('url');
       let client = null;
 
+      // persistent session list stored in localStorage
+      const STORAGE_KEY = 'rpi-cnc-collab-sessions';
+      const CLIENT_KEY = 'rpi-cnc-collab-clientid';
+      function loadSessions() {
+        try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch (e) { return {}; }
+      }
+      function saveSessions(sessions) { localStorage.setItem(STORAGE_KEY, JSON.stringify(sessions)); }
+
+      function updateSessionUI(sessions) {
+        const el = document.getElementById('sessions');
+        const keys = Object.keys(sessions || {});
+        if (!keys.length) { el.innerHTML = '(none)'; return; }
+        el.innerHTML = '';
+        keys.forEach(id => {
+          const s = sessions[id] || {};
+          const li = document.createElement('li');
+          li.style.padding = '6px 0';
+          li.style.borderBottom = '1px solid #ddd';
+          li.dataset.sessionId = id;
+          const owner = s.state && s.state.owner ? s.state.owner : (s.owner || null);
+          const clients = s.clients || (s.state && s.state.clients) || [];
+          li.innerHTML = `<strong>${id}</strong> ${owner ? ' (owner: ' + owner + ')' : ''} — state: <code>${JSON.stringify(s.state)}</code> <small>clients: ${clients.length || 0}</small> `;
+          
+          // add edit state UI
+          const editBtn = document.createElement('button');
+          editBtn.textContent = 'Edit';
+          editBtn.addEventListener('click', () => {
+            // toggle an input
+            if (li._editing) { return; }
+            li._editing = true;
+            const txt = document.createElement('input');
+            txt.value = JSON.stringify(s.state);
+            txt.style.width = '60%';
+            const save = document.createElement('button');
+            save.textContent = 'Save';
+            const cancel = document.createElement('button');
+            cancel.textContent = 'Cancel';
+            save.addEventListener('click', () => {
+              try {
+                const obj = JSON.parse(txt.value);
+                // update via client
+                if (client) client.updateSession(id, obj);
+                // also update local storage
+                const all = loadSessions(); all[id] = { id, state: obj, clients: (s.clients || []) }; saveSessions(all); updateSessionUI(all);
+                li._editing = false;
+              } catch (e) { log('invalid json'); }
+            });
+            cancel.addEventListener('click', () => { li._editing = false; updateSessionUI(loadSessions()); });
+            li.appendChild(document.createElement('br'));
+            li.appendChild(txt); li.appendChild(save); li.appendChild(cancel);
+          });
+          li.appendChild(editBtn);
+          const joinBtn = document.createElement('button');
+          joinBtn.textContent = 'Join';
+          joinBtn.addEventListener('click', () => {
+            if (!client) return log('no client');
+            const clientId = document.getElementById('client-id').value || null;
+            client.joinSession(id, clientId);
+            log('join (from list) ' + id);
+          });
+          li.appendChild(joinBtn);
+          // add forget button
+          const forget = document.createElement('button'); forget.textContent = 'Forget';
+          forget.addEventListener('click', () => {
+            const all = loadSessions(); delete all[id]; saveSessions(all); updateSessionUI(all);
+            log('forgot ' + id);
+          });
+          li.appendChild(forget);
+          el.appendChild(li);
+        });
+      }
+
+      // load initial sessions and render
+      const sessions = loadSessions();
+      updateSessionUI(sessions);
+
+      // load stored client id
+      const clientIdStored = localStorage.getItem(CLIENT_KEY);
+      if (clientIdStored) document.getElementById('client-id').value = clientIdStored;
+
+      document.getElementById('clear-store').addEventListener('click', () => { localStorage.removeItem(STORAGE_KEY); updateSessionUI({}); log('cleared sessions'); });
+
       document.getElementById('connect').addEventListener('click', () => {
+        const cid = document.getElementById('client-id').value || null;
+        if (cid) localStorage.setItem(CLIENT_KEY, cid);
         client = createCollabClient(urlEl.value);
         client.on('open', () => log('open'));
         client.on('close', () => log('close'));
-        client.on('sessionUpdated', (msg) => log('sessionUpdated ' + JSON.stringify(msg.state)));
+        client.on('sessionUpdated', (msg) => {
+          log('sessionUpdated ' + JSON.stringify(msg.state));
+          // update persistent list
+          const s = loadSessions();
+          s[msg.sessionId] = { id: msg.sessionId, state: msg.state, clients: (msg.clients || []) };
+          saveSessions(s);
+          updateSessionUI(s);
+        });
+        client.on('sessionCreated', (msg) => {
+          log('sessionCreated: ' + JSON.stringify(msg));
+          const s = loadSessions();
+          s[msg.sessionId] = { id: msg.sessionId, state: msg.state, clients: (msg.clients || []) };
+          saveSessions(s); updateSessionUI(s);
+        });
+        client.on('clientJoined', (msg) => {
+          log('clientJoined ' + JSON.stringify(msg));
+          const s = loadSessions();
+          s[msg.sessionId] = Object.assign({}, s[msg.sessionId] || {}, { id: msg.sessionId, state: (s[msg.sessionId] && s[msg.sessionId].state) || {}, clients: msg.clients || [] });
+          saveSessions(s); updateSessionUI(s);
+        });
         client.on('message', (m) => log('message ' + JSON.stringify(m)));
         try { client.connect(); log('connect() called'); } catch(e) { log('connect-failed ' + e.message); }
       });
 
-      document.getElementById('create').addEventListener('click', () => { if (client) { client.createSession('s1', { a: 1 }); log('create sent'); } });
-      document.getElementById('join').addEventListener('click', () => { if (client) { client.joinSession('s1', 'browser'); log('join sent'); } });
-      document.getElementById('update').addEventListener('click', () => { if (client) { client.updateSession('s1', { a: 2 }); log('update sent'); } });
+      document.getElementById('create').addEventListener('click', () => {
+        if (client) {
+          const cid = document.getElementById('client-id').value || null;
+          client.createSession('s1', { a: 1 }, cid);
+          // update local list immediately
+          const s = loadSessions(); s['s1'] = { id: 's1', state: { a: 1 } }; saveSessions(s); updateSessionUI(s);
+          log('create sent');
+        }
+      });
+
+      document.getElementById('join').addEventListener('click', () => { if (client) { const cid = document.getElementById('client-id').value || null; client.joinSession('s1', cid); log('join sent'); } });
+
+      document.getElementById('update').addEventListener('click', () => {
+        if (client) { client.updateSession('s1', { a: 2 }); log('update sent'); }
+      });
     </script>
   </body>
 </html>

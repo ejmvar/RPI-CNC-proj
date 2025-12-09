@@ -24,6 +24,8 @@ export function createCollabClient(url) {
       try { msg = JSON.parse(raw); } catch (e) { /* not JSON */ }
       emit('message', msg);
       if (msg && msg.type === 'sessionUpdated') emit('sessionUpdated', msg);
+      if (msg && msg.type === 'sessionCreated') emit('sessionCreated', msg);
+      if (msg && msg.type === 'clientJoined') emit('clientJoined', msg);
     });
 
     return ws;
@@ -35,7 +37,7 @@ export function createCollabClient(url) {
     ws.send(data);
   }
 
-  function createSession(sessionId, initialState) { send({ action: 'create', sessionId, initialState }); }
+  function createSession(sessionId, initialState, clientId) { send({ action: 'create', sessionId, initialState, clientId }); }
   function joinSession(sessionId, clientId) { send({ action: 'join', sessionId, clientId }); }
   function updateSession(sessionId, patch) { send({ action: 'update', sessionId, patch }); }
   function close() { if (ws) { ws.close(); ws = null; } }
