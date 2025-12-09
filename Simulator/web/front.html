@@ -72,6 +72,7 @@
             <div class="mt-4 grid grid-cols-2 gap-3">
                 <button onclick="loadGCode()" class="w-full bg-blue-500 text-white p-3 rounded-lg font-bold hover:bg-blue-600 control-btn shadow-blue-800">Cargar G-Code</button>
                 <button onclick="simulate()" class="w-full bg-teal-500 text-white p-3 rounded-lg font-bold hover:bg-teal-600 control-btn shadow-teal-800">▶️ Simular</button>
+                <button onclick="applyLevelingToGCode()" class="w-full bg-indigo-500 text-white p-3 rounded-lg font-bold hover:bg-indigo-600 control-btn shadow-indigo-800">Apply Leveling</button>
                 <button onclick="pauseSimulation()" class="w-full bg-amber-500 text-white p-3 rounded-lg font-bold hover:bg-amber-600 control-btn shadow-amber-800">⏸️ Pausar</button>
                 <button onclick="resetSimulation()" class="w-full bg-red-500 text-white p-3 rounded-lg font-bold hover:bg-red-600 control-btn shadow-red-800">⏹️ Resetear</button>
             </div>
@@ -116,9 +117,13 @@
     <script type="module">
         import * as GParser from './js/gcode-parser.mjs';
         import * as THREE_HELPER from './js/three-helper.mjs';
+        import * as THREE_CONTROLS from './js/controls.mjs';
+        import * as GCODE_TRANSFORM from './js/gcode-transform.mjs';
         // expose parser and three helpers to the inline script environment
         window.GCODE_PARSER = GParser;
         window.THREE_HELPER = THREE_HELPER;
+        window.THREE_CONTROLS = THREE_CONTROLS;
+        window.GCODE_TRANSFORM = GCODE_TRANSFORM;
     </script>
 
     <script>
@@ -146,6 +151,13 @@
             // attach resize handler
             window.addEventListener('resize', onWindowResize, false);
             onWindowResize();
+            // attach lightweight orbit controls to the rendered canvas (if available)
+            try {
+                if (window.THREE_CONTROLS && typeof window.THREE_CONTROLS.createSimpleOrbitControls === 'function') {
+                    window.CONTROLS = window.THREE_CONTROLS.createSimpleOrbitControls({ camera, domElement: renderer.domElement });
+                    window.CONTROLS.attach && window.CONTROLS.attach();
+                }
+            } catch (err) { console.warn('controls attach failed', err); }
         }
 
         // --- Manejo de Redimensionamiento ---
@@ -321,6 +333,23 @@
                 }
             }
 
+                // Store mesh in a simple structured format for later compensation
+                // values are organized as values[yIndex][xIndex]
+                const values = Array.from({ length: size }, () => Array(size).fill(0));
+                let k = 0;
+                for (let i = 0; i < size; i++) {
+                    for (let j = 0; j < size; j++) {
+                        values[j][i] = parseFloat(meshData[k].z);
+                        k++;
+                    }
+                }
+
+                window.LATEST_MESH = {
+                    bounds: { minX: -materialSize / 2, maxX: materialSize / 2, minY: -materialSize / 2, maxY: materialSize / 2 },
+                    size: size,
+                    values: values
+                };
+
             // Aquí se calcularía la matriz de compensación real (bilinear interpolation)
             showMessage(`FINALIZADO: Malla de compensación conceptual generada con ${numPoints} puntos.`, 'bg-purple-600');
 
@@ -335,6 +364,23 @@
             initThreeJS();
             animate();
         };
+
+        function applyLevelingToGCode() {
+            const gcodeText = document.getElementById('gcode-input').value;
+            if (!window.LATEST_MESH) {
+                showMessage('ERROR: No leveling mesh available. Run "Simular Sondaje y Malla" first.', 'bg-red-500');
+                return;
+            }
+
+            if (!window.GCODE_TRANSFORM || typeof window.GCODE_TRANSFORM.applyMeshCompensationToGCode !== 'function') {
+                showMessage('ERROR: Transform module not loaded.', 'bg-red-500');
+                return;
+            }
+
+            const newGcode = window.GCODE_TRANSFORM.applyMeshCompensationToGCode(gcodeText, window.LATEST_MESH);
+            document.getElementById('gcode-input').value = newGcode;
+            showMessage('G-Code updated with mesh compensation.', 'bg-green-600');
+        }
 
     </script>
 </body>
