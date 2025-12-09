@@ -17,6 +17,8 @@ jobs:
           node-version: 18
       - name: Install deps
         run: npm ci
+      - name: Run lint
+        run: npm run lint
       - name: Run tests
         run: npm test --silent
 name: CI

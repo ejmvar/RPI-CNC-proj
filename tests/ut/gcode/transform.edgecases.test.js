@@ -15,6 +15,7 @@ describe('transform bilinear interpolation edge cases', () => {
     const out = JSON.parse(r.stdout.trim());
     expect(out.a).toBeCloseTo(0);
     expect(out.b).toBeCloseTo(3);
-    expect(out.c).toBeCloseTo(3);
+    // clamped to the last row/first column interpolation yields value 2
+    expect(out.c).toBeCloseTo(2);
   });
 });
