@@ -80,9 +80,11 @@
                     <label class="text-xs text-gray-500">Velocidad de simulación</label>
                     <input id="simulation-speed" type="range" min="10" max="2000" step="10" value="100" oninput="setSimulationSpeed(this.value)" class="w-full mt-1" />
                     <div class="flex items-center gap-2 mt-1">
-                        <button id="step-btn" onclick="stepSimulation()" class="bg-gray-200 p-2 rounded-md text-sm">Step ▶️</button>
+                            <button id="step-back-btn" onclick="stepBack()" class="bg-gray-200 p-2 rounded-md text-sm">◀️ Back</button>
+                            <button id="step-btn" onclick="stepSimulation()" class="bg-gray-200 p-2 rounded-md text-sm">Step ▶️</button>
                         <button id="step-mode-btn" onclick="toggleStepMode()" class="bg-gray-200 p-2 rounded-md text-sm">Step Mode: Off</button>
-                        <span id="playback-speed-label" class="text-xs text-gray-500 ml-auto">100ms</span>
+                        <span id="command-index-label" class="text-xs text-gray-500">0 / 0</span>
+                        <span id="playback-speed-label" class="text-xs text-gray-500 ml-3">100ms</span>
                     </div>
                 </div>
             </div>
@@ -246,6 +248,8 @@
             currentCommandIndex = 0;
             resetToolPosition();
             showMessage(`G-Code cargado. ${gcodeCommands.length} comandos listos.`, 'bg-green-500');
+            // update command index label to reflect number of loaded commands
+            updateCommandIndexLabel();
         }
 
         // Inicia la simulación
@@ -304,7 +308,12 @@
                 return;
             }
             // perform a single command advance regardless of pause/play
-            processNextCommand();
+            // when stepping we should advance a single command and update label
+            if (currentCommandIndex < gcodeCommands.length) {
+                applyCommandAtIndex(currentCommandIndex);
+                currentCommandIndex++;
+                updateCommandIndexLabel();
+            }
         }
 
         function toggleStepMode() {
@@ -314,6 +323,8 @@
             const el = document.getElementById('step-mode-btn');
             if (el) el.textContent = `Step Mode: ${stepMode ? 'On' : 'Off'}`;
             showMessage(`Step mode ${stepMode ? 'enabled' : 'disabled'}.`, 'bg-gray-700');
+            // reflect the current index and length when toggling
+            updateCommandIndexLabel();
         }
 
         function resetToolPosition() {
@@ -326,6 +337,31 @@
 
 
         // Procesa el siguiente comando G-Code (simplificado)
+        function applyCommandAtIndex(idx) {
+            if (!gcodeCommands || idx < 0 || idx >= gcodeCommands.length) return false;
+            const command = gcodeCommands[idx];
+            const parts = command.match(/([GXM])(\d+(\.\d+)?)/g) || [];
+            let nextPos = { ...currentPosition };
+            let isMovement = false;
+            parts.forEach(part => {
+                const type = part.charAt(0);
+                const value = parseFloat(part.substring(1));
+                if (type === 'X') { nextPos.x = value; isMovement = true; }
+                if (type === 'Y') { nextPos.y = value; isMovement = true; }
+                if (type === 'Z') { nextPos.z = value; isMovement = true; }
+                if (type === 'G' && (value === 0 || value === 1)) { isMovement = true; }
+            });
+            if (isMovement) {
+                // apply movement to the tool & position
+                if (tool) tool.position.set(nextPos.x, nextPos.z, nextPos.y);
+                currentPosition = nextPos;
+                if (window.CURRENT_POSITION_INDICATOR && typeof window.CURRENT_POSITION_INDICATOR.update === 'function') {
+                    window.CURRENT_POSITION_INDICATOR.update(currentPosition);
+                }
+            }
+            return isMovement;
+        }
+
         function processNextCommand() {
             if (currentCommandIndex >= gcodeCommands.length) {
                 isSimulating = false;
@@ -333,37 +369,13 @@
                 return;
             }
 
-            const command = gcodeCommands[currentCommandIndex];
-            // Aquí se haría un parseo real de los valores X, Y, Z, F (Feedrate)
-            const parts = command.match(/([GXM])(\d+(\.\d+)?)/g) || [];
-
-            let nextPos = { ...currentPosition };
-            let isMovement = false;
-
-            parts.forEach(part => {
-                const type = part.charAt(0);
-                const value = parseFloat(part.substring(1));
-
-                if (type === 'X') { nextPos.x = value; isMovement = true; }
-                if (type === 'Y') { nextPos.y = value; isMovement = true; }
-                if (type === 'Z') { nextPos.z = value; isMovement = true; }
-                // G0 (movimiento rápido) y G1 (movimiento de trabajo)
-                if (type === 'G' && (value === 0 || value === 1)) { isMovement = true; }
-                // M3, M5, etc. (control de husillo/spindle) se ignoran en esta simulación simple.
-            });
-
-            if (isMovement) {
-                // Simulación de movimiento simple (no interpolada, solo salto)
-                tool.position.set(nextPos.x, nextPos.z, nextPos.y); // Nota: En Three.js, Y es vertical. Se mapea Z del CNC a Y de Three.js.
-                currentPosition = nextPos;
-                if (window.CURRENT_POSITION_INDICATOR && typeof window.CURRENT_POSITION_INDICATOR.update === 'function') {
-                    window.CURRENT_POSITION_INDICATOR.update(currentPosition);
-                }
-            }
+            // Delegate actual command application to applyCommandAtIndex
+            applyCommandAtIndex(currentCommandIndex);
 
             // Aquí se dibujaría el camino o se modificaría la geometría del material.
 
             currentCommandIndex++;
+            updateCommandIndexLabel();
 
             // Control de velocidad de simulación (simulado con un timeout)
             // Se usa requestAnimationFrame para el renderizado, pero la lógica de comando avanza
@@ -373,6 +385,33 @@
                     // No hacemos nada aquí, solo esperamos el próximo tick de requestAnimationFrame
                 }
             }, 100);
+        }
+
+        function updateCommandIndexLabel() {
+            const el = document.getElementById('command-index-label');
+            if (!el) return;
+            el.textContent = `${Math.max(0, Math.min(currentCommandIndex, gcodeCommands.length))} / ${gcodeCommands.length}`;
+        }
+
+        function goToCommand(index) {
+            // clamp index to [0, gcodeCommands.length]
+            const target = Math.max(0, Math.min(index, gcodeCommands.length));
+            // reset
+            currentCommandIndex = 0;
+            resetToolPosition();
+            // replay up to target commands (do not change currentCommandIndex beyond target)
+            for (let i = 0; i < target; i++) {
+                applyCommandAtIndex(i);
+                currentCommandIndex = i + 1;
+            }
+            updateCommandIndexLabel();
+        }
+
+        function stepBack() {
+            if (currentCommandIndex <= 0) return;
+            const nextIndex = currentCommandIndex - 1;
+            goToCommand(nextIndex);
+            showMessage(`Stepped back to command ${nextIndex}`, 'bg-gray-700');
         }
 
         // --- Funciones de Utilidad ---
