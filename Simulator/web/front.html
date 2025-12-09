@@ -86,6 +86,13 @@
                         <span id="command-index-label" class="text-xs text-gray-500">0 / 0</span>
                         <span id="playback-speed-label" class="text-xs text-gray-500 ml-3">100ms</span>
                     </div>
+
+                    <!-- Toolpath smoothing control -->
+                    <div class="flex items-center gap-2 mt-2">
+                        <label class="text-xs text-gray-500">Toolpath smoothing</label>
+                        <input id="toolpath-smooth" type="range" min="1" max="12" step="1" value="1" oninput="document.getElementById('toolpath-smooth-label').textContent=this.value" class="w-full" />
+                        <span id="toolpath-smooth-label" class="text-xs text-gray-500 ml-3">1</span>
+                    </div>
                 </div>
             </div>
         </section>
@@ -232,7 +239,10 @@
                         const prev = scene.getObjectByName('toolpath-line');
                         if (prev) scene.remove(prev);
                         try {
-                            window.GCODE_TOOLPATH.renderToolpath(scene, points);
+                            // read smoothing setting and pass subdivisions to the renderer
+                            const subdivisionsEl = document.getElementById('toolpath-smooth');
+                            const subdivisions = subdivisionsEl ? Number(subdivisionsEl.value) : 1;
+                            window.GCODE_TOOLPATH.renderToolpath(scene, points, { subdivisions, linewidth: 2 });
                         } catch (e) {
                             console.warn('renderToolpath failed', e);
                         }
@@ -475,6 +485,28 @@
                     size: size,
                     values: values
                 };
+
+            // Visualize probe points and the generated mesh overlay in the 3D scene
+            try {
+                if (scene && window.THREE_MESH) {
+                    // remove previous overlays if present
+                    const prevProbe = scene.getObjectByName('probe-points');
+                    if (prevProbe) scene.remove(prevProbe);
+                    const prevMesh = scene.getObjectByName('mesh-overlay');
+                    if (prevMesh) scene.remove(prevMesh);
+
+                    // convert meshData into numeric probe points
+                    const probePoints = meshData.map(m => ({ x: Number(m.x), y: Number(m.y), z: Number(m.z) }));
+                    if (typeof window.THREE_MESH.renderProbePoints === 'function') {
+                        window.THREE_MESH.renderProbePoints(scene, probePoints, { name: 'probe-points', radius: 0.2, color: 0xffcc00 });
+                    }
+                    if (typeof window.THREE_MESH.renderMeshOverlay === 'function') {
+                        window.THREE_MESH.renderMeshOverlay(scene, window.LATEST_MESH, { name: 'mesh-overlay', pointSize: 0.15, color: 0x00ff00 });
+                    }
+                }
+            } catch (err) {
+                console.warn('mesh visualization failed', err);
+            }
 
             // Aquí se calcularía la matriz de compensación real (bilinear interpolation)
             showMessage(`FINALIZADO: Malla de compensación conceptual generada con ${numPoints} puntos.`, 'bg-purple-600');

@@ -47,13 +47,13 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
 **Goal:** Improve 3D visualization with actual toolpath rendering.
 
 #### Tasks:
-- [ ] **TODO** — Render G-Code toolpath as 3D line segments
-- [ ] **TODO** — Add color coding for rapid moves (G0) vs cutting moves (G1)
-- [ ] **TODO** — Implement smooth interpolation between positions
-- [ ] **TODO** — Add visual probe points and mesh overlay for auto-leveling
-- [ ] **TODO** — Show current position indicator and coordinate display
-- [ ] **TODO** — Add simulation speed control (playback rate slider)
-- [ ] **TODO** — Implement step-by-step command execution mode
+ - [x] **DONE** — Render G-Code toolpath as 3D line segments
+ - [x] **DONE** — Add color coding for rapid moves (G0) vs cutting moves (G1)
+ - [x] **DONE** — Implement smooth interpolation between positions (subdivisions)
+ - [x] **DONE** — Add visual probe points and mesh overlay for auto-leveling
+ - [x] **DONE** — Show current position indicator and coordinate display
+ - [x] **DONE** — Add simulation speed control (playback rate slider)
+ - [x] **DONE** — Implement step-by-step command execution mode
 
 ### Phase 4: Backend & Firmware Integration [PLANNED]
 **Goal:** Optional server-side features and real CNC communication.

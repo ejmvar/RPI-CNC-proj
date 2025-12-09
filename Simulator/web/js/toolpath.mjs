@@ -1,14 +1,14 @@
 // Browser wrapper for toolpath helpers
-export { parseGCodeToPoints } from '../../modules/gcode/toolpath.mjs';
+export { parseGCodeToPoints, interpolatePoints } from '../../modules/gcode/toolpath.mjs';
 
 export function renderToolpath(scene, points, options = {}) {
   if (!scene || !scene.add) throw new Error('scene must be a Three.js scene');
   if (!Array.isArray(points)) return null;
   // optionally interpolate points for smoothness
-  if (options.subdivisions && typeof window !== 'undefined') {
-    // try to call interpolatePoints from module if exposed in module runtime
-    if (typeof parseGCodeToPoints !== 'undefined' && typeof window !== 'undefined') {
-      // nothing to do here — calling code can pass interpolation result
+  // optionally interpolate points for smoothness
+  if (options.subdivisions && typeof options.subdivisions === 'number' && options.subdivisions > 1) {
+    if (typeof interpolatePoints === 'function') {
+      points = interpolatePoints(points, options.subdivisions);
     }
   }
   // build line segments from points
