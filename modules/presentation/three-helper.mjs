@@ -60,4 +60,79 @@ export function initThreeJS(containerEl, opts = {}) {
   return { scene, camera, renderer, tool, material, materialGeometry };
 }
 
+// Creates a small 3D marker attached to the provided tool and an HTML overlay
+// that displays the current position coordinates. Returns an object with
+// update(position) and remove() helpers.
+export function createPositionIndicator(containerEl, scene, tool, opts = {}) {
+  if (typeof containerEl === 'string') containerEl = document.querySelector(containerEl);
+  if (!containerEl) throw new Error('container element required');
+  if (!scene) throw new Error('scene required');
+  if (!tool) throw new Error('tool required');
+
+  const cfg = Object.assign({ color: 0x00ff00, textBg: 'rgba(0,0,0,0.6)', textColor: '#fff' }, opts);
+
+  // Create DOM overlay
+  const overlay = document.createElement('div');
+  overlay.style.position = 'absolute';
+  overlay.style.right = '8px';
+  overlay.style.top = '8px';
+  overlay.style.minWidth = '140px';
+  overlay.style.padding = '6px 8px';
+  overlay.style.borderRadius = '6px';
+  overlay.style.background = cfg.textBg;
+  overlay.style.color = cfg.textColor;
+  overlay.style.fontFamily = 'monospace';
+  overlay.style.fontSize = '12px';
+  overlay.style.zIndex = '1000';
+  overlay.innerText = 'X: 0.00 Y: 0.00 Z: 0.000';
+  // Ensure container is positioned for absolute children
+  let computed = { position: 'static' };
+  try {
+    if (typeof window !== 'undefined' && typeof window.getComputedStyle === 'function') computed = window.getComputedStyle(containerEl);
+    else if (typeof global !== 'undefined' && typeof global.getComputedStyle === 'function') computed = global.getComputedStyle(containerEl);
+  } catch (ex) { /* ignore and use default */ }
+  if (computed.position === 'static' || !computed.position) containerEl.style.position = 'relative';
+  containerEl.appendChild(overlay);
+
+  // Create a small marker and attach to tool so it follows its movements
+  let marker = null;
+  try {
+    const geom = new THREE.SphereGeometry(0.35, 8, 8);
+    const mat = new THREE.MeshBasicMaterial({ color: cfg.color });
+    marker = new THREE.Mesh(geom, mat);
+    marker.name = 'position-indicator-3d';
+    // defensive: some runtimes (tests) mock Mesh without a position.set helper
+    if (!marker.position) marker.position = { set: (x, y, z) => { marker._pos=[x,y,z]; } };
+    if (typeof marker.position.set === 'function') marker.position.set(0, 1.2, 0);
+    if (tool && typeof tool.add === 'function') tool.add(marker);
+  } catch (err) {
+    // if WebGL/three is not present or geometry fails, continue without marker
+    marker = null;
+  }
+
+  function update(position = { x: 0, y: 0, z: 0 }) {
+    const x = (position.x ?? 0).toFixed(2);
+    const y = (position.y ?? 0).toFixed(2);
+    const z = (position.z ?? 0).toFixed(3);
+    overlay.innerText = `X: ${x} Y: ${y} Z: ${z}`;
+
+    // If marker is attached, we'll keep it offset slightly above the tool
+    if (marker) {
+      // the marker is parented to the tool so moving the tool is enough; the
+      // marker remains at its relative offset. If the API wants to tweak
+      // offset based on Z we could do it here.
+      // Ensure marker visibility based on tool position
+      marker.visible = true;
+    }
+  }
+
+  function remove() {
+    try { overlay.remove(); } catch (e) { /* ignore */ }
+    if (marker && marker.parent) marker.parent.remove(marker);
+  }
+
+  // return a lightweight control object
+  return { overlay, marker, update, remove };
+}
+
 export default { initThreeJS, createSceneDefaults };

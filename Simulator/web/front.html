@@ -71,10 +71,20 @@
 
             <div class="mt-4 grid grid-cols-2 gap-3">
                 <button onclick="loadGCode()" class="w-full bg-blue-500 text-white p-3 rounded-lg font-bold hover:bg-blue-600 control-btn shadow-blue-800">Cargar G-Code</button>
-                <button onclick="simulate()" class="w-full bg-teal-500 text-white p-3 rounded-lg font-bold hover:bg-teal-600 control-btn shadow-teal-800">▶️ Simular</button>
+                <button id="play-btn" onclick="toggleSimulation()" class="w-full bg-teal-500 text-white p-3 rounded-lg font-bold hover:bg-teal-600 control-btn shadow-teal-800">▶️ Simular</button>
                 <button onclick="applyLevelingToGCode()" class="w-full bg-indigo-500 text-white p-3 rounded-lg font-bold hover:bg-indigo-600 control-btn shadow-indigo-800">Apply Leveling</button>
-                <button onclick="pauseSimulation()" class="w-full bg-amber-500 text-white p-3 rounded-lg font-bold hover:bg-amber-600 control-btn shadow-amber-800">⏸️ Pausar</button>
+                <button id="pause-btn" onclick="pauseSimulation()" class="w-full bg-amber-500 text-white p-3 rounded-lg font-bold hover:bg-amber-600 control-btn shadow-amber-800">⏸️ Pausar</button>
                 <button onclick="resetSimulation()" class="w-full bg-red-500 text-white p-3 rounded-lg font-bold hover:bg-red-600 control-btn shadow-red-800">⏹️ Resetear</button>
+                <!-- Playback/Speed Controls -->
+                <div class="col-span-2 mt-2">
+                    <label class="text-xs text-gray-500">Velocidad de simulación</label>
+                    <input id="simulation-speed" type="range" min="10" max="2000" step="10" value="100" oninput="setSimulationSpeed(this.value)" class="w-full mt-1" />
+                    <div class="flex items-center gap-2 mt-1">
+                        <button id="step-btn" onclick="stepSimulation()" class="bg-gray-200 p-2 rounded-md text-sm">Step ▶️</button>
+                        <button id="step-mode-btn" onclick="toggleStepMode()" class="bg-gray-200 p-2 rounded-md text-sm">Step Mode: Off</button>
+                        <span id="playback-speed-label" class="text-xs text-gray-500 ml-auto">100ms</span>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -135,6 +145,9 @@
         let scene, camera, renderer, tool, materialGeometry, material;
         let animationFrameId = null;
         let isSimulating = false;
+        let stepMode = false; // when true, simulation stays paused and only steps advance
+        let simulationSpeed = 100; // milliseconds per command
+        let lastCommandTime = 0;
         let gcodeCommands = [];
         let currentCommandIndex = 0;
         let currentPosition = { x: 0, y: 0, z: 0 };
@@ -178,7 +191,11 @@
 
             // Simulación del movimiento (implementación conceptual)
             if (isSimulating && gcodeCommands.length > 0) {
-                processNextCommand();
+                const now = Date.now();
+                if (now - lastCommandTime >= simulationSpeed) {
+                    processNextCommand();
+                    lastCommandTime = now;
+                }
             }
 
             // Simple rotación de la cámara para que el usuario pueda ver el modelo
@@ -238,6 +255,7 @@
                 return;
             }
             isSimulating = true;
+            updatePlayButton(true);
             showMessage("Simulación iniciada...", 'bg-teal-500');
         }
 
@@ -245,6 +263,7 @@
         function pauseSimulation() {
             isSimulating = false;
             showMessage("Simulación pausada.", 'bg-amber-500');
+            updatePlayButton(false);
         }
 
         // Resetea la simulación
@@ -254,11 +273,55 @@
             resetToolPosition();
             // Esto limpiaría el rastro de la herramienta en una implementación completa
             showMessage("Simulación reiniciada.", 'bg-blue-500');
+            updatePlayButton(false);
+        }
+
+        function updatePlayButton(playing) {
+            const el = document.getElementById('play-btn');
+            if (!el) return;
+            el.textContent = playing ? '⏸️ Pausado (Running)' : '▶️ Simular';
+        }
+
+        function toggleSimulation() {
+            if (isSimulating) {
+                pauseSimulation();
+            } else {
+                // if in step mode, enabling play should disable step mode
+                if (stepMode) toggleStepMode();
+                simulate();
+            }
+        }
+
+        function setSimulationSpeed(ms) {
+            simulationSpeed = Number(ms) || 100;
+            const label = document.getElementById('playback-speed-label');
+            if (label) label.textContent = `${simulationSpeed}ms`;
+        }
+
+        function stepSimulation() {
+            if (gcodeCommands.length === 0) {
+                showMessage("ERROR: No G-Code loaded.", 'bg-red-500');
+                return;
+            }
+            // perform a single command advance regardless of pause/play
+            processNextCommand();
+        }
+
+        function toggleStepMode() {
+            stepMode = !stepMode;
+            // when enabling step mode, ensure simulation is paused
+            if (stepMode) { isSimulating = false; updatePlayButton(false); }
+            const el = document.getElementById('step-mode-btn');
+            if (el) el.textContent = `Step Mode: ${stepMode ? 'On' : 'Off'}`;
+            showMessage(`Step mode ${stepMode ? 'enabled' : 'disabled'}.`, 'bg-gray-700');
         }
 
         function resetToolPosition() {
              currentPosition = { x: 0, y: 0, z: 0 };
              if (tool) tool.position.set(0, 0, 0);
+            if (window.CURRENT_POSITION_INDICATOR && typeof window.CURRENT_POSITION_INDICATOR.update === 'function') {
+                window.CURRENT_POSITION_INDICATOR.update(currentPosition);
+            }
         }
 
 
@@ -293,6 +356,9 @@
                 // Simulación de movimiento simple (no interpolada, solo salto)
                 tool.position.set(nextPos.x, nextPos.z, nextPos.y); // Nota: En Three.js, Y es vertical. Se mapea Z del CNC a Y de Three.js.
                 currentPosition = nextPos;
+                if (window.CURRENT_POSITION_INDICATOR && typeof window.CURRENT_POSITION_INDICATOR.update === 'function') {
+                    window.CURRENT_POSITION_INDICATOR.update(currentPosition);
+                }
             }
 
             // Aquí se dibujaría el camino o se modificaría la geometría del material.
@@ -382,7 +448,18 @@
 
         // --- Inicialización al cargar la ventana ---
         window.onload = function() {
-            initThreeJS();
+                // initThreeJS returns internals via the module helper and already sets up the tool
+                initThreeJS();
+                // Create a visual position indicator (DOM overlay + small 3D marker)
+                try {
+                    if (window.THREE_HELPER && typeof window.THREE_HELPER.createPositionIndicator === 'function') {
+                        window.CURRENT_POSITION_INDICATOR = window.THREE_HELPER.createPositionIndicator(CONTAINER, scene, tool, { color: 0x4ade80 });
+                        // show the starting position
+                        window.CURRENT_POSITION_INDICATOR.update && window.CURRENT_POSITION_INDICATOR.update(currentPosition);
+                    }
+                } catch (err) {
+                    console.warn('createPositionIndicator failed', err);
+                }
             animate();
         };
 
