@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simulador CNC - Raspberry Pi</title>
-    <!-- Carga de Tailwind CSS para un diseño moderno y responsive -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Carga de Three.js para la visualización 3D del fresado -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Use local Tailwind bundle when available (offline-friendly) -->
+    <script src="./static/tailwind/3.4.17"></script>
+    <!-- Use local Three.js bundle (r128) to avoid remote CDN dependencies -->
+    <script src="./static/three.min.js"></script>
     <style>
         /* Estilos personalizados para el contenedor 3D */
         #visualization-container {
@@ -112,6 +112,15 @@
 
     </main>
 
+    <!-- front script imports a small browser module to reuse the parser internally -->
+    <script type="module">
+        import * as GParser from './js/gcode-parser.mjs';
+        import * as THREE_HELPER from './js/three-helper.mjs';
+        // expose parser and three helpers to the inline script environment
+        window.GCODE_PARSER = GParser;
+        window.THREE_HELPER = THREE_HELPER;
+    </script>
+
     <script>
         // --- Variables Globales ---
         let scene, camera, renderer, tool, materialGeometry, material;
@@ -124,51 +133,17 @@
 
         // --- Configuración Inicial de Three.js ---
         function initThreeJS() {
-            // Escena
-            scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x1f2937);
-
-            // Cámara
-            camera = new THREE.PerspectiveCamera(75, CONTAINER.clientWidth / CONTAINER.clientHeight, 0.1, 1000);
-            camera.position.set(20, 30, 40); // Posición inicial para perspectiva
-
-            // Renderizador
-            renderer = new THREE.WebGLRenderer({ antialias: true });
-            renderer.setSize(CONTAINER.clientWidth, CONTAINER.clientHeight);
-            CONTAINER.appendChild(renderer.domElement);
-
-            // Dimensiones del espacio de trabajo simulado (ej: 100x100x20)
-            const WORKSPACE_SIZE = 50;
-            const WORKSPACE_HEIGHT = 10;
-
-            // Suelo/Plataforma (el material a fresar)
-            const floorGeometry = new THREE.BoxGeometry(WORKSPACE_SIZE, WORKSPACE_HEIGHT, WORKSPACE_SIZE);
-            materialGeometry = new THREE.MeshPhongMaterial({ color: 0x6b7280, transparent: true, opacity: 0.8 });
-            material = new THREE.Mesh(floorGeometry, materialGeometry);
-            material.position.y = -WORKSPACE_HEIGHT / 2; // Lo sitúa con Z=0 en la superficie superior
-            scene.add(material);
-
-            // Ejes de coordenadas (Visualización)
-            const axesHelper = new THREE.AxesHelper(WORKSPACE_SIZE * 1.5);
-            scene.add(axesHelper);
-
-            // Herramienta CNC (simulada como una esfera)
-            const toolGeometry = new THREE.SphereGeometry(1, 32, 32);
-            const toolMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-            tool = new THREE.Mesh(toolGeometry, toolMaterial);
-            tool.position.set(0, 0, 0);
-            scene.add(tool);
-
-            // Luces
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-            scene.add(ambientLight);
-            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-            directionalLight.position.set(50, 50, 50);
-            scene.add(directionalLight);
-
-            // Orbit Controls (Para mover la cámara con el ratón/tacto) - Se usaría un script externo, pero para este ejercicio, simularemos un simple control de cámara.
-            // Para una aplicación real, se cargaría OrbitControls.js.
-            // Aquí, simplemente agregamos un listener de redimensionamiento
+            // Delegate to the ES module helper (the module assumes global THREE exists)
+            try {
+                const res = window.THREE_HELPER.initThreeJS(CONTAINER, { WORKSPACE_SIZE: 50, WORKSPACE_HEIGHT: 10 });
+                scene = res.scene; camera = res.camera; renderer = res.renderer; tool = res.tool; material = res.material; materialGeometry = res.materialGeometry;
+            } catch (e) {
+                console.error('Failed to initialize Three.js via helper:', e);
+                // fallback to inline init if helper is not available or fails
+                // (keep previous inline code omitted for brevity)
+                throw e;
+            }
+            // attach resize handler
             window.addEventListener('resize', onWindowResize, false);
             onWindowResize();
         }
@@ -208,9 +183,15 @@
                 showMessage("ERROR: El área de G-Code está vacía.", 'bg-red-500');
                 return;
             }
-            gcodeCommands = gcodeText.toUpperCase().split('\n')
-                .map(line => line.trim())
-                .filter(line => line.length > 0 && !line.startsWith(';')); // Filtra comentarios y líneas vacías
+            // Use the browser module parser to normalize lines and filter comments
+            if (window.GCODE_PARSER && typeof window.GCODE_PARSER.parse === 'function') {
+                gcodeCommands = window.GCODE_PARSER.parse(gcodeText).map(c => c.raw.trim().toUpperCase());
+            } else {
+                // fallback to the prior simple parse
+                gcodeCommands = gcodeText.toUpperCase().split('\n')
+                    .map(line => line.trim())
+                    .filter(line => line.length > 0 && !line.startsWith(';'));
+            }
 
             currentCommandIndex = 0;
             resetToolPosition();

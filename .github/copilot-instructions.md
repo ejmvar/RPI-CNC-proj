@@ -18,6 +18,7 @@ Key files and locations
   - G‑code parsing and simulation loop live in `processNextCommand()` and `loadGCode()`.
   - Coordinate mapping: the code maps CNC Z → Three.js Y via `tool.position.set(nextPos.x, nextPos.z, nextPos.y)`.
 - `Simulator/static/`: contains local assets (three.min.js, tailwind folders). Note: `front.html` currently uses CDN versions — replace the CDN URLs with local paths to use offline assets.
+- `Simulator/web/static/`: contains local assets (three.min.js, tailwind/3.4.17). `front.html` now references these local files so the simulator works offline.
 - Root note file: `20251116 _Proyecto CNC Raspberry Pi Integral .md` contains project notes and context; review before major design changes.
 - Project plan: `.github/PLAN CNC architecture.md` contains phases, tasks, and status tracking (DONE/WIP/TODO/BLOCKED/FAILED). Check this before proposing new features to avoid duplicating work or starting tasks out of sequence.
 
@@ -25,6 +26,7 @@ Developer workflows (what works now)
 
 - Quick preview (static site):
   - From repo root: `cd Simulator/web && python3 -m http.server 8000` and open `http://localhost:8000/front.html`.
+  - From repo root: `./scripts/serve.sh` (starts a python simple HTTP server) and open `http://localhost:8000/front.html`.
   - Or use any static server (e.g. `npx serve .`).
 - There are no test, build, or CI scripts in the repository — do not look for `package.json`, `Makefile`, or test runners.
 

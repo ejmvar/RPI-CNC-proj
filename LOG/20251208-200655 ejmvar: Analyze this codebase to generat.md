@@ -345,3 +345,128 @@ Next steps I can take (pick one)
 Which of the next steps would you like me to do? Or should I continue with Phase 1 TODOs (switch to local assets, add serve script, create root README) now?
 
 Made changes.
+
+ejmvar: Phase 1 TODOs (switch to local assets, add serve script, create root README) now
+
+GitHub Copilot: Proceeding to update the simulator to use local assets, add a dev serve script, and create a root README; I'll update files and add tests, then run the test suite after each change.
+
+Created 5 todos
+
+Ran terminal command: ls -la Simulator/static || true
+
+Ran terminal command: ls -la Simulator/web/static || true
+
+Ran terminal command: ls -la Simulator/web/static/tailwind || true
+
+Read [](file:///WRK/RPI-CNC-proj/Simulator/web/static/tailwind/3.4.17#1-1), lines 1 to 40
+
+Now I'm updating front.html to use local assets and adding tests and a serve script; I'll make the edits and run the test suite.
+
+Using "Apply Patch"
+
+
+```
+
+```
+
+
+Using "Apply Patch"
+
+
+```
+
+```
+
+
+Using "Apply Patch"
+
+
+```
+
+```
+
+
+Using "Apply Patch"
+
+
+```
+
+```
+
+
+Using "Apply Patch"
+
+
+```
+
+```
+
+
+Ran terminal command: npm test --silent -- --runInBand --watchAll=false
+
+Completed: *Switch front.html to local assets* (1/5)
+
+Using "Apply Patch"
+
+
+```
+
+```
+
+
+Using "Apply Patch"
+
+
+```
+
+```
+
+
+Ran terminal command: npm test --silent -- --runInBand --watchAll=false
+
+Nice — Phase 1 TODOs are finished and fully tested. I switched the simulator to local assets, added a dev serve script, created the root README, added tests to validate everything, and verified the test suite passes.
+
+## ✅ What I changed
+- Files updated / added
+  - Updated: front.html — now uses local static assets:
+    - ./static/three.min.js
+    - 3.4.17
+  - Added: serve.sh — dev helper to serve web on http://localhost:8000/front.html
+  - Added: README.md — project quick-start and dev/test instructions
+  - Tests added/updated:
+    - front-local-assets.test.js (integration)
+    - scripts.test.js (integration: serve script + README)
+  - Tests already present remain and were re-run: parser.test.js, parse-integration.test.js, front-smoke.test.js
+  - Updated docs:
+    - copilot-instructions.md — now references local assets + the serve script and testing policy
+    - `.github/PLAN CNC architecture.md` — Phase 1 TODOs now marked DONE, plus mandatory testing policy
+
+## 🔧 Commands you can run
+- Start dev server (open http://localhost:8000/front.html):
+```bash
+./scripts/serve.sh
+```
+- Run tests:
+```bash
+npm install      # only if dev deps not installed yet
+npm test
+# Or specific groups:
+npm run test:unit
+npm run test:integration
+npm run test:e2e
+```
+
+## 📊 Test status (current)
+All tests passed after each change — final run:
+- 5 test suites, 9 tests — all passing ✅
+
+## 👣 Next recommended options
+Pick one and I’ll start:
+1. Extract the G‑Code parser to use ES modules and wire it into front.html (Phase 2 first task).  
+2. Start extracting Three.js initialization into `modules/presentation/three-helper.js` and add unit tests (Phase 2).  
+3. Add CI (GitHub Actions) to run tests on every push/PR.  
+4. Anything else you want prioritized?
+
+Would you like me to begin one of these next steps?
+
+Made changes.

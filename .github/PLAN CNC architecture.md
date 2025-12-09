@@ -27,9 +27,9 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
 - [x] **DONE** — Create `.github/copilot-instructions.md` for AI agent guidance
 - [x] **DONE** — Scaffold `modules/` folder structure with READMEs
 - [x] **DONE** — Create `modules/modules-config.yml` toggle configuration
-- [ ] **TODO** — Switch from CDN to local assets (Three.js, Tailwind)
-- [ ] **TODO** — Add `scripts/serve.sh` for quick dev server startup
-- [ ] **TODO** — Create root `README.md` with project overview and quick-start
+ - [x] **DONE** — Switch from CDN to local assets (Three.js, Tailwind)
+ - [x] **DONE** — Add `scripts/serve.sh` for quick dev server startup
+ - [x] **DONE** — Create root `README.md` with project overview and quick-start
 
 ### Phase 2: Module Extraction & Code Organization [PLANNED]
 **Goal:** Refactor single-file simulator into modular components.
