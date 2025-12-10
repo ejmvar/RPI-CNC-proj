@@ -90,6 +90,8 @@ describe('browser collab e2e (headless browser)', () => {
     // sessions should show updated state and owner/present client list
     await page1.waitForFunction(() => document.getElementById('sessions').textContent.includes('a":2') || document.getElementById('sessions').textContent.includes('a:2'), { timeout: 2000 });
     await page1.waitForFunction(() => document.getElementById('sessions').textContent.includes('owner: p1') && document.getElementById('sessions').textContent.includes('clients: 2'), { timeout: 2000 });
+    // verify badges for client ids appear
+    await page1.waitForFunction(() => document.getElementById('sessions').textContent.includes('p1') && document.getElementById('sessions').textContent.includes('p2'), { timeout: 2000 });
 
     // reload the page and verify the session list persists in localStorage
     // reload one page and verify session list persists in localStorage

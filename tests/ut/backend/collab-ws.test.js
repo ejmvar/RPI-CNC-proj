@@ -50,19 +50,47 @@ describe('Collab WebSocket server (optional)', () => {
     expect(typeof wss._simulateConnection === 'function').toBe(true);
     wss._simulateConnection(clientSocket);
 
-    // simulate create action
-    clientSocket._trigger('message', JSON.stringify({ action: 'create', sessionId: 's1', initialState: { a: 1 } }));
+    // simulate create action (client declares clientId)
+    clientSocket._trigger('message', JSON.stringify({ action: 'create', sessionId: 's1', initialState: { a: 1 }, clientId: 'c1' }));
     await new Promise(r => setTimeout(r, 5));
 
     // session should be created on the collab server
     const s = collab.getSession('s1');
     expect(s).toBeTruthy();
-    expect(s.state).toEqual({ a: 1 });
+    expect(s.state).toEqual({ a: 1, owner: 'c1' });
 
-    // client should have received a created ack
+    // client should have received a created ack and a sessionCreated broadcast
     expect(clientSocket.sent.some(m => String(m).includes('created'))).toBe(true);
+    expect(clientSocket.sent.some(m => String(m).includes('sessionCreated'))).toBe(true);
+    // session state must reflect owner when clientId was provided
+    const createdMsg = clientSocket.sent.map(String).find(s => s.includes('sessionCreated'));
+    expect(createdMsg).toBeTruthy();
+    expect(createdMsg.includes('owner') || createdMsg.includes('c1')).toBe(true);
 
-    // simulate update from client
+    // simulate a second client connecting and joining
+    const clientSocket2 = new (function () {
+      this._handlers = {};
+      this.sent = [];
+      this.on = (ev, cb) => { this._handlers[ev] = cb; };
+      this.send = (m) => { this.sent.push(m); };
+      this._trigger = (ev, ...args) => { if (this._handlers[ev]) this._handlers[ev](...args); };
+    })();
+    // ensure wss can simulate connection for new client
+    wss._simulateConnection(clientSocket2);
+
+    // client2 joins as c2
+    clientSocket2._trigger('message', JSON.stringify({ action: 'join', sessionId: 's1', clientId: 'c2' }));
+    await new Promise(r => setTimeout(r, 5));
+
+    // both clients should have a clientJoined message broadcast
+    expect(clientSocket.sent.some(m => String(m).includes('clientJoined'))).toBe(true);
+    expect(clientSocket2.sent.some(m => String(m).includes('clientJoined'))).toBe(true);
+    // the broadcast should include the clients list
+    expect(clientSocket.sent.some(m => String(m).includes('clients'))).toBe(true);
+    // the collab server session metadata should include the joined client
+    expect(collab.getSession('s1').clients).toContain('c2');
+
+    // simulate update from client (original)
     clientSocket._trigger('message', JSON.stringify({ action: 'update', sessionId: 's1', patch: { b: 2 } }));
     await new Promise(r => setTimeout(r, 5));
 

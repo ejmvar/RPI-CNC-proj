@@ -60,6 +60,22 @@
           const owner = s.state && s.state.owner ? s.state.owner : (s.owner || null);
           const clients = s.clients || (s.state && s.state.clients) || [];
           li.innerHTML = `<strong>${id}</strong> ${owner ? ' (owner: ' + owner + ')' : ''} — state: <code>${JSON.stringify(s.state)}</code> <small>clients: ${clients.length || 0}</small> `;
+          // display connected client badges
+          const badges = document.createElement('span');
+          badges.style.marginLeft = '8px';
+          (clients || []).forEach(cid => {
+            const b = document.createElement('span');
+            b.textContent = cid || 'anon';
+            b.style.display = 'inline-block';
+            b.style.padding = '2px 6px';
+            b.style.marginRight = '6px';
+            b.style.borderRadius = '999px';
+            b.style.background = (cid === owner) ? '#2277dd' : '#ddd';
+            b.style.color = (cid === owner) ? '#fff' : '#000';
+            b.style.fontSize = '12px';
+            badges.appendChild(b);
+          });
+          li.appendChild(badges);
           
           // add edit state UI
           const editBtn = document.createElement('button');

@@ -40,6 +40,9 @@ test-browser:
 demo:
 	node scripts/collab-demo.js
 
+demo-headless:
+	node scripts/collab-headless-demo.js
+
 serve:
 	./scripts/serve.sh
 
