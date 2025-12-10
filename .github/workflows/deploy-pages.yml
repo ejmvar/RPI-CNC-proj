@@ -27,7 +27,7 @@ jobs:
         run: |
           mkdir -p _site
           cp -r Simulator/web/* _site/
-          
+
           # Create index.html redirecting to front.html
           cat > _site/index.html << 'EOF'
           <!DOCTYPE html>
@@ -42,7 +42,7 @@ jobs:
           </body>
           </html>
           EOF
-          
+
           # Create a simple navigation page
           cat > _site/nav.html << 'EOF'
           <!DOCTYPE html>

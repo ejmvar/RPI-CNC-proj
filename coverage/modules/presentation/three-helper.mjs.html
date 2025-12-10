@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Code coverage report for modules/presentation/three-helper.mjs</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type="text/css">
+      .coverage-summary .sorter {
+        background-image: url(../../sort-arrow-sprite.png);
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="wrapper">
+      <div class="pad1">
+        <h1>
+          <a href="../../index.html">All files</a> /
+          <a href="index.html">modules/presentation</a> three-helper.mjs
+        </h1>
+        <div class="clearfix">
+          <div class="fl pad1y space-right2">
+            <span class="strong">0% </span>
+            <span class="quiet">Statements</span>
+            <span class="fraction">0/92</span>
+          </div>
+
+          <div class="fl pad1y space-right2">
+            <span class="strong">0% </span>
+            <span class="quiet">Branches</span>
+            <span class="fraction">0/53</span>
+          </div>
+
+          <div class="fl pad1y space-right2">
+            <span class="strong">0% </span>
+            <span class="quiet">Functions</span>
+            <span class="fraction">0/6</span>
+          </div>
+
+          <div class="fl pad1y space-right2">
+            <span class="strong">0% </span>
+            <span class="quiet">Lines</span>
+            <span class="fraction">0/76</span>
+          </div>
+        </div>
+        <p class="quiet">
+          Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>,
+          <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+          <div class="quiet">
+            Filter:
+            <input type="search" id="fileSearch" />
+          </div>
+        </template>
+      </div>
+      <div class="status-line low"></div>
+      <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// ES module: presentation helper for Three.js initialization
+// This module exports helper factory functions but does not assume a DOM until functions are called.
+&nbsp;
+export function <span class="fstat-no" title="function not covered" >createSceneDefaults(</span>) {
+<span class="cstat-no" title="statement not covered" >  return {</span>
+    background: 0x1f2937,
+    cameraFov: 75,
+    near: 0.1,
+    far: 1000
+  };
+}
+&nbsp;
+// initThreeJS(containerElement)
+// - requires a global THREE available in the browser
+// - returns { scene, camera, renderer, tool, material, materialGeometry }
+export function <span class="fstat-no" title="function not covered" >initThreeJS(</span>containerEl, opts = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> {
+<span class="cstat-no" title="statement not covered" >  if (typeof containerEl === 'string') <span class="cstat-no" title="statement not covered" >containerEl = document.querySelector(containerEl);</span></span>
+<span class="cstat-no" title="statement not covered" >  if (!containerEl) <span class="cstat-no" title="statement not covered" >throw new Error('initThreeJS requires a container element');</span></span>
+<span class="cstat-no" title="statement not covered" >  if (typeof THREE === 'undefined') <span class="cstat-no" title="statement not covered" >throw new Error('THREE is not available (include three.js in the page)');</span></span>
+&nbsp;
+  const defaults = <span class="cstat-no" title="statement not covered" >createSceneDefaults();</span>
+  const cfg = <span class="cstat-no" title="statement not covered" >Object.assign({}, defaults, opts);</span>
+&nbsp;
+  const scene = <span class="cstat-no" title="statement not covered" >new THREE.Scene();</span>
+<span class="cstat-no" title="statement not covered" >  scene.background = new THREE.Color(cfg.background);</span>
+&nbsp;
+  const camera = <span class="cstat-no" title="statement not covered" >new THREE.PerspectiveCamera(cfg.cameraFov, containerEl.clientWidth / containerEl.clientHeight, cfg.near, cfg.far);</span>
+<span class="cstat-no" title="statement not covered" >  camera.position.set(20, 30, 40);</span>
+&nbsp;
+  const renderer = <span class="cstat-no" title="statement not covered" >new THREE.WebGLRenderer({ antialias: true });</span>
+<span class="cstat-no" title="statement not covered" >  renderer.setSize(containerEl.clientWidth, containerEl.clientHeight);</span>
+<span class="cstat-no" title="statement not covered" >  containerEl.appendChild(renderer.domElement);</span>
+&nbsp;
+  // Workspace dims
+  const WORKSPACE_SIZE = <span class="cstat-no" title="statement not covered" >opts.WORKSPACE_SIZE ?? 50;</span>
+  const WORKSPACE_HEIGHT = <span class="cstat-no" title="statement not covered" >opts.WORKSPACE_HEIGHT ?? 10;</span>
+&nbsp;
+  const floorGeometry = <span class="cstat-no" title="statement not covered" >new THREE.BoxGeometry(WORKSPACE_SIZE, WORKSPACE_HEIGHT, WORKSPACE_SIZE);</span>
+  const materialGeometry = <span class="cstat-no" title="statement not covered" >new THREE.MeshPhongMaterial({ color: 0x6b7280, transparent: true, opacity: 0.8 });</span>
+  const material = <span class="cstat-no" title="statement not covered" >new THREE.Mesh(floorGeometry, materialGeometry);</span>
+<span class="cstat-no" title="statement not covered" >  material.position.y = -WORKSPACE_HEIGHT / 2;</span>
+<span class="cstat-no" title="statement not covered" >  scene.add(material);</span>
+&nbsp;
+  const axesHelper = <span class="cstat-no" title="statement not covered" >new THREE.AxesHelper(WORKSPACE_SIZE * 1.5);</span>
+<span class="cstat-no" title="statement not covered" >  scene.add(axesHelper);</span>
+&nbsp;
+  const toolGeometry = <span class="cstat-no" title="statement not covered" >new THREE.SphereGeometry(1, 32, 32);</span>
+  const toolMaterial = <span class="cstat-no" title="statement not covered" >new THREE.MeshBasicMaterial({ color: 0xff0000 });</span>
+  const tool = <span class="cstat-no" title="statement not covered" >new THREE.Mesh(toolGeometry, toolMaterial);</span>
+<span class="cstat-no" title="statement not covered" >  tool.position.set(0, 0, 0);</span>
+<span class="cstat-no" title="statement not covered" >  scene.add(tool);</span>
+&nbsp;
+  const ambientLight = <span class="cstat-no" title="statement not covered" >new THREE.AmbientLight(0xffffff, 0.6);</span>
+<span class="cstat-no" title="statement not covered" >  scene.add(ambientLight);</span>
+  const directionalLight = <span class="cstat-no" title="statement not covered" >new THREE.DirectionalLight(0xffffff, 0.8);</span>
+<span class="cstat-no" title="statement not covered" >  directionalLight.position.set(50, 50, 50);</span>
+<span class="cstat-no" title="statement not covered" >  scene.add(directionalLight);</span>
+&nbsp;
+  // return internals for caller to wire animation, control or resize
+<span class="cstat-no" title="statement not covered" >  return { scene, camera, renderer, tool, material, materialGeometry };</span>
+}
+&nbsp;
+// Creates a small 3D marker attached to the provided tool and an HTML overlay
+// that displays the current position coordinates. Returns an object with
+// update(position) and remove() helpers.
+export function <span class="fstat-no" title="function not covered" >createPositionIndicator(</span>containerEl, scene, tool, opts = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> {
+<span class="cstat-no" title="statement not covered" >  if (typeof containerEl === 'string') <span class="cstat-no" title="statement not covered" >containerEl = document.querySelector(containerEl);</span></span>
+<span class="cstat-no" title="statement not covered" >  if (!containerEl) <span class="cstat-no" title="statement not covered" >throw new Error('container element required');</span></span>
+<span class="cstat-no" title="statement not covered" >  if (!scene) <span class="cstat-no" title="statement not covered" >throw new Error('scene required');</span></span>
+<span class="cstat-no" title="statement not covered" >  if (!tool) <span class="cstat-no" title="statement not covered" >throw new Error('tool required');</span></span>
+&nbsp;
+  const cfg = <span class="cstat-no" title="statement not covered" >Object.assign({ color: 0x00ff00, textBg: 'rgba(0,0,0,0.6)', textColor: '#fff' }, opts);</span>
+&nbsp;
+  // Create DOM overlay
+  const overlay = <span class="cstat-no" title="statement not covered" >document.createElement('div');</span>
+<span class="cstat-no" title="statement not covered" >  overlay.style.position = 'absolute';</span>
+<span class="cstat-no" title="statement not covered" >  overlay.style.right = '8px';</span>
+<span class="cstat-no" title="statement not covered" >  overlay.style.top = '8px';</span>
+<span class="cstat-no" title="statement not covered" >  overlay.style.minWidth = '140px';</span>
+<span class="cstat-no" title="statement not covered" >  overlay.style.padding = '6px 8px';</span>
+<span class="cstat-no" title="statement not covered" >  overlay.style.borderRadius = '6px';</span>
+<span class="cstat-no" title="statement not covered" >  overlay.style.background = cfg.textBg;</span>
+<span class="cstat-no" title="statement not covered" >  overlay.style.color = cfg.textColor;</span>
+<span class="cstat-no" title="statement not covered" >  overlay.style.fontFamily = 'monospace';</span>
+<span class="cstat-no" title="statement not covered" >  overlay.style.fontSize = '12px';</span>
+<span class="cstat-no" title="statement not covered" >  overlay.style.zIndex = '1000';</span>
+<span class="cstat-no" title="statement not covered" >  overlay.innerText = 'X: 0.00 Y: 0.00 Z: 0.000';</span>
+  // Ensure container is positioned for absolute children
+  let computed = <span class="cstat-no" title="statement not covered" >{ position: 'static' };</span>
+<span class="cstat-no" title="statement not covered" >  try {</span>
+<span class="cstat-no" title="statement not covered" >    if (typeof window !== 'undefined' &amp;&amp; typeof window.getComputedStyle === 'function') <span class="cstat-no" title="statement not covered" >computed = window.getComputedStyle(containerEl);</span></span>
+    else <span class="cstat-no" title="statement not covered" >if (typeof global !== 'undefined' &amp;&amp; typeof global.getComputedStyle === 'function') <span class="cstat-no" title="statement not covered" >computed = global.getComputedStyle(containerEl);</span></span>
+  } catch (ex) { /* ignore and use default */ }
+<span class="cstat-no" title="statement not covered" >  if (computed.position === 'static' || !computed.position) <span class="cstat-no" title="statement not covered" >containerEl.style.position = 'relative';</span></span>
+<span class="cstat-no" title="statement not covered" >  containerEl.appendChild(overlay);</span>
+&nbsp;
+  // Create a small marker and attach to tool so it follows its movements
+  let marker = <span class="cstat-no" title="statement not covered" >null;</span>
+<span class="cstat-no" title="statement not covered" >  try {</span>
+    const geom = <span class="cstat-no" title="statement not covered" >new THREE.SphereGeometry(0.35, 8, 8);</span>
+    const mat = <span class="cstat-no" title="statement not covered" >new THREE.MeshBasicMaterial({ color: cfg.color });</span>
+<span class="cstat-no" title="statement not covered" >    marker = new THREE.Mesh(geom, mat);</span>
+<span class="cstat-no" title="statement not covered" >    marker.name = 'position-indicator-3d';</span>
+    // defensive: some runtimes (tests) mock Mesh without a position.set helper
+<span class="cstat-no" title="statement not covered" >    if (!marker.position) <span class="cstat-no" title="statement not covered" >marker.position = { set: <span class="fstat-no" title="function not covered" >(x</span>, y, z) =&gt; { <span class="cstat-no" title="statement not covered" >marker._pos=[x,y,z]; </span>} };</span></span>
+<span class="cstat-no" title="statement not covered" >    if (typeof marker.position.set === 'function') <span class="cstat-no" title="statement not covered" >marker.position.set(0, 1.2, 0);</span></span>
+<span class="cstat-no" title="statement not covered" >    if (tool &amp;&amp; typeof tool.add === 'function') <span class="cstat-no" title="statement not covered" >tool.add(marker);</span></span>
+  } catch (err) {
+    // if WebGL/three is not present or geometry fails, continue without marker
+<span class="cstat-no" title="statement not covered" >    marker = null;</span>
+  }
+&nbsp;
+  function <span class="fstat-no" title="function not covered" >update(</span>position = <span class="branch-0 cbranch-no" title="branch not covered" >{ x: 0, y: 0, z: 0 })</span> {
+    const x = <span class="cstat-no" title="statement not covered" >(position.x ?? 0).toFixed(2);</span>
+    const y = <span class="cstat-no" title="statement not covered" >(position.y ?? 0).toFixed(2);</span>
+    const z = <span class="cstat-no" title="statement not covered" >(position.z ?? 0).toFixed(3);</span>
+<span class="cstat-no" title="statement not covered" >    overlay.innerText = `X: ${x} Y: ${y} Z: ${z}`;</span>
+&nbsp;
+    // If marker is attached, we'll keep it offset slightly above the tool
+<span class="cstat-no" title="statement not covered" >    if (marker) {</span>
+      // the marker is parented to the tool so moving the tool is enough; the
+      // marker remains at its relative offset. If the API wants to tweak
+      // offset based on Z we could do it here.
+      // Ensure marker visibility based on tool position
+<span class="cstat-no" title="statement not covered" >      marker.visible = true;</span>
+    }
+  }
+&nbsp;
+  function <span class="fstat-no" title="function not covered" >remove(</span>) {
+<span class="cstat-no" title="statement not covered" >    try { <span class="cstat-no" title="statement not covered" >overlay.remove(); </span>} catch (e) { /* ignore */ }</span>
+<span class="cstat-no" title="statement not covered" >    if (marker &amp;&amp; marker.parent) <span class="cstat-no" title="statement not covered" >marker.parent.remove(marker);</span></span>
+  }
+&nbsp;
+  // return a lightweight control object
+<span class="cstat-no" title="statement not covered" >  return { overlay, marker, update, remove };</span>
+}
+&nbsp;
+export default { initThreeJS, createSceneDefaults };
+&nbsp;</pre></td></tr></table></pre>
+
+      <div class="push"></div>
+      <!-- for sticky footer -->
+    </div>
+    <!-- /wrapper -->
+    <div class="footer quiet pad2 space-top1 center small">
+      Code coverage generated by
+      <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+      at 2025-12-10T02:42:42.507Z
+    </div>
+    <script src="../../prettify.js"></script>
+    <script>
+      window.onload = function () {
+        prettyPrint();
+      };
+    </script>
+    <script src="../../sorter.js"></script>
+    <script src="../../block-navigation.js"></script>
+  </body>
+</html>

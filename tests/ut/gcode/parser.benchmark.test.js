@@ -1,4 +1,4 @@
-const parser = require('../../modules/gcode/parser.js');
+const parser = require('../../../modules/gcode/parser.js');
 const { performance } = require('perf_hooks');
 
 describe('G-Code parser performance benchmarks', () => {
