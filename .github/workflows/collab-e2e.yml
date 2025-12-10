@@ -196,14 +196,34 @@ jobs:
           name: visual-snapshots
           path: tests/__image_snapshots__
 
+      - name: Build visual-diff comment body
+        id: build_comment
+        if: ${{ steps.visual.outcome == 'failure' && github.event_name == 'pull_request' }}
+        run: |
+          echo "Gathering snapshot files..."
+          mkdir -p tmp_snapshot_comment
+          out=tmp_snapshot_comment/body.md
+          echo "# Visual snapshot diffs for run $GITHUB_RUN_ID" > $out
+          echo "Artifacts: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" >> $out
+          echo "\n" >> $out
+          find tests/__image_snapshots__ -type f -name '*.png' | while read -r f; do
+            echo "### $(basename "$f")" >> $out
+            # embed small inline thumbnail (base64) - caution: this can make the comment large
+            base64 -w0 "$f" > tmp_snapshot_comment/tmpbase64
+            echo "![$(basename $f)](data:image/png;base64,$(cat tmp_snapshot_comment/tmpbase64))" >> $out
+            echo "\n" >> $out
+          done
+          echo "Done."
+          echo "body<<EOF" >> $GITHUB_OUTPUT
+          cat $out >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
       - name: Comment on PR with visual diff notice
         if: ${{ steps.visual.outcome == 'failure' && github.event_name == 'pull_request' }}
         uses: peter-evans/create-or-update-comment@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          body: |
-            ⚠️ Visual snapshot tests changed. Please review the added artifacts attached to this job for visual diffs and update snapshot images if those changes are expected.
-            Artifacts: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          body: ${{ steps.build_comment.outputs.body }}
 
       - name: Fail job if visual diffs exist
         if: ${{ steps.visual.outcome == 'failure' }}
