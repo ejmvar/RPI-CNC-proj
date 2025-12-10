@@ -64,7 +64,7 @@
           const badges = document.createElement('span');
           badges.style.marginLeft = '8px';
           (clients || []).forEach(cid => {
-            const b = document.createElement('span');
+              const b = document.createElement('span');
             b.textContent = cid || 'anon';
             b.style.display = 'inline-block';
             b.style.padding = '2px 6px';
@@ -72,6 +72,11 @@
             b.style.borderRadius = '999px';
             b.style.background = (cid === owner) ? '#2277dd' : '#ddd';
             b.style.color = (cid === owner) ? '#fff' : '#000';
+            if (cid === owner) {
+              // stronger visual emphasis for owner
+              b.style.boxShadow = '0 0 8px rgba(34,119,221,0.6)';
+              b.style.border = '1px solid rgba(34,119,221,0.9)';
+            }
             b.style.fontSize = '12px';
             badges.appendChild(b);
           });
@@ -106,6 +111,21 @@
             li.appendChild(txt); li.appendChild(save); li.appendChild(cancel);
           });
           li.appendChild(editBtn);
+          // mark a visual strip for owner sessions
+          if (owner) {
+            li.style.position = 'relative';
+            const ownerLabel = document.createElement('span');
+            ownerLabel.textContent = owner === document.getElementById('client-id').value ? 'You (owner)' : 'Owner: ' + owner;
+            ownerLabel.style.position = 'absolute';
+            ownerLabel.style.top = '6px';
+            ownerLabel.style.right = '8px';
+            ownerLabel.style.fontSize = '12px';
+            ownerLabel.style.background = '#ffde59';
+            ownerLabel.style.padding = '2px 6px';
+            ownerLabel.style.borderRadius = '999px';
+            ownerLabel.style.boxShadow = '0 1px 2px rgba(0,0,0,0.1)';
+            li.appendChild(ownerLabel);
+          }
           const joinBtn = document.createElement('button');
           joinBtn.textContent = 'Join';
           joinBtn.addEventListener('click', () => {

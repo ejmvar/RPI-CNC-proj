@@ -24,6 +24,12 @@ const server = http.createServer((req, res) => {
     res.end(html);
     return;
   }
+  if (u === '/dashboard' || u === '/dashboard.html') {
+    const html = fs.readFileSync(path.join(__dirname, '..', 'Simulator', 'web', 'dashboard.html'), 'utf8');
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    res.end(html);
+    return;
+  }
 
   if (u.startsWith('/js/') || u.startsWith('/static/')) {
     // map to Simulator/web

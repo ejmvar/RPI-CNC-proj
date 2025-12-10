@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>RPI-CNC Collab Dashboard</title>
+    <style>
+      body { font-family: system-ui, sans-serif; padding: 1rem; display:flex; gap:20px }
+      #sessions { width: 34%; border-right:1px solid #ddd; padding-right: 16px }
+      #activity { flex:1 }
+      .session { padding:8px; border:1px solid #eee; margin-bottom:8px; border-radius:6px }
+      .owner { background:#eaf4ff; border-color:#cfe9ff }
+      #log { height:480px; overflow:auto; background:#111; color:#0f0; padding:8px; white-space:pre-wrap }
+      .controls { margin-bottom: 12px }
+    </style>
+  </head>
+  <body>
+    <div id="sessions">
+      <div class="controls">
+        <label>WS URL: <input id="url" value="ws://127.0.0.1:8001/c" size="28"/></label>
+        <button id="connect">Connect</button>
+      </div>
+      <h3>Sessions</h3>
+      <div id="list">(none)</div>
+    </div>
+
+    <div id="activity">
+      <h3>Activity & logs</h3>
+      <div id="log">(log)</div>
+      <div style="margin-top:8px">
+        <button id="clearLog">Clear</button>
+      </div>
+    </div>
+
+    <script type="module">
+      import { createCollabClient } from './js/collab-client.mjs';
+      const log = (t) => { const L = document.getElementById('log'); L.textContent = new Date().toISOString() + ' ' + t + '\n' + L.textContent; };
+
+      let client = null;
+      const sessions = {};
+
+      function renderSessions() {
+        const el = document.getElementById('list');
+        el.innerHTML = '';
+        const keys = Object.keys(sessions);
+        if (!keys.length) el.textContent = '(none)';
+        keys.forEach(k => {
+          const s = sessions[k];
+          const d = document.createElement('div');
+          d.className = 'session' + (s.state && s.state.owner ? ' owner' : '');
+          d.innerHTML = `<strong>${k}</strong> <small>clients: ${s.clients ? s.clients.length : 0}</small><div><code>${JSON.stringify(s.state)}</code></div>`;
+          el.appendChild(d);
+        });
+      }
+
+      document.getElementById('connect').addEventListener('click', () => {
+        client = createCollabClient(document.getElementById('url').value);
+        client.on('message', m => log('message ' + JSON.stringify(m)));
+        client.on('sessionCreated', (m) => { sessions[m.sessionId] = m; renderSessions(); log('session created ' + m.sessionId); });
+        client.on('sessionUpdated', (m) => { sessions[m.sessionId] = m; renderSessions(); log('session updated ' + m.sessionId + ' -> ' + JSON.stringify(m.state)); });
+        client.on('clientJoined', (m) => { const s = sessions[m.sessionId] || {}; s.clients = m.clients || s.clients || []; sessions[m.sessionId] = s; renderSessions(); log('client joined ' + m.clientId + ' -> ' + m.sessionId); });
+        client.connect();
+      });
+
+      document.getElementById('clearLog').addEventListener('click', () => { document.getElementById('log').textContent = ''; });
+    </script>
+  </body>
+</html>
