@@ -1,31 +1,50 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8" />
     <title>RPI-CNC Collab Demo</title>
     <style>
-      body { font-family: system-ui, sans-serif; padding: 1rem; }
-      #log { white-space: pre-wrap; background:#111; color:#0f0; padding:8px; height:200px; overflow:auto }
-      button { margin-right: 8px }
+      body {
+        font-family: system-ui, sans-serif;
+        padding: 1rem;
+      }
+      #log {
+        white-space: pre-wrap;
+        background: #111;
+        color: #0f0;
+        padding: 8px;
+        height: 200px;
+        overflow: auto;
+      }
+      button {
+        margin-right: 8px;
+      }
     </style>
   </head>
   <body>
     <h1>RPI-CNC Collab Demo</h1>
     <div>
-      <label>WebSocket URL: <input id="url" value="ws://127.0.0.1:8001/c" size="30"/></label>
-      <label style="margin-left: 12px">Client ID: <input id="client-id" value="" size="12"/></label>
-      <button id="clear-store" style="margin-left:12px">Clear persisted sessions</button>
+      <label>WebSocket URL: <input id="url" value="ws://127.0.0.1:8001/c" size="30" /></label>
+      <label style="margin-left: 12px"
+        >Client ID: <input id="client-id" value="" size="12"
+      /></label>
+      <button id="clear-store" style="margin-left: 12px">Clear persisted sessions</button>
     </div>
-    <div style="margin-top:8px">
+    <div style="margin-top: 8px">
       <button id="connect">Connect</button>
       <button id="create">Create session s1</button>
       <button id="join">Join s1</button>
       <button id="update">Update (a:2)</button>
+      <button id="export-sessions">💾 Export Sessions</button>
+      <button id="import-sessions">📂 Import Sessions</button>
+      <input type="file" id="import-file" accept=".json" style="display: none" />
     </div>
 
     <h2>Active Sessions</h2>
     <div>
-      <ul id="sessions" style="padding-left:0; list-style:none;">(none)</ul>
+      <ul id="sessions" style="padding-left: 0; list-style: none">
+        (none)
+      </ul>
     </div>
 
     <h2>Messages</h2>
@@ -33,7 +52,10 @@
 
     <script type="module">
       import { createCollabClient } from './js/collab-client.mjs';
-      const log = (s) => { const el = document.getElementById('log'); el.textContent = `${new Date().toISOString()} ${s}\n` + el.textContent; };
+      const log = (s) => {
+        const el = document.getElementById('log');
+        el.textContent = `${new Date().toISOString()} ${s}\n` + el.textContent;
+      };
 
       const urlEl = document.getElementById('url');
       let client = null;
@@ -42,36 +64,49 @@
       const STORAGE_KEY = 'rpi-cnc-collab-sessions';
       const CLIENT_KEY = 'rpi-cnc-collab-clientid';
       function loadSessions() {
-        try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch (e) { return {}; }
+        try {
+          return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+        } catch (e) {
+          return {};
+        }
       }
-      function saveSessions(sessions) { localStorage.setItem(STORAGE_KEY, JSON.stringify(sessions)); }
+      function saveSessions(sessions) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(sessions));
+      }
 
       function updateSessionUI(sessions) {
         const el = document.getElementById('sessions');
         const keys = Object.keys(sessions || {});
-        if (!keys.length) { el.innerHTML = '(none)'; return; }
+        if (!keys.length) {
+          el.innerHTML = '(none)';
+          return;
+        }
         el.innerHTML = '';
-        keys.forEach(id => {
+        keys.forEach((id) => {
           const s = sessions[id] || {};
           const li = document.createElement('li');
           li.style.padding = '6px 0';
           li.style.borderBottom = '1px solid #ddd';
           li.dataset.sessionId = id;
-          const owner = s.state && s.state.owner ? s.state.owner : (s.owner || null);
+          const owner = s.state && s.state.owner ? s.state.owner : s.owner || null;
           const clients = s.clients || (s.state && s.state.clients) || [];
-          li.innerHTML = `<strong>${id}</strong> ${owner ? ' (owner: ' + owner + ')' : ''} — state: <code>${JSON.stringify(s.state)}</code> <small>clients: ${clients.length || 0}</small> `;
+          li.innerHTML = `<strong>${id}</strong> ${
+            owner ? ' (owner: ' + owner + ')' : ''
+          } — state: <code>${JSON.stringify(s.state)}</code> <small>clients: ${
+            clients.length || 0
+          }</small> `;
           // display connected client badges
           const badges = document.createElement('span');
           badges.style.marginLeft = '8px';
-          (clients || []).forEach(cid => {
-              const b = document.createElement('span');
+          (clients || []).forEach((cid) => {
+            const b = document.createElement('span');
             b.textContent = cid || 'anon';
             b.style.display = 'inline-block';
             b.style.padding = '2px 6px';
             b.style.marginRight = '6px';
             b.style.borderRadius = '999px';
-            b.style.background = (cid === owner) ? '#2277dd' : '#ddd';
-            b.style.color = (cid === owner) ? '#fff' : '#000';
+            b.style.background = cid === owner ? '#2277dd' : '#ddd';
+            b.style.color = cid === owner ? '#fff' : '#000';
             if (cid === owner) {
               // stronger visual emphasis for owner
               b.style.boxShadow = '0 0 8px rgba(34,119,221,0.6)';
@@ -81,14 +116,17 @@
             badges.appendChild(b);
           });
           li.appendChild(badges);
-          
+
           // add edit state UI
           const editBtn = document.createElement('button');
           editBtn.textContent = 'Edit';
           editBtn.addEventListener('click', () => {
             // toggle an input
-            if (li._editing) { return; }
+            if (li._editing) {
+              return;
+            }
             li._editing = true;
+            li._localEditVersion = JSON.parse(JSON.stringify(s.state)); // save local copy for conflict detection
             const txt = document.createElement('input');
             txt.value = JSON.stringify(s.state);
             txt.style.width = '60%';
@@ -99,23 +137,61 @@
             save.addEventListener('click', () => {
               try {
                 const obj = JSON.parse(txt.value);
+
+                // conflict detection: check if state changed since edit started
+                const current = loadSessions()[id];
+                const currentState = (current && current.state) || {};
+                if (JSON.stringify(currentState) !== JSON.stringify(li._localEditVersion)) {
+                  // conflict detected - show merge UI
+                  const resolution = confirm(
+                    'CONFLICT: Session state changed by another client.\\n\\n' +
+                      'Current (remote): ' +
+                      JSON.stringify(currentState) +
+                      '\\n' +
+                      'Your changes: ' +
+                      JSON.stringify(obj) +
+                      '\\n\\n' +
+                      'Click OK to keep your changes (overwrite remote), Cancel to discard yours.'
+                  );
+                  if (!resolution) {
+                    log('Edit cancelled due to conflict');
+                    li._editing = false;
+                    updateSessionUI(loadSessions());
+                    return;
+                  }
+                  log('Conflict resolved: keeping local changes');
+                }
+
                 // update via client
                 if (client) client.updateSession(id, obj);
                 // also update local storage
-                const all = loadSessions(); all[id] = { id, state: obj, clients: (s.clients || []) }; saveSessions(all); updateSessionUI(all);
+                const all = loadSessions();
+                all[id] = { id, state: obj, clients: s.clients || [] };
+                saveSessions(all);
+                updateSessionUI(all);
                 li._editing = false;
-              } catch (e) { log('invalid json'); }
+              } catch (e) {
+                log('invalid json: ' + e.message);
+              }
             });
-            cancel.addEventListener('click', () => { li._editing = false; updateSessionUI(loadSessions()); });
+            cancel.addEventListener('click', () => {
+              li._editing = false;
+              updateSessionUI(loadSessions());
+            });
             li.appendChild(document.createElement('br'));
-            li.appendChild(txt); li.appendChild(save); li.appendChild(cancel);
+            li.appendChild(txt);
+            li.appendChild(save);
+            li.appendChild(cancel);
           });
           li.appendChild(editBtn);
           // mark a visual strip for owner sessions
           if (owner) {
             li.style.position = 'relative';
             const ownerLabel = document.createElement('span');
-            ownerLabel.textContent = owner === document.getElementById('client-id').value ? 'You (owner)' : 'Owner: ' + owner;
+            ownerLabel.textContent =
+              owner === document.getElementById('client-id').value
+                ? 'You (owner)'
+                : 'Owner: ' + owner;
             ownerLabel.style.position = 'absolute';
             ownerLabel.style.top = '6px';
             ownerLabel.style.right = '8px';
@@ -136,9 +212,13 @@
           });
           li.appendChild(joinBtn);
           // add forget button
-          const forget = document.createElement('button'); forget.textContent = 'Forget';
+          const forget = document.createElement('button');
+          forget.textContent = 'Forget';
           forget.addEventListener('click', () => {
-            const all = loadSessions(); delete all[id]; saveSessions(all); updateSessionUI(all);
+            const all = loadSessions();
+            delete all[id];
+            saveSessions(all);
+            updateSessionUI(all);
             log('forgot ' + id);
           });
           li.appendChild(forget);
@@ -154,7 +234,11 @@
       const clientIdStored = localStorage.getItem(CLIENT_KEY);
       if (clientIdStored) document.getElementById('client-id').value = clientIdStored;
 
-      document.getElementById('clear-store').addEventListener('click', () => { localStorage.removeItem(STORAGE_KEY); updateSessionUI({}); log('cleared sessions'); });
+      document.getElementById('clear-store').addEventListener('click', () => {
+        localStorage.removeItem(STORAGE_KEY);
+        updateSessionUI({});
+        log('cleared sessions');
+      });
 
       document.getElementById('connect').addEventListener('click', () => {
         const cid = document.getElementById('client-id').value || null;
@@ -166,24 +250,35 @@
           log('sessionUpdated ' + JSON.stringify(msg.state));
           // update persistent list
           const s = loadSessions();
-          s[msg.sessionId] = { id: msg.sessionId, state: msg.state, clients: (msg.clients || []) };
+          s[msg.sessionId] = { id: msg.sessionId, state: msg.state, clients: msg.clients || [] };
           saveSessions(s);
           updateSessionUI(s);
         });
         client.on('sessionCreated', (msg) => {
           log('sessionCreated: ' + JSON.stringify(msg));
           const s = loadSessions();
-          s[msg.sessionId] = { id: msg.sessionId, state: msg.state, clients: (msg.clients || []) };
-          saveSessions(s); updateSessionUI(s);
+          s[msg.sessionId] = { id: msg.sessionId, state: msg.state, clients: msg.clients || [] };
+          saveSessions(s);
+          updateSessionUI(s);
         });
         client.on('clientJoined', (msg) => {
           log('clientJoined ' + JSON.stringify(msg));
           const s = loadSessions();
-          s[msg.sessionId] = Object.assign({}, s[msg.sessionId] || {}, { id: msg.sessionId, state: (s[msg.sessionId] && s[msg.sessionId].state) || {}, clients: msg.clients || [] });
-          saveSessions(s); updateSessionUI(s);
+          s[msg.sessionId] = Object.assign({}, s[msg.sessionId] || {}, {
+            id: msg.sessionId,
+            state: (s[msg.sessionId] && s[msg.sessionId].state) || {},
+            clients: msg.clients || [],
+          });
+          saveSessions(s);
+          updateSessionUI(s);
         });
         client.on('message', (m) => log('message ' + JSON.stringify(m)));
-        try { client.connect(); log('connect() called'); } catch(e) { log('connect-failed ' + e.message); }
+        try {
+          client.connect();
+          log('connect() called');
+        } catch (e) {
+          log('connect-failed ' + e.message);
+        }
       });
 
       document.getElementById('create').addEventListener('click', () => {
@@ -191,15 +286,61 @@
           const cid = document.getElementById('client-id').value || null;
           client.createSession('s1', { a: 1 }, cid);
           // update local list immediately
-          const s = loadSessions(); s['s1'] = { id: 's1', state: { a: 1 } }; saveSessions(s); updateSessionUI(s);
+          const s = loadSessions();
+          s['s1'] = { id: 's1', state: { a: 1 } };
+          saveSessions(s);
+          updateSessionUI(s);
           log('create sent');
         }
       });
 
-      document.getElementById('join').addEventListener('click', () => { if (client) { const cid = document.getElementById('client-id').value || null; client.joinSession('s1', cid); log('join sent'); } });
+      document.getElementById('join').addEventListener('click', () => {
+        if (client) {
+          const cid = document.getElementById('client-id').value || null;
+          client.joinSession('s1', cid);
+          log('join sent');
+        }
+      });
 
       document.getElementById('update').addEventListener('click', () => {
-        if (client) { client.updateSession('s1', { a: 2 }); log('update sent'); }
+        if (client) {
+          client.updateSession('s1', { a: 2 });
+          log('update sent');
+        }
+      });
+
+      document.getElementById('export-sessions').addEventListener('click', () => {
+        const sessions = loadSessions();
+        const data = JSON.stringify(sessions, null, 2);
+        const blob = new Blob([data], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `collab-sessions-${new Date().toISOString().slice(0, 10)}.json`;
+        link.click();
+        URL.revokeObjectURL(url);
+        log('Sessions exported');
+      });
+
+      document.getElementById('import-sessions').addEventListener('click', () => {
+        document.getElementById('import-file').click();
+      });
+
+      document.getElementById('import-file').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          try {
+            const imported = JSON.parse(evt.target.result);
+            saveSessions(imported);
+            updateSessionUI(imported);
+            log(`Imported ${Object.keys(imported).length} sessions`);
+          } catch (err) {
+            log('Import failed: ' + err.message);
+          }
+        };
+        reader.readAsText(file);
       });
     </script>
   </body>

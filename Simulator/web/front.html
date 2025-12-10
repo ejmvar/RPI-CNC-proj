@@ -1,590 +1,843 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Simulador CNC - Raspberry Pi</title>
     <!-- Use local Tailwind bundle when available (offline-friendly) -->
     <script src="./static/tailwind/3.4.17"></script>
     <!-- Use local Three.js bundle (r128) to avoid remote CDN dependencies -->
     <script src="./static/three.min.js"></script>
     <style>
-        /* Estilos personalizados para el contenedor 3D */
-        #visualization-container {
-            width: 100%;
-            aspect-ratio: 16 / 9; /* Mantiene una relación de aspecto para la visualización */
-            min-height: 300px;
-            background-color: #1f2937; /* Gris oscuro para el fondo del espacio de trabajo */
-            border-radius: 0.5rem;
-            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.2);
-            position: relative;
-        }
-        /* Ocultar scrollbar pero permitir desplazamiento */
-        textarea::-webkit-scrollbar { display: none; }
-        textarea { -ms-overflow-style: none; scrollbar-width: none; }
-        .gcode-textarea {
-            font-family: monospace;
-            line-height: 1.25;
-            min-height: 400px;
-            background-color: #f3f4f6;
-        }
-        /* Estilo para los botones interactivos */
-        .control-btn {
-            transition: all 0.15s ease-in-out;
-            box-shadow: 0 4px #0f766e; /* Sombra para efecto 3D */
-        }
-        .control-btn:active {
-            box-shadow: 0 1px #0f766e;
-            transform: translateY(3px);
-        }
+      /* Estilos personalizados para el contenedor 3D */
+      #visualization-container {
+        width: 100%;
+        aspect-ratio: 16 / 9; /* Mantiene una relación de aspecto para la visualización */
+        min-height: 300px;
+        background-color: #1f2937; /* Gris oscuro para el fondo del espacio de trabajo */
+        border-radius: 0.5rem;
+        box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.2);
+        position: relative;
+      }
+      /* Ocultar scrollbar pero permitir desplazamiento */
+      textarea::-webkit-scrollbar {
+        display: none;
+      }
+      textarea {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+      .gcode-textarea {
+        font-family: monospace;
+        line-height: 1.25;
+        min-height: 400px;
+        background-color: #f3f4f6;
+      }
+      /* Estilo para los botones interactivos */
+      .control-btn {
+        transition: all 0.15s ease-in-out;
+        box-shadow: 0 4px #0f766e; /* Sombra para efecto 3D */
+      }
+      .control-btn:active {
+        box-shadow: 0 1px #0f766e;
+        transform: translateY(3px);
+      }
     </style>
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                }
-            }
-        }
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+            },
+          },
+        },
+      };
     </script>
-</head>
-<body class="bg-gray-50 text-gray-800 font-sans p-4 sm:p-8">
-
+  </head>
+  <body class="bg-gray-50 text-gray-800 font-sans p-4 sm:p-8">
     <header class="mb-6">
-        <h1 class="text-3xl sm:text-4xl font-extrabold text-blue-600 border-b-4 border-blue-200 pb-2">
-            Simulador CNC y Herramientas de Desarrollo
-        </h1>
-        <p class="text-gray-500 mt-2">Plataforma de visualización 3D, edición de G-Code y control conceptual de auto-nivelado.</p>
+      <h1 class="text-3xl sm:text-4xl font-extrabold text-blue-600 border-b-4 border-blue-200 pb-2">
+        Simulador CNC y Herramientas de Desarrollo
+      </h1>
+      <p class="text-gray-500 mt-2">
+        Plataforma de visualización 3D, edición de G-Code y control conceptual de auto-nivelado.
+      </p>
     </header>
 
     <main class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Columna de G-Code y Controles -->
+      <section class="lg:col-span-1 bg-white p-5 rounded-xl shadow-lg border border-gray-100">
+        <h2 class="text-xl font-semibold mb-4 text-gray-700 flex items-center">
+          <svg
+            class="w-5 h-5 mr-2 text-indigo-500"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
+            ></path>
+          </svg>
+          Editor de G-Code
+        </h2>
+        <div class="mb-3 flex gap-2">
+          <input
+            type="file"
+            id="gcode-file-input"
+            accept=".nc,.gcode,.txt"
+            class="hidden"
+            onchange="loadGCodeFromFile(event)"
+          />
+          <button
+            onclick="document.getElementById('gcode-file-input').click()"
+            class="flex-1 bg-gray-600 text-white p-2 rounded-lg font-bold hover:bg-gray-700 text-sm"
+          >
+            📂 Upload File
+          </button>
+        </div>
+        <textarea
+          id="gcode-input"
+          class="gcode-textarea w-full p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+          placeholder="Pega tu G-Code aquí... (ej: G0 Z10 F500)"
+        ></textarea>
 
-        <!-- Columna de G-Code y Controles -->
-        <section class="lg:col-span-1 bg-white p-5 rounded-xl shadow-lg border border-gray-100">
-            <h2 class="text-xl font-semibold mb-4 text-gray-700 flex items-center">
-                <svg class="w-5 h-5 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
-                Editor de G-Code
-            </h2>
-            <textarea id="gcode-input" class="gcode-textarea w-full p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Pega tu G-Code aquí... (ej: G0 Z10 F500)"></textarea>
-
-            <div class="mt-4 grid grid-cols-2 gap-3">
-                <button onclick="loadGCode()" class="w-full bg-blue-500 text-white p-3 rounded-lg font-bold hover:bg-blue-600 control-btn shadow-blue-800">Cargar G-Code</button>
-                <button id="play-btn" onclick="toggleSimulation()" class="w-full bg-teal-500 text-white p-3 rounded-lg font-bold hover:bg-teal-600 control-btn shadow-teal-800">▶️ Simular</button>
-                <button onclick="applyLevelingToGCode()" class="w-full bg-indigo-500 text-white p-3 rounded-lg font-bold hover:bg-indigo-600 control-btn shadow-indigo-800">Apply Leveling</button>
-                <button id="pause-btn" onclick="pauseSimulation()" class="w-full bg-amber-500 text-white p-3 rounded-lg font-bold hover:bg-amber-600 control-btn shadow-amber-800">⏸️ Pausar</button>
-                <button onclick="exportCompensatedGCode()" class="w-full bg-purple-500 text-white p-3 rounded-lg font-bold hover:bg-purple-600 control-btn shadow-purple-800">💾 Export G-Code</button>
-                <button onclick="resetSimulation()" class="w-full bg-red-500 text-white p-3 rounded-lg font-bold hover:bg-red-600 control-btn shadow-red-800">⏹️ Resetear</button>
-                <!-- Playback/Speed Controls -->
-                <div class="col-span-2 mt-2">
-                    <label class="text-xs text-gray-500">Velocidad de simulación</label>
-                    <input id="simulation-speed" type="range" min="10" max="2000" step="10" value="100" oninput="setSimulationSpeed(this.value)" class="w-full mt-1" />
-                    <div class="flex items-center gap-2 mt-1">
-                            <button id="step-back-btn" onclick="stepBack()" class="bg-gray-200 p-2 rounded-md text-sm">◀️ Back</button>
-                            <button id="step-btn" onclick="stepSimulation()" class="bg-gray-200 p-2 rounded-md text-sm">Step ▶️</button>
-                        <button id="step-mode-btn" onclick="toggleStepMode()" class="bg-gray-200 p-2 rounded-md text-sm">Step Mode: Off</button>
-                        <span id="command-index-label" class="text-xs text-gray-500">0 / 0</span>
-                        <span id="playback-speed-label" class="text-xs text-gray-500 ml-3">100ms</span>
-                    </div>
-
-                    <!-- Toolpath smoothing control -->
-                    <div class="flex items-center gap-2 mt-2">
-                        <label class="text-xs text-gray-500">Toolpath smoothing</label>
-                        <input id="toolpath-smooth" type="range" min="1" max="12" step="1" value="1" oninput="document.getElementById('toolpath-smooth-label').textContent=this.value" class="w-full" />
-                        <span id="toolpath-smooth-label" class="text-xs text-gray-500 ml-3">1</span>
-                    </div>
-                </div>
+        <div class="mt-4 grid grid-cols-2 gap-3">
+          <button
+            onclick="loadGCode()"
+            class="w-full bg-blue-500 text-white p-3 rounded-lg font-bold hover:bg-blue-600 control-btn shadow-blue-800"
+          >
+            Cargar G-Code
+          </button>
+          <button
+            id="play-btn"
+            onclick="toggleSimulation()"
+            class="w-full bg-teal-500 text-white p-3 rounded-lg font-bold hover:bg-teal-600 control-btn shadow-teal-800"
+          >
+            ▶️ Simular
+          </button>
+          <button
+            onclick="applyLevelingToGCode()"
+            class="w-full bg-indigo-500 text-white p-3 rounded-lg font-bold hover:bg-indigo-600 control-btn shadow-indigo-800"
+          >
+            Apply Leveling
+          </button>
+          <button
+            id="pause-btn"
+            onclick="pauseSimulation()"
+            class="w-full bg-amber-500 text-white p-3 rounded-lg font-bold hover:bg-amber-600 control-btn shadow-amber-800"
+          >
+            ⏸️ Pausar
+          </button>
+          <button
+            onclick="exportCompensatedGCode()"
+            class="w-full bg-purple-500 text-white p-3 rounded-lg font-bold hover:bg-purple-600 control-btn shadow-purple-800"
+          >
+            💾 Export G-Code
+          </button>
+          <button
+            onclick="resetSimulation()"
+            class="w-full bg-red-500 text-white p-3 rounded-lg font-bold hover:bg-red-600 control-btn shadow-red-800"
+          >
+            ⏹️ Resetear
+          </button>
+          <!-- Playback/Speed Controls -->
+          <div class="col-span-2 mt-2">
+            <label class="text-xs text-gray-500">Velocidad de simulación</label>
+            <input
+              id="simulation-speed"
+              type="range"
+              min="10"
+              max="2000"
+              step="10"
+              value="100"
+              oninput="setSimulationSpeed(this.value)"
+              class="w-full mt-1"
+            />
+            <div class="flex items-center gap-2 mt-1">
+              <button
+                id="step-back-btn"
+                onclick="stepBack()"
+                class="bg-gray-200 p-2 rounded-md text-sm"
+              >
+                ◀️ Back
+              </button>
+              <button
+                id="step-btn"
+                onclick="stepSimulation()"
+                class="bg-gray-200 p-2 rounded-md text-sm"
+              >
+                Step ▶️
+              </button>
+              <button
+                id="step-mode-btn"
+                onclick="toggleStepMode()"
+                class="bg-gray-200 p-2 rounded-md text-sm"
+              >
+                Step Mode: Off
+              </button>
+              <span id="command-index-label" class="text-xs text-gray-500">0 / 0</span>
+              <span id="playback-speed-label" class="text-xs text-gray-500 ml-3">100ms</span>
             </div>
-        </section>
 
-        <!-- Columna de Visualización 3D y Logs -->
-        <section class="lg:col-span-2 space-y-6">
-            <div class="bg-white p-5 rounded-xl shadow-lg border border-gray-100">
-                <h2 class="text-xl font-semibold mb-4 text-gray-700 flex items-center">
-                    <svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.727A8 8 0 016.343 7.273v0A8.001 8.001 0 004 14v1a8.004 8.004 0 014.243-7.071L12 11l-3.757 3.757A8.004 8.004 0 014 18v1a8 8 0 008 8h1a8 8 0 008-8v-1a8 8 0 01-2.343-5.273z"></path></svg>
-                    Visualización 3D del Fresado
-                </h2>
-                <div id="visualization-container">
-                    <!-- El canvas de Three.js se insertará aquí -->
-                </div>
+            <!-- Toolpath smoothing control -->
+            <div class="flex items-center gap-2 mt-2">
+              <label class="text-xs text-gray-500">Toolpath smoothing</label>
+              <input
+                id="toolpath-smooth"
+                type="range"
+                min="1"
+                max="12"
+                step="1"
+                value="1"
+                oninput="document.getElementById('toolpath-smooth-label').textContent=this.value"
+                class="w-full"
+              />
+              <span id="toolpath-smooth-label" class="text-xs text-gray-500 ml-3">1</span>
             </div>
+          </div>
+        </div>
+      </section>
 
-            <!-- Sección de Herramientas Avanzadas: Auto-Nivelado -->
-            <div class="bg-white p-5 rounded-xl shadow-lg border border-gray-100">
-                <h2 class="text-xl font-semibold mb-4 text-gray-700 flex items-center">
-                    <svg class="w-5 h-5 mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1h2a1 1 0 001-1V7zM5 7a1 1 0 00-1-1H3a1 1 0 00-1 1v2a1 1 0 001 1h2a1 1 0 001-1V7zM14 14a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1h2a1 1 0 001-1v-2z"></path></svg>
-                    Auto-Nivelado (Conceptual)
-                </h2>
-                <p class="text-sm text-gray-500 mb-3">Simula la creación de la malla de compensación para superficies irregulares.</p>
+      <!-- Columna de Visualización 3D y Logs -->
+      <section class="lg:col-span-2 space-y-6">
+        <div class="bg-white p-5 rounded-xl shadow-lg border border-gray-100">
+          <h2 class="text-xl font-semibold mb-4 text-gray-700 flex items-center">
+            <svg
+              class="w-5 h-5 mr-2 text-green-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M17.657 16.727A8 8 0 016.343 7.273v0A8.001 8.001 0 004 14v1a8.004 8.004 0 014.243-7.071L12 11l-3.757 3.757A8.004 8.004 0 014 18v1a8 8 0 008 8h1a8 8 0 008-8v-1a8 8 0 01-2.343-5.273z"
+              ></path>
+            </svg>
+            Visualización 3D del Fresado
+          </h2>
+          <div id="visualization-container">
+            <!-- El canvas de Three.js se insertará aquí -->
+          </div>
+        </div>
 
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <input type="number" id="mesh-size" value="9" min="3" class="p-2 border rounded-lg text-center" placeholder="Puntos de Malla (ej: 9)">
-                    <button onclick="simulateProbing()" class="bg-purple-500 text-white p-3 rounded-lg font-bold hover:bg-purple-600 control-btn shadow-purple-800 col-span-2 sm:col-span-3">
-                        Simular Sondaje y Malla
-                    </button>
-                </div>
-                <div id="probing-log" class="mt-4 p-3 bg-gray-100 rounded-lg text-sm overflow-auto max-h-40">
-                    <!-- Logs del proceso de auto-nivelado aquí -->
-                    <p class="text-gray-500">Log de sondaje listo.</p>
-                </div>
-            </div>
-        </section>
+        <!-- Sección de Herramientas Avanzadas: Auto-Nivelado -->
+        <div class="bg-white p-5 rounded-xl shadow-lg border border-gray-100">
+          <h2 class="text-xl font-semibold mb-4 text-gray-700 flex items-center">
+            <svg
+              class="w-5 h-5 mr-2 text-purple-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1h2a1 1 0 001-1V7zM5 7a1 1 0 00-1-1H3a1 1 0 00-1 1v2a1 1 0 001 1h2a1 1 0 001-1V7zM14 14a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1h2a1 1 0 001-1v-2z"
+              ></path>
+            </svg>
+            Auto-Nivelado (Conceptual)
+          </h2>
+          <p class="text-sm text-gray-500 mb-3">
+            Simula la creación de la malla de compensación para superficies irregulares.
+          </p>
 
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <input
+              type="number"
+              id="mesh-size"
+              value="9"
+              min="3"
+              class="p-2 border rounded-lg text-center"
+              placeholder="Puntos de Malla (ej: 9)"
+            />
+            <button
+              onclick="simulateProbing()"
+              class="bg-purple-500 text-white p-3 rounded-lg font-bold hover:bg-purple-600 control-btn shadow-purple-800 col-span-2 sm:col-span-3"
+            >
+              Simular Sondaje y Malla
+            </button>
+          </div>
+          <div
+            id="probing-log"
+            class="mt-4 p-3 bg-gray-100 rounded-lg text-sm overflow-auto max-h-40"
+          >
+            <!-- Logs del proceso de auto-nivelado aquí -->
+            <p class="text-gray-500">Log de sondaje listo.</p>
+          </div>
+        </div>
+      </section>
     </main>
 
     <!-- front script imports a small browser module to reuse the parser internally -->
     <script type="module">
-        import * as GParser from './js/gcode-parser.mjs';
-        import * as THREE_HELPER from './js/three-helper.mjs';
-        import * as THREE_CONTROLS from './js/controls.mjs';
-        import * as GCODE_TRANSFORM from './js/gcode-transform.mjs';
-        import * as GCODE_TOOLPATH from './js/toolpath.mjs';
-        import * as THREE_MESH from './js/mesh.mjs';
-        import * as COLLAB_CLIENT from './js/collab-client.mjs';
-        // expose parser and three helpers to the inline script environment
-        window.GCODE_PARSER = GParser;
-        window.THREE_HELPER = THREE_HELPER;
-        window.THREE_CONTROLS = THREE_CONTROLS;
-        window.GCODE_TRANSFORM = GCODE_TRANSFORM;
-        window.GCODE_TOOLPATH = GCODE_TOOLPATH;
-        window.THREE_MESH = THREE_MESH;
-        window.COLLAB_CLIENT = COLLAB_CLIENT;
+      import * as GParser from './js/gcode-parser.mjs';
+      import * as THREE_HELPER from './js/three-helper.mjs';
+      import * as THREE_CONTROLS from './js/controls.mjs';
+      import * as GCODE_TRANSFORM from './js/gcode-transform.mjs';
+      import * as GCODE_TOOLPATH from './js/toolpath.mjs';
+      import * as THREE_MESH from './js/mesh.mjs';
+      import * as COLLAB_CLIENT from './js/collab-client.mjs';
+      // expose parser and three helpers to the inline script environment
+      window.GCODE_PARSER = GParser;
+      window.THREE_HELPER = THREE_HELPER;
+      window.THREE_CONTROLS = THREE_CONTROLS;
+      window.GCODE_TRANSFORM = GCODE_TRANSFORM;
+      window.GCODE_TOOLPATH = GCODE_TOOLPATH;
+      window.THREE_MESH = THREE_MESH;
+      window.COLLAB_CLIENT = COLLAB_CLIENT;
     </script>
 
     <script>
-        // --- Variables Globales ---
-        let scene, camera, renderer, tool, materialGeometry, material;
-        let animationFrameId = null;
-        let isSimulating = false;
-        let stepMode = false; // when true, simulation stays paused and only steps advance
-        let simulationSpeed = 100; // milliseconds per command
-        let lastCommandTime = 0;
-        let gcodeCommands = [];
-        let currentCommandIndex = 0;
-        let currentPosition = { x: 0, y: 0, z: 0 };
-        const CONTAINER = document.getElementById('visualization-container');
+      // --- Variables Globales ---
+      let scene, camera, renderer, tool, materialGeometry, material;
+      let animationFrameId = null;
+      let isSimulating = false;
+      let stepMode = false; // when true, simulation stays paused and only steps advance
+      let simulationSpeed = 100; // milliseconds per command
+      let lastCommandTime = 0;
+      let gcodeCommands = [];
+      let currentCommandIndex = 0;
+      let currentPosition = { x: 0, y: 0, z: 0 };
+      const CONTAINER = document.getElementById('visualization-container');
 
-        // --- Configuración Inicial de Three.js ---
-        function initThreeJS() {
-            // Delegate to the ES module helper (the module assumes global THREE exists)
-            try {
-                const res = window.THREE_HELPER.initThreeJS(CONTAINER, { WORKSPACE_SIZE: 50, WORKSPACE_HEIGHT: 10 });
-                scene = res.scene; camera = res.camera; renderer = res.renderer; tool = res.tool; material = res.material; materialGeometry = res.materialGeometry;
-            } catch (e) {
-                console.error('Failed to initialize Three.js via helper:', e);
-                // fallback to inline init if helper is not available or fails
-                // (keep previous inline code omitted for brevity)
-                throw e;
-            }
-            // attach resize handler
-            window.addEventListener('resize', onWindowResize, false);
-            onWindowResize();
-            // attach lightweight orbit controls to the rendered canvas (if available)
-            try {
-                if (window.THREE_CONTROLS && typeof window.THREE_CONTROLS.createSimpleOrbitControls === 'function') {
-                    window.CONTROLS = window.THREE_CONTROLS.createSimpleOrbitControls({ camera, domElement: renderer.domElement });
-                    window.CONTROLS.attach && window.CONTROLS.attach();
-                }
-            } catch (err) { console.warn('controls attach failed', err); }
+      // --- Configuración Inicial de Three.js ---
+      function initThreeJS() {
+        // Delegate to the ES module helper (the module assumes global THREE exists)
+        try {
+          const res = window.THREE_HELPER.initThreeJS(CONTAINER, {
+            WORKSPACE_SIZE: 50,
+            WORKSPACE_HEIGHT: 10,
+          });
+          scene = res.scene;
+          camera = res.camera;
+          renderer = res.renderer;
+          tool = res.tool;
+          material = res.material;
+          materialGeometry = res.materialGeometry;
+        } catch (e) {
+          console.error('Failed to initialize Three.js via helper:', e);
+          // fallback to inline init if helper is not available or fails
+          // (keep previous inline code omitted for brevity)
+          throw e;
         }
-
-        // --- Manejo de Redimensionamiento ---
-        function onWindowResize() {
-            if (!camera || !renderer) return;
-            camera.aspect = CONTAINER.clientWidth / CONTAINER.clientHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(CONTAINER.clientWidth, CONTAINER.clientHeight);
-        }
-
-        // --- Loop de Renderizado (Animación) ---
-        function animate() {
-            animationFrameId = requestAnimationFrame(animate);
-
-            // Simulación del movimiento (implementación conceptual)
-            if (isSimulating && gcodeCommands.length > 0) {
-                const now = Date.now();
-                if (now - lastCommandTime >= simulationSpeed) {
-                    processNextCommand();
-                    lastCommandTime = now;
-                }
-            }
-
-            // Simple rotación de la cámara para que el usuario pueda ver el modelo
-            camera.position.x = 20 * Math.sin(Date.now() * 0.0001);
-            camera.position.z = 20 * Math.cos(Date.now() * 0.0001);
-            camera.lookAt(new THREE.Vector3(0, 0, 0));
-
-
-            renderer.render(scene, camera);
-        }
-
-        // --- Funciones de Control de Simulación ---
-
-        // Carga y parsea el G-Code
-        function loadGCode() {
-            const gcodeText = document.getElementById('gcode-input').value;
-            if (gcodeText.trim() === "") {
-                showMessage("ERROR: El área de G-Code está vacía.", 'bg-red-500');
-                return;
-            }
-            // Use the browser module parser to normalize lines and filter comments
-            if (window.GCODE_PARSER && typeof window.GCODE_PARSER.parse === 'function') {
-                const parsed = window.GCODE_PARSER.parse(gcodeText);
-                gcodeCommands = parsed.map(c => c.raw.trim().toUpperCase());
-
-                // create toolpath points and render into scene if the renderer exists
-                if (window.GCODE_TOOLPATH && typeof window.GCODE_TOOLPATH.parseGCodeToPoints === 'function') {
-                    const points = window.GCODE_TOOLPATH.parseGCodeToPoints(parsed);
-                    window.LAST_TOOLPATH = points; // expose for debugging/tests
-                    if (typeof window.THREE_HELPER !== 'undefined' && scene) {
-                        // remove any previous toolpath lines
-                        const prev = scene.getObjectByName('toolpath-line');
-                        if (prev) scene.remove(prev);
-                        try {
-                            // read smoothing setting and pass subdivisions to the renderer
-                            const subdivisionsEl = document.getElementById('toolpath-smooth');
-                            const subdivisions = subdivisionsEl ? Number(subdivisionsEl.value) : 1;
-                            window.GCODE_TOOLPATH.renderToolpath(scene, points, { subdivisions, linewidth: 2 });
-                        } catch (e) {
-                            console.warn('renderToolpath failed', e);
-                        }
-                    }
-                }
-            } else {
-                // fallback to the prior simple parse
-                gcodeCommands = gcodeText.toUpperCase().split('\n')
-                    .map(line => line.trim())
-                    .filter(line => line.length > 0 && !line.startsWith(';'));
-            }
-
-            currentCommandIndex = 0;
-            resetToolPosition();
-            showMessage(`G-Code cargado. ${gcodeCommands.length} comandos listos.`, 'bg-green-500');
-            // update command index label to reflect number of loaded commands
-            updateCommandIndexLabel();
-        }
-
-        // Inicia la simulación
-        function simulate() {
-            if (gcodeCommands.length === 0) {
-                showMessage("ERROR: Primero carga el G-Code.", 'bg-red-500');
-                return;
-            }
-            isSimulating = true;
-            updatePlayButton(true);
-            showMessage("Simulación iniciada...", 'bg-teal-500');
-        }
-
-        // Pausa la simulación
-        function pauseSimulation() {
-            isSimulating = false;
-            showMessage("Simulación pausada.", 'bg-amber-500');
-            updatePlayButton(false);
-        }
-
-        // Resetea la simulación
-        function resetSimulation() {
-            isSimulating = false;
-            currentCommandIndex = 0;
-            resetToolPosition();
-            // Esto limpiaría el rastro de la herramienta en una implementación completa
-            showMessage("Simulación reiniciada.", 'bg-blue-500');
-            updatePlayButton(false);
-        }
-
-        function updatePlayButton(playing) {
-            const el = document.getElementById('play-btn');
-            if (!el) return;
-            el.textContent = playing ? '⏸️ Pausado (Running)' : '▶️ Simular';
-        }
-
-        function toggleSimulation() {
-            if (isSimulating) {
-                pauseSimulation();
-            } else {
-                // if in step mode, enabling play should disable step mode
-                if (stepMode) toggleStepMode();
-                simulate();
-            }
-        }
-
-        function setSimulationSpeed(ms) {
-            simulationSpeed = Number(ms) || 100;
-            const label = document.getElementById('playback-speed-label');
-            if (label) label.textContent = `${simulationSpeed}ms`;
-        }
-
-        function stepSimulation() {
-            if (gcodeCommands.length === 0) {
-                showMessage("ERROR: No G-Code loaded.", 'bg-red-500');
-                return;
-            }
-            // perform a single command advance regardless of pause/play
-            // when stepping we should advance a single command and update label
-            if (currentCommandIndex < gcodeCommands.length) {
-                applyCommandAtIndex(currentCommandIndex);
-                currentCommandIndex++;
-                updateCommandIndexLabel();
-            }
-        }
-
-        function toggleStepMode() {
-            stepMode = !stepMode;
-            // when enabling step mode, ensure simulation is paused
-            if (stepMode) { isSimulating = false; updatePlayButton(false); }
-            const el = document.getElementById('step-mode-btn');
-            if (el) el.textContent = `Step Mode: ${stepMode ? 'On' : 'Off'}`;
-            showMessage(`Step mode ${stepMode ? 'enabled' : 'disabled'}.`, 'bg-gray-700');
-            // reflect the current index and length when toggling
-            updateCommandIndexLabel();
-        }
-
-        function resetToolPosition() {
-             currentPosition = { x: 0, y: 0, z: 0 };
-             if (tool) tool.position.set(0, 0, 0);
-            if (window.CURRENT_POSITION_INDICATOR && typeof window.CURRENT_POSITION_INDICATOR.update === 'function') {
-                window.CURRENT_POSITION_INDICATOR.update(currentPosition);
-            }
-        }
-
-
-        // Procesa el siguiente comando G-Code (simplificado)
-        function applyCommandAtIndex(idx) {
-            if (!gcodeCommands || idx < 0 || idx >= gcodeCommands.length) return false;
-            const command = gcodeCommands[idx];
-            const parts = command.match(/([GXM])(\d+(\.\d+)?)/g) || [];
-            let nextPos = { ...currentPosition };
-            let isMovement = false;
-            parts.forEach(part => {
-                const type = part.charAt(0);
-                const value = parseFloat(part.substring(1));
-                if (type === 'X') { nextPos.x = value; isMovement = true; }
-                if (type === 'Y') { nextPos.y = value; isMovement = true; }
-                if (type === 'Z') { nextPos.z = value; isMovement = true; }
-                if (type === 'G' && (value === 0 || value === 1)) { isMovement = true; }
+        // attach resize handler
+        window.addEventListener('resize', onWindowResize, false);
+        onWindowResize();
+        // attach lightweight orbit controls to the rendered canvas (if available)
+        try {
+          if (
+            window.THREE_CONTROLS &&
+            typeof window.THREE_CONTROLS.createSimpleOrbitControls === 'function'
+          ) {
+            window.CONTROLS = window.THREE_CONTROLS.createSimpleOrbitControls({
+              camera,
+              domElement: renderer.domElement,
             });
-            if (isMovement) {
-                // apply movement to the tool & position
-                if (tool) tool.position.set(nextPos.x, nextPos.z, nextPos.y);
-                currentPosition = nextPos;
-                if (window.CURRENT_POSITION_INDICATOR && typeof window.CURRENT_POSITION_INDICATOR.update === 'function') {
-                    window.CURRENT_POSITION_INDICATOR.update(currentPosition);
-                }
+            window.CONTROLS.attach && window.CONTROLS.attach();
+          }
+        } catch (err) {
+          console.warn('controls attach failed', err);
+        }
+      }
+
+      // --- Manejo de Redimensionamiento ---
+      function onWindowResize() {
+        if (!camera || !renderer) return;
+        camera.aspect = CONTAINER.clientWidth / CONTAINER.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(CONTAINER.clientWidth, CONTAINER.clientHeight);
+      }
+
+      // --- Loop de Renderizado (Animación) ---
+      function animate() {
+        animationFrameId = requestAnimationFrame(animate);
+
+        // Simulación del movimiento (implementación conceptual)
+        if (isSimulating && gcodeCommands.length > 0) {
+          const now = Date.now();
+          if (now - lastCommandTime >= simulationSpeed) {
+            processNextCommand();
+            lastCommandTime = now;
+          }
+        }
+
+        // Simple rotación de la cámara para que el usuario pueda ver el modelo
+        camera.position.x = 20 * Math.sin(Date.now() * 0.0001);
+        camera.position.z = 20 * Math.cos(Date.now() * 0.0001);
+        camera.lookAt(new THREE.Vector3(0, 0, 0));
+
+        renderer.render(scene, camera);
+      }
+
+      // --- Funciones de Control de Simulación ---
+
+      // Carga y parsea el G-Code
+      function loadGCode() {
+        const gcodeText = document.getElementById('gcode-input').value;
+        if (gcodeText.trim() === '') {
+          showMessage('ERROR: El área de G-Code está vacía.', 'bg-red-500');
+          return;
+        }
+        // Use the browser module parser to normalize lines and filter comments
+        if (window.GCODE_PARSER && typeof window.GCODE_PARSER.parse === 'function') {
+          const parsed = window.GCODE_PARSER.parse(gcodeText);
+          gcodeCommands = parsed.map((c) => c.raw.trim().toUpperCase());
+
+          // create toolpath points and render into scene if the renderer exists
+          if (
+            window.GCODE_TOOLPATH &&
+            typeof window.GCODE_TOOLPATH.parseGCodeToPoints === 'function'
+          ) {
+            const points = window.GCODE_TOOLPATH.parseGCodeToPoints(parsed);
+            window.LAST_TOOLPATH = points; // expose for debugging/tests
+            if (typeof window.THREE_HELPER !== 'undefined' && scene) {
+              // remove any previous toolpath lines
+              const prev = scene.getObjectByName('toolpath-line');
+              if (prev) scene.remove(prev);
+              try {
+                // read smoothing setting and pass subdivisions to the renderer
+                const subdivisionsEl = document.getElementById('toolpath-smooth');
+                const subdivisions = subdivisionsEl ? Number(subdivisionsEl.value) : 1;
+                window.GCODE_TOOLPATH.renderToolpath(scene, points, { subdivisions, linewidth: 2 });
+              } catch (e) {
+                console.warn('renderToolpath failed', e);
+              }
             }
-            return isMovement;
+          }
+        } else {
+          // fallback to the prior simple parse
+          gcodeCommands = gcodeText
+            .toUpperCase()
+            .split('\n')
+            .map((line) => line.trim())
+            .filter((line) => line.length > 0 && !line.startsWith(';'));
         }
 
-        function processNextCommand() {
-            if (currentCommandIndex >= gcodeCommands.length) {
-                isSimulating = false;
-                showMessage("Simulación completada.", 'bg-indigo-500');
-                return;
-            }
+        currentCommandIndex = 0;
+        resetToolPosition();
+        showMessage(`G-Code cargado. ${gcodeCommands.length} comandos listos.`, 'bg-green-500');
+        // update command index label to reflect number of loaded commands
+        updateCommandIndexLabel();
+      }
 
-            // Delegate actual command application to applyCommandAtIndex
-            applyCommandAtIndex(currentCommandIndex);
+      // Inicia la simulación
+      function simulate() {
+        if (gcodeCommands.length === 0) {
+          showMessage('ERROR: Primero carga el G-Code.', 'bg-red-500');
+          return;
+        }
+        isSimulating = true;
+        updatePlayButton(true);
+        showMessage('Simulación iniciada...', 'bg-teal-500');
+      }
 
-            // Aquí se dibujaría el camino o se modificaría la geometría del material.
+      // Pausa la simulación
+      function pauseSimulation() {
+        isSimulating = false;
+        showMessage('Simulación pausada.', 'bg-amber-500');
+        updatePlayButton(false);
+      }
 
-            currentCommandIndex++;
-            updateCommandIndexLabel();
+      // Resetea la simulación
+      function resetSimulation() {
+        isSimulating = false;
+        currentCommandIndex = 0;
+        resetToolPosition();
+        // Esto limpiaría el rastro de la herramienta en una implementación completa
+        showMessage('Simulación reiniciada.', 'bg-blue-500');
+        updatePlayButton(false);
+      }
 
-            // Control de velocidad de simulación (simulado con un timeout)
-            // Se usa requestAnimationFrame para el renderizado, pero la lógica de comando avanza
-            // más lento para que sea visible (ej. cada 100ms)
-            setTimeout(() => {
-                if (isSimulating) {
-                    // No hacemos nada aquí, solo esperamos el próximo tick de requestAnimationFrame
-                }
-            }, 100);
+      function updatePlayButton(playing) {
+        const el = document.getElementById('play-btn');
+        if (!el) return;
+        el.textContent = playing ? '⏸️ Pausado (Running)' : '▶️ Simular';
+      }
+
+      function toggleSimulation() {
+        if (isSimulating) {
+          pauseSimulation();
+        } else {
+          // if in step mode, enabling play should disable step mode
+          if (stepMode) toggleStepMode();
+          simulate();
+        }
+      }
+
+      function setSimulationSpeed(ms) {
+        simulationSpeed = Number(ms) || 100;
+        const label = document.getElementById('playback-speed-label');
+        if (label) label.textContent = `${simulationSpeed}ms`;
+      }
+
+      function stepSimulation() {
+        if (gcodeCommands.length === 0) {
+          showMessage('ERROR: No G-Code loaded.', 'bg-red-500');
+          return;
+        }
+        // perform a single command advance regardless of pause/play
+        // when stepping we should advance a single command and update label
+        if (currentCommandIndex < gcodeCommands.length) {
+          applyCommandAtIndex(currentCommandIndex);
+          currentCommandIndex++;
+          updateCommandIndexLabel();
+        }
+      }
+
+      function toggleStepMode() {
+        stepMode = !stepMode;
+        // when enabling step mode, ensure simulation is paused
+        if (stepMode) {
+          isSimulating = false;
+          updatePlayButton(false);
+        }
+        const el = document.getElementById('step-mode-btn');
+        if (el) el.textContent = `Step Mode: ${stepMode ? 'On' : 'Off'}`;
+        showMessage(`Step mode ${stepMode ? 'enabled' : 'disabled'}.`, 'bg-gray-700');
+        // reflect the current index and length when toggling
+        updateCommandIndexLabel();
+      }
+
+      function resetToolPosition() {
+        currentPosition = { x: 0, y: 0, z: 0 };
+        if (tool) tool.position.set(0, 0, 0);
+        if (
+          window.CURRENT_POSITION_INDICATOR &&
+          typeof window.CURRENT_POSITION_INDICATOR.update === 'function'
+        ) {
+          window.CURRENT_POSITION_INDICATOR.update(currentPosition);
+        }
+      }
+
+      // Procesa el siguiente comando G-Code (simplificado)
+      function applyCommandAtIndex(idx) {
+        if (!gcodeCommands || idx < 0 || idx >= gcodeCommands.length) return false;
+        const command = gcodeCommands[idx];
+        const parts = command.match(/([GXM])(\d+(\.\d+)?)/g) || [];
+        let nextPos = { ...currentPosition };
+        let isMovement = false;
+        parts.forEach((part) => {
+          const type = part.charAt(0);
+          const value = parseFloat(part.substring(1));
+          if (type === 'X') {
+            nextPos.x = value;
+            isMovement = true;
+          }
+          if (type === 'Y') {
+            nextPos.y = value;
+            isMovement = true;
+          }
+          if (type === 'Z') {
+            nextPos.z = value;
+            isMovement = true;
+          }
+          if (type === 'G' && (value === 0 || value === 1)) {
+            isMovement = true;
+          }
+        });
+        if (isMovement) {
+          // apply movement to the tool & position
+          if (tool) tool.position.set(nextPos.x, nextPos.z, nextPos.y);
+          currentPosition = nextPos;
+          if (
+            window.CURRENT_POSITION_INDICATOR &&
+            typeof window.CURRENT_POSITION_INDICATOR.update === 'function'
+          ) {
+            window.CURRENT_POSITION_INDICATOR.update(currentPosition);
+          }
+        }
+        return isMovement;
+      }
+
+      function processNextCommand() {
+        if (currentCommandIndex >= gcodeCommands.length) {
+          isSimulating = false;
+          showMessage('Simulación completada.', 'bg-indigo-500');
+          return;
         }
 
-        function updateCommandIndexLabel() {
-            const el = document.getElementById('command-index-label');
-            if (!el) return;
-            el.textContent = `${Math.max(0, Math.min(currentCommandIndex, gcodeCommands.length))} / ${gcodeCommands.length}`;
+        // Delegate actual command application to applyCommandAtIndex
+        applyCommandAtIndex(currentCommandIndex);
+
+        // Aquí se dibujaría el camino o se modificaría la geometría del material.
+
+        currentCommandIndex++;
+        updateCommandIndexLabel();
+
+        // Control de velocidad de simulación (simulado con un timeout)
+        // Se usa requestAnimationFrame para el renderizado, pero la lógica de comando avanza
+        // más lento para que sea visible (ej. cada 100ms)
+        setTimeout(() => {
+          if (isSimulating) {
+            // No hacemos nada aquí, solo esperamos el próximo tick de requestAnimationFrame
+          }
+        }, 100);
+      }
+
+      function updateCommandIndexLabel() {
+        const el = document.getElementById('command-index-label');
+        if (!el) return;
+        el.textContent = `${Math.max(0, Math.min(currentCommandIndex, gcodeCommands.length))} / ${
+          gcodeCommands.length
+        }`;
+      }
+
+      function goToCommand(index) {
+        // clamp index to [0, gcodeCommands.length]
+        const target = Math.max(0, Math.min(index, gcodeCommands.length));
+        // reset
+        currentCommandIndex = 0;
+        resetToolPosition();
+        // replay up to target commands (do not change currentCommandIndex beyond target)
+        for (let i = 0; i < target; i++) {
+          applyCommandAtIndex(i);
+          currentCommandIndex = i + 1;
+        }
+        updateCommandIndexLabel();
+      }
+
+      function stepBack() {
+        if (currentCommandIndex <= 0) return;
+        const nextIndex = currentCommandIndex - 1;
+        goToCommand(nextIndex);
+        showMessage(`Stepped back to command ${nextIndex}`, 'bg-gray-700');
+      }
+
+      // --- Funciones de Utilidad ---
+
+      function showMessage(message, colorClass) {
+        const container = document.getElementById('probing-log');
+        const logEntry = document.createElement('p');
+        logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+        logEntry.className = `p-1 rounded ${colorClass} text-white my-1`;
+        container.prepend(logEntry);
+        container.scrollTop = 0; // Mostrar el mensaje más reciente arriba
+      }
+
+      // --- Lógica Conceptual de Auto-Nivelado ---
+
+      function simulateProbing() {
+        const meshSizeInput = document.getElementById('mesh-size');
+        const numPoints = parseInt(meshSizeInput.value) || 9;
+        const size = Math.sqrt(numPoints);
+
+        if (size % 1 !== 0) {
+          showMessage(
+            'ERROR: El número de puntos debe ser un cuadrado perfecto (ej: 9, 16, 25).',
+            'bg-red-500'
+          );
+          return;
         }
 
-        function goToCommand(index) {
-            // clamp index to [0, gcodeCommands.length]
-            const target = Math.max(0, Math.min(index, gcodeCommands.length));
-            // reset
-            currentCommandIndex = 0;
-            resetToolPosition();
-            // replay up to target commands (do not change currentCommandIndex beyond target)
-            for (let i = 0; i < target; i++) {
-                applyCommandAtIndex(i);
-                currentCommandIndex = i + 1;
-            }
-            updateCommandIndexLabel();
+        showMessage(
+          `INICIO: Simulando sondaje para una malla de ${size}x${size} (${numPoints} puntos).`,
+          'bg-purple-600'
+        );
+
+        const materialSize = 50; // Basado en el tamaño de la geometría
+        const step = materialSize / (size - 1);
+        let meshData = [];
+
+        for (let i = 0; i < size; i++) {
+          for (let j = 0; j < size; j++) {
+            const x = i * step - materialSize / 2;
+            const y = j * step - materialSize / 2;
+
+            // Simulación de la lectura Z (añadiendo una ligera inclinación/irregularidad)
+            const simulatedZ = 0.5 * Math.sin(x * 0.5) + 0.3 * Math.cos(y * 0.8) + (i / size) * 1.5;
+
+            meshData.push({ x: x.toFixed(2), y: y.toFixed(2), z: simulatedZ.toFixed(3) });
+
+            // Log de sondaje
+            const logMsg = `Punto (${i + 1}, ${j + 1}): X${x.toFixed(2)} Y${y.toFixed(
+              2
+            )} -> Z${simulatedZ.toFixed(3)}`;
+            showMessage(logMsg, 'bg-gray-700');
+          }
         }
 
-        function stepBack() {
-            if (currentCommandIndex <= 0) return;
-            const nextIndex = currentCommandIndex - 1;
-            goToCommand(nextIndex);
-            showMessage(`Stepped back to command ${nextIndex}`, 'bg-gray-700');
+        // Store mesh in a simple structured format for later compensation
+        // values are organized as values[yIndex][xIndex]
+        const values = Array.from({ length: size }, () => Array(size).fill(0));
+        let k = 0;
+        for (let i = 0; i < size; i++) {
+          for (let j = 0; j < size; j++) {
+            values[j][i] = parseFloat(meshData[k].z);
+            k++;
+          }
         }
 
-        // --- Funciones de Utilidad ---
-
-        function showMessage(message, colorClass) {
-            const container = document.getElementById('probing-log');
-            const logEntry = document.createElement('p');
-            logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
-            logEntry.className = `p-1 rounded ${colorClass} text-white my-1`;
-            container.prepend(logEntry);
-            container.scrollTop = 0; // Mostrar el mensaje más reciente arriba
-        }
-
-        // --- Lógica Conceptual de Auto-Nivelado ---
-
-        function simulateProbing() {
-            const meshSizeInput = document.getElementById('mesh-size');
-            const numPoints = parseInt(meshSizeInput.value) || 9;
-            const size = Math.sqrt(numPoints);
-
-            if (size % 1 !== 0) {
-                showMessage("ERROR: El número de puntos debe ser un cuadrado perfecto (ej: 9, 16, 25).", 'bg-red-500');
-                return;
-            }
-
-            showMessage(`INICIO: Simulando sondaje para una malla de ${size}x${size} (${numPoints} puntos).`, 'bg-purple-600');
-
-            const materialSize = 50; // Basado en el tamaño de la geometría
-            const step = materialSize / (size - 1);
-            let meshData = [];
-
-            for (let i = 0; i < size; i++) {
-                for (let j = 0; j < size; j++) {
-                    const x = i * step - materialSize / 2;
-                    const y = j * step - materialSize / 2;
-
-                    // Simulación de la lectura Z (añadiendo una ligera inclinación/irregularidad)
-                    const simulatedZ = 0.5 * Math.sin(x * 0.5) + 0.3 * Math.cos(y * 0.8) + (i / size) * 1.5;
-
-                    meshData.push({ x: x.toFixed(2), y: y.toFixed(2), z: simulatedZ.toFixed(3) });
-
-                    // Log de sondaje
-                    const logMsg = `Punto (${i + 1}, ${j + 1}): X${x.toFixed(2)} Y${y.toFixed(2)} -> Z${simulatedZ.toFixed(3)}`;
-                    showMessage(logMsg, 'bg-gray-700');
-                }
-            }
-
-                // Store mesh in a simple structured format for later compensation
-                // values are organized as values[yIndex][xIndex]
-                const values = Array.from({ length: size }, () => Array(size).fill(0));
-                let k = 0;
-                for (let i = 0; i < size; i++) {
-                    for (let j = 0; j < size; j++) {
-                        values[j][i] = parseFloat(meshData[k].z);
-                        k++;
-                    }
-                }
-
-                window.LATEST_MESH = {
-                    bounds: { minX: -materialSize / 2, maxX: materialSize / 2, minY: -materialSize / 2, maxY: materialSize / 2 },
-                    size: size,
-                    values: values
-                };
-
-            // Visualize probe points and the generated mesh overlay in the 3D scene
-            try {
-                if (scene && window.THREE_MESH) {
-                    // remove previous overlays if present
-                    const prevProbe = scene.getObjectByName('probe-points');
-                    if (prevProbe) scene.remove(prevProbe);
-                    const prevMesh = scene.getObjectByName('mesh-overlay');
-                    if (prevMesh) scene.remove(prevMesh);
-
-                    // convert meshData into numeric probe points
-                    const probePoints = meshData.map(m => ({ x: Number(m.x), y: Number(m.y), z: Number(m.z) }));
-                    if (typeof window.THREE_MESH.renderProbePoints === 'function') {
-                        window.THREE_MESH.renderProbePoints(scene, probePoints, { name: 'probe-points', radius: 0.2, color: 0xffcc00 });
-                    }
-                    if (typeof window.THREE_MESH.renderMeshOverlay === 'function') {
-                        window.THREE_MESH.renderMeshOverlay(scene, window.LATEST_MESH, { name: 'mesh-overlay', pointSize: 0.15, color: 0x00ff00 });
-                    }
-                }
-            } catch (err) {
-                console.warn('mesh visualization failed', err);
-            }
-
-            // Aquí se calcularía la matriz de compensación real (bilinear interpolation)
-            showMessage(`FINALIZADO: Malla de compensación conceptual generada con ${numPoints} puntos.`, 'bg-purple-600');
-
-            // En una aplicación real, esta malla se enviaría al firmware (ej. GRBL con soporte ABL)
-            // o se usaría para reescribir/compensar el G-Code antes de la simulación.
-            console.log("Datos de la Malla:", meshData);
-        }
-
-
-        // --- Inicialización al cargar la ventana ---
-        window.onload = function() {
-                // initThreeJS returns internals via the module helper and already sets up the tool
-                initThreeJS();
-                // Create a visual position indicator (DOM overlay + small 3D marker)
-                try {
-                    if (window.THREE_HELPER && typeof window.THREE_HELPER.createPositionIndicator === 'function') {
-                        window.CURRENT_POSITION_INDICATOR = window.THREE_HELPER.createPositionIndicator(CONTAINER, scene, tool, { color: 0x4ade80 });
-                        // show the starting position
-                        window.CURRENT_POSITION_INDICATOR.update && window.CURRENT_POSITION_INDICATOR.update(currentPosition);
-                    }
-                } catch (err) {
-                    console.warn('createPositionIndicator failed', err);
-                }
-            animate();
+        window.LATEST_MESH = {
+          bounds: {
+            minX: -materialSize / 2,
+            maxX: materialSize / 2,
+            minY: -materialSize / 2,
+            maxY: materialSize / 2,
+          },
+          size: size,
+          values: values,
         };
 
-        function applyLevelingToGCode() {
-            const gcodeText = document.getElementById('gcode-input').value;
-            if (!window.LATEST_MESH) {
-                showMessage('ERROR: No leveling mesh available. Run "Simular Sondaje y Malla" first.', 'bg-red-500');
-                return;
-            }
+        // Visualize probe points and the generated mesh overlay in the 3D scene
+        try {
+          if (scene && window.THREE_MESH) {
+            // remove previous overlays if present
+            const prevProbe = scene.getObjectByName('probe-points');
+            if (prevProbe) scene.remove(prevProbe);
+            const prevMesh = scene.getObjectByName('mesh-overlay');
+            if (prevMesh) scene.remove(prevMesh);
 
-            if (!window.GCODE_TRANSFORM || typeof window.GCODE_TRANSFORM.applyMeshCompensationToGCode !== 'function') {
-                showMessage('ERROR: Transform module not loaded.', 'bg-red-500');
-                return;
+            // convert meshData into numeric probe points
+            const probePoints = meshData.map((m) => ({
+              x: Number(m.x),
+              y: Number(m.y),
+              z: Number(m.z),
+            }));
+            if (typeof window.THREE_MESH.renderProbePoints === 'function') {
+              window.THREE_MESH.renderProbePoints(scene, probePoints, {
+                name: 'probe-points',
+                radius: 0.2,
+                color: 0xffcc00,
+              });
             }
-
-            const newGcode = window.GCODE_TRANSFORM.applyMeshCompensationToGCode(gcodeText, window.LATEST_MESH);
-            document.getElementById('gcode-input').value = newGcode;
-            showMessage('G-Code updated with mesh compensation.', 'bg-green-600');
+            if (typeof window.THREE_MESH.renderMeshOverlay === 'function') {
+              window.THREE_MESH.renderMeshOverlay(scene, window.LATEST_MESH, {
+                name: 'mesh-overlay',
+                pointSize: 0.15,
+                color: 0x00ff00,
+              });
+            }
+          }
+        } catch (err) {
+          console.warn('mesh visualization failed', err);
         }
 
-        function exportCompensatedGCode() {
-            const gcodeText = document.getElementById('gcode-input').value;
-            if (!gcodeText || !gcodeText.trim()) {
-                showMessage('ERROR: No G-Code to export.', 'bg-red-500');
-                return;
-            }
+        // Aquí se calcularía la matriz de compensación real (bilinear interpolation)
+        showMessage(
+          `FINALIZADO: Malla de compensación conceptual generada con ${numPoints} puntos.`,
+          'bg-purple-600'
+        );
 
-            // Apply mesh compensation if available
-            let finalGcode = gcodeText;
-            if (window.LATEST_MESH && window.GCODE_TRANSFORM && typeof window.GCODE_TRANSFORM.applyMeshCompensationToGCode === 'function') {
-                finalGcode = window.GCODE_TRANSFORM.applyMeshCompensationToGCode(gcodeText, window.LATEST_MESH);
-                showMessage('Exporting G-Code with mesh compensation applied...', 'bg-blue-600');
-            } else {
-                showMessage('Exporting G-Code without mesh compensation...', 'bg-yellow-600');
-            }
+        // En una aplicación real, esta malla se enviaría al firmware (ej. GRBL con soporte ABL)
+        // o se usaría para reescribir/compensar el G-Code antes de la simulación.
+        console.log('Datos de la Malla:', meshData);
+      }
 
-            // Create downloadable file
-            const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
-            const filename = `gcode-compensated-${timestamp}.nc`;
-            
-            const blob = new Blob([finalGcode], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = filename;
-            link.click();
-            URL.revokeObjectURL(url);
+      // --- Inicialización al cargar la ventana ---
+      window.onload = function () {
+        // initThreeJS returns internals via the module helper and already sets up the tool
+        initThreeJS();
+        // Create a visual position indicator (DOM overlay + small 3D marker)
+        try {
+          if (
+            window.THREE_HELPER &&
+            typeof window.THREE_HELPER.createPositionIndicator === 'function'
+          ) {
+            window.CURRENT_POSITION_INDICATOR = window.THREE_HELPER.createPositionIndicator(
+              CONTAINER,
+              scene,
+              tool,
+              { color: 0x4ade80 }
+            );
+            // show the starting position
+            window.CURRENT_POSITION_INDICATOR.update &&
+              window.CURRENT_POSITION_INDICATOR.update(currentPosition);
+          }
+        } catch (err) {
+          console.warn('createPositionIndicator failed', err);
+        }
+        animate();
+      };
 
-            showMessage(`G-Code exported as ${filename}`, 'bg-green-600');
+      function applyLevelingToGCode() {
+        const gcodeText = document.getElementById('gcode-input').value;
+        if (!window.LATEST_MESH) {
+          showMessage(
+            'ERROR: No leveling mesh available. Run "Simular Sondaje y Malla" first.',
+            'bg-red-500'
+          );
+          return;
         }
 
+        if (
+          !window.GCODE_TRANSFORM ||
+          typeof window.GCODE_TRANSFORM.applyMeshCompensationToGCode !== 'function'
+        ) {
+          showMessage('ERROR: Transform module not loaded.', 'bg-red-500');
+          return;
+        }
+
+        const newGcode = window.GCODE_TRANSFORM.applyMeshCompensationToGCode(
+          gcodeText,
+          window.LATEST_MESH
+        );
+        document.getElementById('gcode-input').value = newGcode;
+        showMessage('G-Code updated with mesh compensation.', 'bg-green-600');
+      }
+
+      function exportCompensatedGCode() {
+        const gcodeText = document.getElementById('gcode-input').value;
+        if (!gcodeText || !gcodeText.trim()) {
+          showMessage('ERROR: No G-Code to export.', 'bg-red-500');
+          return;
+        }
+
+        // Apply mesh compensation if available
+        let finalGcode = gcodeText;
+        if (
+          window.LATEST_MESH &&
+          window.GCODE_TRANSFORM &&
+          typeof window.GCODE_TRANSFORM.applyMeshCompensationToGCode === 'function'
+        ) {
+          finalGcode = window.GCODE_TRANSFORM.applyMeshCompensationToGCode(
+            gcodeText,
+            window.LATEST_MESH
+          );
+          showMessage('Exporting G-Code with mesh compensation applied...', 'bg-blue-600');
+        } else {
+          showMessage('Exporting G-Code without mesh compensation...', 'bg-yellow-600');
+        }
+
+        // Create downloadable file
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+        const filename = `gcode-compensated-${timestamp}.nc`;
+
+        const blob = new Blob([finalGcode], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        link.click();
+        URL.revokeObjectURL(url);
+
+        showMessage(`G-Code exported as ${filename}`, 'bg-green-600');
+      }
+
+      function loadGCodeFromFile(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const content = e.target.result;
+          document.getElementById('gcode-input').value = content;
+          showMessage(`Loaded ${file.name} (${(file.size / 1024).toFixed(1)} KB)`, 'bg-green-600');
+        };
+        reader.onerror = () => {
+          showMessage('ERROR: Failed to read file', 'bg-red-500');
+        };
+        reader.readAsText(file);
+      }
     </script>
-</body>
+  </body>
 </html>
