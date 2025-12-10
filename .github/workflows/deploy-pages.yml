@@ -1,0 +1,97 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: 'pages'
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Create deployment directory
+        run: |
+          mkdir -p _site
+          cp -r Simulator/web/* _site/
+          
+          # Create index.html redirecting to front.html
+          cat > _site/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="utf-8">
+            <meta http-equiv="refresh" content="0; url=front.html">
+            <title>RPI-CNC Simulator</title>
+          </head>
+          <body>
+            <p>Redirecting to <a href="front.html">simulator</a>...</p>
+          </body>
+          </html>
+          EOF
+          
+          # Create a simple navigation page
+          cat > _site/nav.html << 'EOF'
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="utf-8">
+            <title>RPI-CNC Project</title>
+            <style>
+              body { font-family: system-ui, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+              h1 { color: #2277dd; }
+              .card { border: 1px solid #ddd; padding: 20px; margin: 20px 0; border-radius: 8px; }
+              a { color: #2277dd; text-decoration: none; font-weight: bold; }
+              a:hover { text-decoration: underline; }
+            </style>
+          </head>
+          <body>
+            <h1>🔧 RPI-CNC Project</h1>
+            <p>Raspberry Pi CNC Simulator & Collaboration Tools</p>
+            
+            <div class="card">
+              <h2>📐 <a href="front.html">CNC Simulator</a></h2>
+              <p>3D visualization, G-Code editor, auto-leveling simulation</p>
+            </div>
+            
+            <div class="card">
+              <h2>👥 <a href="demo.html">Collaboration Demo</a></h2>
+              <p>Multi-client session management and real-time collaboration</p>
+            </div>
+            
+            <div class="card">
+              <h2>📊 <a href="dashboard.html">Activity Dashboard</a></h2>
+              <p>Real-time monitoring of collaboration sessions</p>
+            </div>
+            
+            <p><small>Note: WebSocket features require a running server. Use the simulator offline for G-Code visualization.</small></p>
+          </body>
+          </html>
+          EOF
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -199,6 +199,22 @@
               />
               <span id="toolpath-smooth-label" class="text-xs text-gray-500 ml-3">1</span>
             </div>
+
+            <!-- Toolpath optimization controls -->
+            <div class="flex items-center gap-2 mt-2">
+              <button
+                onclick="optimizeToolpath()"
+                class="flex-1 bg-green-600 text-white p-2 rounded-md text-sm font-bold hover:bg-green-700"
+              >
+                ⚡ Optimize Path
+              </button>
+              <button
+                onclick="showOptimizationReport()"
+                class="flex-1 bg-blue-600 text-white p-2 rounded-md text-sm font-bold hover:bg-blue-700"
+              >
+                📊 Report
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -837,6 +853,89 @@
           showMessage('ERROR: Failed to read file', 'bg-red-500');
         };
         reader.readAsText(file);
+      }
+
+      function optimizeToolpath() {
+        const gcodeText = document.getElementById('gcode-input').value;
+        if (!gcodeText || !gcodeText.trim()) {
+          showMessage('ERROR: No G-Code to optimize.', 'bg-red-500');
+          return;
+        }
+
+        const lines = gcodeText
+          .split(/\r?\n/)
+          .filter((l) => l.trim() && !l.trim().startsWith(';') && !l.trim().startsWith('('));
+        const optimized = [];
+        let lastX, lastY, lastZ;
+        let rapidMoves = 0,
+          redundantMoves = 0;
+
+        lines.forEach((line) => {
+          const l = line.trim().toUpperCase();
+          const xMatch = l.match(/X(-?\d+\.?\d*)/);
+          const yMatch = l.match(/Y(-?\d+\.?\d*)/);
+          const zMatch = l.match(/Z(-?\d+\.?\d*)/);
+
+          const x = xMatch ? parseFloat(xMatch[1]) : lastX;
+          const y = yMatch ? parseFloat(yMatch[1]) : lastY;
+          const z = zMatch ? parseFloat(zMatch[1]) : lastZ;
+
+          // Skip redundant moves (same position)
+          if (x === lastX && y === lastY && z === lastZ) {
+            redundantMoves++;
+            return;
+          }
+
+          // Convert rapid moves at safe Z to G0
+          if (l.startsWith('G1') && z !== undefined && z > 5) {
+            optimized.push(line.replace('G1', 'G0'));
+            rapidMoves++;
+          } else {
+            optimized.push(line);
+          }
+
+          lastX = x;
+          lastY = y;
+          lastZ = z;
+        });
+
+        document.getElementById('gcode-input').value = optimized.join('\n');
+        window.OPTIMIZATION_STATS = {
+          original: lines.length,
+          optimized: optimized.length,
+          redundantMoves,
+          rapidMoves,
+          reduction: ((1 - optimized.length / lines.length) * 100).toFixed(1),
+        };
+        showMessage(
+          `Optimized: removed ${redundantMoves} redundant moves, converted ${rapidMoves} to rapid`,
+          'bg-green-600'
+        );
+      }
+
+      function showOptimizationReport() {
+        if (!window.OPTIMIZATION_STATS) {
+          showMessage(
+            'No optimization performed yet. Click "⚡ Optimize Path" first.',
+            'bg-yellow-600'
+          );
+          return;
+        }
+
+        const stats = window.OPTIMIZATION_STATS;
+        const report = `
+📊 OPTIMIZATION REPORT
+
+Original lines:     ${stats.original}
+Optimized lines:    ${stats.optimized}
+Redundant moves:    ${stats.redundantMoves}
+Rapid conversions:  ${stats.rapidMoves}
+Size reduction:     ${stats.reduction}%
+
+Performance gain: Fewer moves = faster execution
+        `.trim();
+
+        alert(report);
       }
     </script>
   </body>

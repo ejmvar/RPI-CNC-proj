@@ -47,6 +47,31 @@
       </ul>
     </div>
 
+    <h2>Chat & Annotations</h2>
+    <div style="border: 1px solid #ccc; padding: 8px; margin-bottom: 8px">
+      <div
+        id="chat-messages"
+        style="
+          height: 150px;
+          overflow-y: auto;
+          background: #f9f9f9;
+          padding: 8px;
+          margin-bottom: 8px;
+          border-radius: 4px;
+        "
+      ></div>
+      <div style="display: flex; gap: 8px">
+        <input
+          type="text"
+          id="chat-input"
+          placeholder="Type a message or annotation..."
+          style="flex: 1; padding: 6px"
+        />
+        <button id="send-chat">Send</button>
+        <button id="send-annotation">📌 Annotate</button>
+      </div>
+    </div>
+
     <h2>Messages</h2>
     <div id="log">(log)</div>
 
@@ -341,6 +366,71 @@
           }
         };
         reader.readAsText(file);
+      });
+
+      // Chat and annotation features
+      const chatMessages = [];
+      const annotations = [];
+
+      function displayChatMessage(msg) {
+        const chatDiv = document.getElementById('chat-messages');
+        const msgEl = document.createElement('div');
+        msgEl.style.marginBottom = '6px';
+        msgEl.style.padding = '4px 8px';
+        msgEl.style.borderRadius = '4px';
+        msgEl.style.background = msg.type === 'annotation' ? '#fff3cd' : '#e7f3ff';
+        msgEl.innerHTML = `<strong>${msg.from || 'anon'}:</strong> ${
+          msg.type === 'annotation' ? '📌 ' : ''
+        }${msg.text} <small style="color:#666">${new Date(
+          msg.timestamp
+        ).toLocaleTimeString()}</small>`;
+        chatDiv.appendChild(msgEl);
+        chatDiv.scrollTop = chatDiv.scrollHeight;
+      }
+
+      document.getElementById('send-chat').addEventListener('click', () => {
+        const input = document.getElementById('chat-input');
+        const text = input.value.trim();
+        if (!text) return;
+        const msg = {
+          type: 'chat',
+          from: document.getElementById('client-id').value || 'anon',
+          text,
+          timestamp: Date.now(),
+        };
+        chatMessages.push(msg);
+        displayChatMessage(msg);
+        // broadcast via client if connected
+        if (client) {
+          client.send(JSON.stringify({ action: 'chat', message: msg }));
+        }
+        input.value = '';
+        log('Chat sent: ' + text);
+      });
+
+      document.getElementById('send-annotation').addEventListener('click', () => {
+        const input = document.getElementById('chat-input');
+        const text = input.value.trim();
+        if (!text) return;
+        const msg = {
+          type: 'annotation',
+          from: document.getElementById('client-id').value || 'anon',
+          text,
+          timestamp: Date.now(),
+        };
+        annotations.push(msg);
+        displayChatMessage(msg);
+        if (client) {
+          client.send(JSON.stringify({ action: 'annotate', message: msg }));
+        }
+        input.value = '';
+        log('Annotation sent: ' + text);
+      });
+
+      document.getElementById('chat-input').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          document.getElementById('send-chat').click();
+        }
       });
     </script>
   </body>
