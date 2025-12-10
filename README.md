@@ -35,6 +35,17 @@ Lightweight browser-based simulator for a Raspberry Pi CNC educational project. 
 
 ## Quick Start
 
+### Option 1: Quick Access via Makefile (Recommended)
+
+```bash
+make help    # See all available commands
+make s       # Start server (alias for 'serve')
+make t       # Run tests (alias for 'test')
+make c       # Check coverage (alias for 'coverage')
+```
+
+### Option 2: Manual Commands
+
 1. Serve the simulator locally:
 
 ```bash
@@ -57,6 +68,12 @@ npm run test:coverage # With coverage report
 npm run test:coverage
 open coverage/index.html
 ```
+
+## Documentation
+
+- **[Firmware Integration Guide](docs/FIRMWARE_INTEGRATION.md)**: 5 approaches to connect with real/simulated CNC firmware (Serial, WebSocket, REST, GPIO, Mock GRBL)
+- **[Performance Optimization Guide](docs/PERFORMANCE_OPTIMIZATION.md)**: Detailed strategies for parser, rendering, and memory optimization
+- **[Makefile Reference](#makefile-commands)**: Complete list of 40+ development commands
 
 ## New Features (December 2025)
 
@@ -82,6 +99,65 @@ Benchmark suite in `tests/ut/gcode/parser.benchmark.test.js`:
 
 - Measures parsing throughput (100, 1000, 10000 lines)
 - Memory efficiency tracking
+
+## Makefile Commands
+
+The project includes a comprehensive Makefile with 40+ documented commands organized into categories:
+
+### Testing Commands
+
+```bash
+make test              # Run all tests
+make test-quick        # Fast tests (exclude WebSocket)
+make test-coverage     # Coverage report
+make test-unit         # Unit tests only
+make test-integration  # Integration tests
+make test-e2e          # End-to-end tests
+make test-grbl         # GRBL firmware tests
+make watch             # Watch mode
+```
+
+### Development Commands
+
+```bash
+make serve             # Start dev server (localhost:8000)
+make dev               # Start dev server
+make clean             # Remove generated files
+make fix               # Auto-fix linting issues
+make status            # Git status + coverage stats
+make commit-check      # Pre-commit validation
+```
+
+### Firmware & Performance
+
+```bash
+make run-grbl          # Interactive GRBL simulator
+make firmware-info     # Show 5 integration options
+make benchmark         # Run performance benchmarks
+make perf-report       # Detailed performance analysis
+make optimization-tips # Show optimization strategies
+```
+
+### Utilities
+
+```bash
+make help              # Show categorized help
+make list              # List all targets
+make coverage          # Alias for test-coverage
+```
+
+### Quick Aliases
+
+```bash
+make t                 # Alias for test
+make s                 # Alias for serve
+make c                 # Alias for coverage
+make l                 # Alias for list
+make b                 # Alias for benchmark
+```
+
+Run `make help` for the complete categorized list with descriptions.
+
 - Complex G-code with comments
 
 ### Mock GRBL Interface

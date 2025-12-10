@@ -27,8 +27,8 @@ describe('front.html G-Code export integration', () => {
   });
 
   test('export function applies mesh compensation when available', () => {
-    expect(frontHtml).toMatch(/if \(window\.LATEST_MESH/);
-    expect(frontHtml).toMatch(/applyMeshCompensationToGCode\(gcodeText, window\.LATEST_MESH\)/);
+    expect(frontHtml).toMatch(/if \(\s*window\.LATEST_MESH/);
+    expect(frontHtml).toMatch(/window\.GCODE_TRANSFORM\.applyMeshCompensationToGCode/);
   });
 
   test('export function handles case when no mesh is available', () => {

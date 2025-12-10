@@ -13,20 +13,24 @@ describe('Backend module coverage', () => {
       expect(typeof collabIndex.createCollabServer).toBe('function');
     });
 
-    it('exports handleCollabMessage', () => {
-      expect(typeof collabIndex.handleCollabMessage).toBe('function');
+    it('creates collab server instance', () => {
+      const server = collabIndex.createCollabServer();
+      expect(server).toBeDefined();
+      expect(typeof server.createSession).toBe('function');
     });
 
-    it('handles collab message types', () => {
-      const message = { type: 'gcode', data: 'G0 X10', clientId: 'test123' };
-      const result = collabIndex.handleCollabMessage(message);
-      expect(result).toBeDefined();
+    it('creates and manages sessions', () => {
+      const server = collabIndex.createCollabServer();
+      const session = server.createSession('test123', { gcode: 'G0 X10' });
+      expect(session.id).toBe('test123');
+      expect(session.state.gcode).toBe('G0 X10');
     });
 
-    it('handles mesh broadcast', () => {
-      const message = { type: 'mesh', data: { grid: [[0]] }, clientId: 'test123' };
-      const result = collabIndex.handleCollabMessage(message);
-      expect(result).toBeDefined();
+    it('handles session updates', () => {
+      const server = collabIndex.createCollabServer();
+      server.createSession('test123', { gcode: 'G0 X10' });
+      const updated = server.updateSession('test123', { mesh: { grid: [[0]] } });
+      expect(updated.mesh).toBeDefined();
     });
   });
 
