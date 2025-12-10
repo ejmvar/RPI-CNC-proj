@@ -1,9 +1,9 @@
 {
   "total": {
-    "lines": { "total": 968, "covered": 299, "skipped": 0, "pct": 30.88 },
-    "statements": { "total": 1140, "covered": 318, "skipped": 0, "pct": 27.89 },
-    "functions": { "total": 186, "covered": 65, "skipped": 0, "pct": 34.94 },
-    "branches": { "total": 669, "covered": 121, "skipped": 0, "pct": 18.08 },
+    "lines": { "total": 968, "covered": 345, "skipped": 0, "pct": 35.64 },
+    "statements": { "total": 1140, "covered": 367, "skipped": 0, "pct": 32.19 },
+    "functions": { "total": 186, "covered": 76, "skipped": 0, "pct": 40.86 },
+    "branches": { "total": 669, "covered": 153, "skipped": 0, "pct": 22.86 },
     "branchesTrue": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
   },
   "/WRK/RPI-CNC-proj/Simulator/web/js/collab-client.mjs": {
@@ -49,16 +49,16 @@
     "branches": { "total": 24, "covered": 0, "skipped": 0, "pct": 0 }
   },
   "/WRK/RPI-CNC-proj/modules/backend/collab/index.js": {
-    "lines": { "total": 34, "covered": 23, "skipped": 0, "pct": 67.64 },
-    "functions": { "total": 7, "covered": 5, "skipped": 0, "pct": 71.42 },
-    "statements": { "total": 38, "covered": 23, "skipped": 0, "pct": 60.52 },
+    "lines": { "total": 34, "covered": 24, "skipped": 0, "pct": 70.58 },
+    "functions": { "total": 7, "covered": 6, "skipped": 0, "pct": 85.71 },
+    "statements": { "total": 38, "covered": 24, "skipped": 0, "pct": 63.15 },
     "branches": { "total": 30, "covered": 14, "skipped": 0, "pct": 46.66 }
   },
   "/WRK/RPI-CNC-proj/modules/backend/collab/ws-server.js": {
-    "lines": { "total": 71, "covered": 12, "skipped": 0, "pct": 16.9 },
-    "functions": { "total": 10, "covered": 1, "skipped": 0, "pct": 10 },
-    "statements": { "total": 76, "covered": 13, "skipped": 0, "pct": 17.1 },
-    "branches": { "total": 61, "covered": 4, "skipped": 0, "pct": 6.55 }
+    "lines": { "total": 71, "covered": 64, "skipped": 0, "pct": 90.14 },
+    "functions": { "total": 10, "covered": 10, "skipped": 0, "pct": 100 },
+    "statements": { "total": 76, "covered": 67, "skipped": 0, "pct": 88.15 },
+    "branches": { "total": 61, "covered": 39, "skipped": 0, "pct": 63.93 }
   },
   "/WRK/RPI-CNC-proj/modules/backend/firmware/mock-grbl.js": {
     "lines": { "total": 88, "covered": 85, "skipped": 0, "pct": 96.59 },
@@ -79,10 +79,10 @@
     "branches": { "total": 6, "covered": 3, "skipped": 0, "pct": 50 }
   },
   "/WRK/RPI-CNC-proj/modules/backend/gateway/ws-bridge.js": {
-    "lines": { "total": 17, "covered": 8, "skipped": 0, "pct": 47.05 },
-    "functions": { "total": 5, "covered": 1, "skipped": 0, "pct": 20 },
-    "statements": { "total": 21, "covered": 9, "skipped": 0, "pct": 42.85 },
-    "branches": { "total": 12, "covered": 4, "skipped": 0, "pct": 33.33 }
+    "lines": { "total": 17, "covered": 0, "skipped": 0, "pct": 0 },
+    "functions": { "total": 5, "covered": 0, "skipped": 0, "pct": 0 },
+    "statements": { "total": 21, "covered": 0, "skipped": 0, "pct": 0 },
+    "branches": { "total": 12, "covered": 0, "skipped": 0, "pct": 0 }
   },
   "/WRK/RPI-CNC-proj/modules/backend/server/http-server.js": {
     "lines": { "total": 70, "covered": 52, "skipped": 0, "pct": 74.28 },
@@ -97,10 +97,10 @@
     "branches": { "total": 17, "covered": 7, "skipped": 0, "pct": 41.17 }
   },
   "/WRK/RPI-CNC-proj/modules/backend/session/index.js": {
-    "lines": { "total": 16, "covered": 15, "skipped": 0, "pct": 93.75 },
-    "functions": { "total": 4, "covered": 2, "skipped": 0, "pct": 50 },
-    "statements": { "total": 20, "covered": 15, "skipped": 0, "pct": 75 },
-    "branches": { "total": 10, "covered": 6, "skipped": 0, "pct": 60 }
+    "lines": { "total": 16, "covered": 16, "skipped": 0, "pct": 100 },
+    "functions": { "total": 4, "covered": 4, "skipped": 0, "pct": 100 },
+    "statements": { "total": 20, "covered": 18, "skipped": 0, "pct": 90 },
+    "branches": { "total": 10, "covered": 7, "skipped": 0, "pct": 70 }
   },
   "/WRK/RPI-CNC-proj/modules/backend/streaming/position-streamer.js": {
     "lines": { "total": 21, "covered": 21, "skipped": 0, "pct": 100 },

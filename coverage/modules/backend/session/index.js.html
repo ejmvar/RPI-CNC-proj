@@ -23,27 +23,27 @@
         </h1>
         <div class="clearfix">
           <div class="fl pad1y space-right2">
-            <span class="strong">75% </span>
+            <span class="strong">90% </span>
             <span class="quiet">Statements</span>
-            <span class="fraction">15/20</span>
+            <span class="fraction">18/20</span>
           </div>
 
           <div class="fl pad1y space-right2">
-            <span class="strong">60% </span>
+            <span class="strong">70% </span>
             <span class="quiet">Branches</span>
-            <span class="fraction">6/10</span>
+            <span class="fraction">7/10</span>
           </div>
 
           <div class="fl pad1y space-right2">
-            <span class="strong">50% </span>
+            <span class="strong">100% </span>
             <span class="quiet">Functions</span>
-            <span class="fraction">2/4</span>
+            <span class="fraction">4/4</span>
           </div>
 
           <div class="fl pad1y space-right2">
-            <span class="strong">93.75% </span>
+            <span class="strong">100% </span>
             <span class="quiet">Lines</span>
-            <span class="fraction">15/16</span>
+            <span class="fraction">16/16</span>
           </div>
         </div>
         <p class="quiet">
@@ -86,33 +86,33 @@
 <a name='L25'></a><a href='#L25'>25</a>
 <a name='L26'></a><a href='#L26'>26</a>
 <a name='L27'></a><a href='#L27'>27</a>
-<a name='L28'></a><a href='#L28'>28</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
+<a name='L28'></a><a href='#L28'>28</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">const fs = require('fs');
 const path = require('path');
 &nbsp;
@@ -130,13 +130,13 @@ function saveSession(filename, sessionObj) {
 function loadSession(filename) {
   const safeName = path.basename(filename || <span class="branch-1 cbranch-no" title="branch not covered" >'')</span>;
   const fp = path.join(SESSIONS_DIR, safeName);
-  <span class="missing-if-branch" title="if path not taken" >I</span>if (!fs.existsSync(fp)) <span class="cstat-no" title="statement not covered" >throw Object.assign(new Error('not_found'), { code: 'ENOENT' });</span>
+  if (!fs.existsSync(fp)) throw Object.assign(new Error('not_found'), { code: 'ENOENT' });
   const raw = fs.readFileSync(fp, 'utf8');
   return JSON.parse(raw);
 }
 &nbsp;
-function <span class="fstat-no" title="function not covered" >listSessions(</span>) {
-<span class="cstat-no" title="statement not covered" >  return fs.readdirSync(SESSIONS_DIR).filter(<span class="fstat-no" title="function not covered" >f </span>=&gt; <span class="cstat-no" title="statement not covered" >fs.statSync(path.join(SESSIONS_DIR, f)).isFile())</span>;</span>
+function listSessions() {
+  return fs.readdirSync(SESSIONS_DIR).filter(f =&gt; fs.statSync(path.join(SESSIONS_DIR, f)).isFile());
 }
 &nbsp;
 module.exports = { saveSession, loadSession, listSessions, SESSIONS_DIR };
@@ -149,7 +149,7 @@ module.exports = { saveSession, loadSession, listSessions, SESSIONS_DIR };
     <div class="footer quiet pad2 space-top1 center small">
       Code coverage generated by
       <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-      at 2025-12-10T02:42:42.507Z
+      at 2025-12-10T20:48:16.106Z
     </div>
     <script src="../../../prettify.js"></script>
     <script>

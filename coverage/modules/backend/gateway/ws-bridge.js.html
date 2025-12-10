@@ -23,27 +23,27 @@
         </h1>
         <div class="clearfix">
           <div class="fl pad1y space-right2">
-            <span class="strong">42.85% </span>
+            <span class="strong">0% </span>
             <span class="quiet">Statements</span>
-            <span class="fraction">9/21</span>
+            <span class="fraction">0/21</span>
           </div>
 
           <div class="fl pad1y space-right2">
-            <span class="strong">33.33% </span>
+            <span class="strong">0% </span>
             <span class="quiet">Branches</span>
-            <span class="fraction">4/12</span>
+            <span class="fraction">0/12</span>
           </div>
 
           <div class="fl pad1y space-right2">
-            <span class="strong">20% </span>
+            <span class="strong">0% </span>
             <span class="quiet">Functions</span>
-            <span class="fraction">1/5</span>
+            <span class="fraction">0/5</span>
           </div>
 
           <div class="fl pad1y space-right2">
-            <span class="strong">47.05% </span>
+            <span class="strong">0% </span>
             <span class="quiet">Lines</span>
-            <span class="fraction">8/17</span>
+            <span class="fraction">0/17</span>
           </div>
         </div>
         <p class="quiet">
@@ -114,21 +114,13 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -138,6 +130,14 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -151,32 +151,32 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// Optional WebSocket bridge for the firmware gateway.
 // This file tries to require('ws') lazily so the project has no hard dependency.
 // If 'ws' is not installed, createWsBridge returns null so consumers can fallback.
 &nbsp;
-function createWsBridge(gateway, opts = {}) {
+function <span class="fstat-no" title="function not covered" >createWsBridge(</span>gateway, opts = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> {
   // gateway should be an EventEmitter-like object exposing sendCommand and 'data' events
   let WsServer;
-  try {
+<span class="cstat-no" title="statement not covered" >  try {</span>
     // require lazily — if not installed, return null
     // eslint-disable-next-line global-require
-    WsServer = require('ws').Server;
+<span class="cstat-no" title="statement not covered" >    WsServer = require('ws').Server;</span>
   } catch (e) {
 <span class="cstat-no" title="statement not covered" >    return null;</span>
   }
 &nbsp;
-  const { server, path = '/gateway' } = opts;
-  if (!server) throw new Error('http server required');
+  const { server, path = <span class="branch-0 cbranch-no" title="branch not covered" >'/gateway' </span>} = <span class="cstat-no" title="statement not covered" >opts;</span>
+<span class="cstat-no" title="statement not covered" >  if (!server) <span class="cstat-no" title="statement not covered" >throw new Error('http server required');</span></span>
 &nbsp;
-  const wss = new WsServer({ server, path });
+  const wss = <span class="cstat-no" title="statement not covered" >new WsServer({ server, path });</span>
 &nbsp;
   // forward incoming messages from clients to the gateway as commands
-  wss.on('connection', <span class="fstat-no" title="function not covered" >(s</span>ocket) =&gt; {
+<span class="cstat-no" title="statement not covered" >  wss.on('connection', <span class="fstat-no" title="function not covered" >(s</span>ocket) =&gt; {</span>
     // when a client sends a message, forward to gateway
 <span class="cstat-no" title="statement not covered" >    socket.on('message', <span class="fstat-no" title="function not covered" >as</span>ync (msg) =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >      try {</span>
@@ -199,10 +199,10 @@ function createWsBridge(gateway, opts = {}) {
 <span class="cstat-no" title="statement not covered" >    socket.on('close', <span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >gateway.removeListener('data', onData))</span>;</span>
   });
 &nbsp;
-  return wss;
+<span class="cstat-no" title="statement not covered" >  return wss;</span>
 }
 &nbsp;
-module.exports = { createWsBridge };
+<span class="cstat-no" title="statement not covered" >module.exports = { createWsBridge };</span>
 &nbsp;</pre></td></tr></table></pre>
 
       <div class="push"></div>
@@ -212,7 +212,7 @@ module.exports = { createWsBridge };
     <div class="footer quiet pad2 space-top1 center small">
       Code coverage generated by
       <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-      at 2025-12-10T02:42:42.507Z
+      at 2025-12-10T20:48:16.106Z
     </div>
     <script src="../../../prettify.js"></script>
     <script>
