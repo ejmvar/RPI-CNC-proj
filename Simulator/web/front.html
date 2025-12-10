@@ -74,6 +74,7 @@
                 <button id="play-btn" onclick="toggleSimulation()" class="w-full bg-teal-500 text-white p-3 rounded-lg font-bold hover:bg-teal-600 control-btn shadow-teal-800">▶️ Simular</button>
                 <button onclick="applyLevelingToGCode()" class="w-full bg-indigo-500 text-white p-3 rounded-lg font-bold hover:bg-indigo-600 control-btn shadow-indigo-800">Apply Leveling</button>
                 <button id="pause-btn" onclick="pauseSimulation()" class="w-full bg-amber-500 text-white p-3 rounded-lg font-bold hover:bg-amber-600 control-btn shadow-amber-800">⏸️ Pausar</button>
+                <button onclick="exportCompensatedGCode()" class="w-full bg-purple-500 text-white p-3 rounded-lg font-bold hover:bg-purple-600 control-btn shadow-purple-800">💾 Export G-Code</button>
                 <button onclick="resetSimulation()" class="w-full bg-red-500 text-white p-3 rounded-lg font-bold hover:bg-red-600 control-btn shadow-red-800">⏹️ Resetear</button>
                 <!-- Playback/Speed Controls -->
                 <div class="col-span-2 mt-2">
@@ -551,6 +552,37 @@
             const newGcode = window.GCODE_TRANSFORM.applyMeshCompensationToGCode(gcodeText, window.LATEST_MESH);
             document.getElementById('gcode-input').value = newGcode;
             showMessage('G-Code updated with mesh compensation.', 'bg-green-600');
+        }
+
+        function exportCompensatedGCode() {
+            const gcodeText = document.getElementById('gcode-input').value;
+            if (!gcodeText || !gcodeText.trim()) {
+                showMessage('ERROR: No G-Code to export.', 'bg-red-500');
+                return;
+            }
+
+            // Apply mesh compensation if available
+            let finalGcode = gcodeText;
+            if (window.LATEST_MESH && window.GCODE_TRANSFORM && typeof window.GCODE_TRANSFORM.applyMeshCompensationToGCode === 'function') {
+                finalGcode = window.GCODE_TRANSFORM.applyMeshCompensationToGCode(gcodeText, window.LATEST_MESH);
+                showMessage('Exporting G-Code with mesh compensation applied...', 'bg-blue-600');
+            } else {
+                showMessage('Exporting G-Code without mesh compensation...', 'bg-yellow-600');
+            }
+
+            // Create downloadable file
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+            const filename = `gcode-compensated-${timestamp}.nc`;
+            
+            const blob = new Blob([finalGcode], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            link.click();
+            URL.revokeObjectURL(url);
+
+            showMessage(`G-Code exported as ${filename}`, 'bg-green-600');
         }
 
     </script>
