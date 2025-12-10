@@ -37,6 +37,9 @@ test-e2e:
 test-browser:
 	npm test -- tests/e2e/collab-browser.test.js --runInBand || true
 
+baseline:
+	npm test -- tests/e2e/visual-snapshot.test.js --runInBand || true
+
 demo:
 	node scripts/collab-demo.js
 

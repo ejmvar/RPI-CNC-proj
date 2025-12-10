@@ -25,6 +25,7 @@
 
     <div id="activity">
       <h3>Activity & logs</h3>
+      <div id="counters" style="display:flex; gap:8px; margin-bottom:8px"></div>
       <div id="log">(log)</div>
       <div style="margin-top:8px">
         <button id="clearLog">Clear</button>
@@ -55,9 +56,21 @@
       document.getElementById('connect').addEventListener('click', () => {
         client = createCollabClient(document.getElementById('url').value);
         client.on('message', m => log('message ' + JSON.stringify(m)));
-        client.on('sessionCreated', (m) => { sessions[m.sessionId] = m; renderSessions(); log('session created ' + m.sessionId); });
-        client.on('sessionUpdated', (m) => { sessions[m.sessionId] = m; renderSessions(); log('session updated ' + m.sessionId + ' -> ' + JSON.stringify(m.state)); });
-        client.on('clientJoined', (m) => { const s = sessions[m.sessionId] || {}; s.clients = m.clients || s.clients || []; sessions[m.sessionId] = s; renderSessions(); log('client joined ' + m.clientId + ' -> ' + m.sessionId); });
+        client.on('sessionCreated', (m) => { sessions[m.sessionId] = Object.assign({}, m, { activity: 0 }); renderSessions(); log('session created ' + m.sessionId); updateCounters(); });
+        client.on('sessionUpdated', (m) => { sessions[m.sessionId] = Object.assign({}, m, { activity: (sessions[m.sessionId] && sessions[m.sessionId].activity) || 0 }); sessions[m.sessionId].activity++; renderSessions(); log('session updated ' + m.sessionId + ' -> ' + JSON.stringify(m.state)); updateCounters(); });
+        client.on('clientJoined', (m) => { const s = sessions[m.sessionId] || {}; s.clients = m.clients || s.clients || []; sessions[m.sessionId] = Object.assign({}, s, { activity: (s.activity || 0) }); renderSessions(); log('client joined ' + m.clientId + ' -> ' + m.sessionId); updateCounters(); });
+
+        function updateCounters() {
+          const el = document.getElementById('counters'); el.innerHTML = '';
+          const keys = Object.keys(sessions);
+          keys.forEach(k => {
+            const s = sessions[k] || {};
+            const badge = document.createElement('div');
+            badge.style.padding = '8px'; badge.style.border = '1px solid #ddd'; badge.style.borderRadius = '6px'; badge.style.minWidth = '120px';
+            badge.innerHTML = `<div style="font-weight:700">${k}</div><div style="font-size:12px">clients: ${s.clients ? s.clients.length : 0}</div><div style="font-size:11px;color:#666">activity: ${s.activity || 0}</div>`;
+            el.appendChild(badge);
+          });
+        }
         client.connect();
       });
 
