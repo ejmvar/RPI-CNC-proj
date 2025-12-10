@@ -1,5 +1,7 @@
 module.exports = {
   testEnvironment: 'node',
+  testMatch: ['**/*.test.js', '**/*.test.mjs'],
+  transform: {},
   collectCoverageFrom: [
     'modules/**/*.{js,mjs}',
     'Simulator/web/js/*.{js,mjs}',
