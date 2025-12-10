@@ -7,7 +7,7 @@ module.exports = {
     '!Simulator/web/static/**',
     '!**/vendor/**',
   ],
-  coverageThresholds: {
+  coverageThreshold: {
     global: {
       branches: 50,
       functions: 50,
