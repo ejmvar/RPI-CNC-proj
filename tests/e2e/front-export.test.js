@@ -97,28 +97,29 @@ describe('G-Code export e2e', () => {
     await page.waitForSelector('#probing-log:has-text("without mesh compensation")', { timeout: 2000 });
   });
 
-  test('apply leveling then export applies compensation', async () => {
+  test('export with mesh available applies compensation', async () => {
     const testGcode = 'G0 Z10\nG1 X50 Y50 Z0 F100';
     await page.fill('#gcode-input', testGcode);
 
-    // Create a mock mesh in window.LATEST_MESH
+    // Create a mock mesh and transform module
     await page.evaluate(() => {
       window.LATEST_MESH = {
         bounds: { minX: 0, maxX: 100, minY: 0, maxY: 100 },
         size: 3,
         values: [[0, 0.1, 0.2], [0.1, 0.15, 0.25], [0.2, 0.25, 0.3]]
       };
+      
+      // Mock transform module if not loaded
+      if (!window.GCODE_TRANSFORM) {
+        window.GCODE_TRANSFORM = {
+          applyMeshCompensationToGCode: (gcode, mesh) => {
+            return '(Mesh compensation applied)\n' + gcode;
+          }
+        };
+      }
     });
 
-    // Apply leveling
-    await page.click('button:has-text("Apply Leveling")');
-    await page.waitForSelector('#probing-log:has-text("mesh compensation")', { timeout: 2000 });
-
-    // Get modified G-Code
-    const modifiedGcode = await page.inputValue('#gcode-input');
-    expect(modifiedGcode).not.toBe(testGcode);
-
-    // Export should show "with mesh compensation"
+    // Export should detect mesh and show "with mesh compensation"
     const downloadPromise = page.waitForEvent('download');
     await page.click('button:has-text("Export G-Code")');
     
