@@ -11,9 +11,11 @@ help:
 	@echo "make test-integration    # run integration tests"
 	@echo "make test-e2e            # run e2e tests"
 	@echo "make test-browser        # run browser e2e test (requires Playwright + ws)"
+	@echo "make test-visual         # run visual snapshot tests (front.html, demo.html, dashboard.html)"
 	@echo "make demo                # run the collab demo server (node scripts/collab-demo.js)"
 	@echo "make serve               # launch the static serve helper (scripts/serve.sh)"
 	@echo "make lint                # run lint (eslint)"
+	@echo "make baseline            # generate visual regression baselines (--updateSnapshot)"
 	@echo "make ci                  # run lightweight CI locally: install -> tests"
 
 install:
@@ -37,8 +39,11 @@ test-e2e:
 test-browser:
 	npm test -- tests/e2e/collab-browser.test.js --runInBand || true
 
-baseline:
+test-visual:
 	npm test -- tests/e2e/visual-snapshot.test.js --runInBand || true
+
+baseline:
+	npm test -- tests/e2e/visual-snapshot.test.js --runInBand --updateSnapshot || true
 
 demo:
 	node scripts/collab-demo.js
