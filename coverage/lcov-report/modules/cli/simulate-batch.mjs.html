@@ -23,27 +23,27 @@
         </h1>
         <div class="clearfix">
           <div class="fl pad1y space-right2">
-            <span class="strong">100% </span>
+            <span class="strong">0% </span>
             <span class="quiet">Statements</span>
-            <span class="fraction">18/18</span>
+            <span class="fraction">0/18</span>
           </div>
 
           <div class="fl pad1y space-right2">
-            <span class="strong">83.33% </span>
+            <span class="strong">0% </span>
             <span class="quiet">Branches</span>
-            <span class="fraction">10/12</span>
+            <span class="fraction">0/12</span>
           </div>
 
           <div class="fl pad1y space-right2">
-            <span class="strong">100% </span>
+            <span class="strong">0% </span>
             <span class="quiet">Functions</span>
-            <span class="fraction">6/6</span>
+            <span class="fraction">0/6</span>
           </div>
 
           <div class="fl pad1y space-right2">
-            <span class="strong">100% </span>
+            <span class="strong">0% </span>
             <span class="quiet">Lines</span>
-            <span class="fraction">15/15</span>
+            <span class="fraction">0/15</span>
           </div>
         </div>
         <p class="quiet">
@@ -57,7 +57,7 @@
           </div>
         </template>
       </div>
-      <div class="status-line high"></div>
+      <div class="status-line low"></div>
       <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -91,58 +91,58 @@
 <a name='L30'></a><a href='#L30'>30</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">10x</span>
-<span class="cline-any cline-yes">10x</span>
-<span class="cline-any cline-yes">10x</span>
-<span class="cline-any cline-yes">10x</span>
-<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">10x</span>
-<span class="cline-any cline-yes">10x</span>
-<span class="cline-any cline-yes">10x</span>
-<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { parse } from '../gcode/parser.mjs';
 &nbsp;
-export function simulateBatchFromText(gcodeText) {
-  const cmds = parse(gcodeText);
-  const points = [];
-  let pos = { x: 0, y: 0, z: 0 };
-  cmds.forEach(c =&gt; {
-    const params = c.params || <span class="branch-1 cbranch-no" title="branch not covered" >{};</span>
-    if ('X' in params) pos.x = params.X;
-    if ('Y' in params) pos.y = params.Y;
-    if ('Z' in params) pos.z = params.Z;
-    points.push({ x: pos.x, y: pos.y, z: pos.z, type: (c.params.G === 0 ? 'G0' : (c.params.G === 1 ? 'G1' : <span class="branch-1 cbranch-no" title="branch not covered" >'UNK')</span>) });
+export function <span class="fstat-no" title="function not covered" >simulateBatchFromText(</span>gcodeText) {
+  const cmds = <span class="cstat-no" title="statement not covered" >parse(gcodeText);</span>
+  const points = <span class="cstat-no" title="statement not covered" >[];</span>
+  let pos = <span class="cstat-no" title="statement not covered" >{ x: 0, y: 0, z: 0 };</span>
+<span class="cstat-no" title="statement not covered" >  cmds.forEach(<span class="fstat-no" title="function not covered" >c </span>=&gt; {</span>
+    const params = <span class="cstat-no" title="statement not covered" >c.params || {};</span>
+<span class="cstat-no" title="statement not covered" >    if ('X' in params) <span class="cstat-no" title="statement not covered" >pos.x = params.X;</span></span>
+<span class="cstat-no" title="statement not covered" >    if ('Y' in params) <span class="cstat-no" title="statement not covered" >pos.y = params.Y;</span></span>
+<span class="cstat-no" title="statement not covered" >    if ('Z' in params) <span class="cstat-no" title="statement not covered" >pos.z = params.Z;</span></span>
+<span class="cstat-no" title="statement not covered" >    points.push({ x: pos.x, y: pos.y, z: pos.z, type: (c.params.G === 0 ? 'G0' : (c.params.G === 1 ? 'G1' : 'UNK')) });</span>
   });
 &nbsp;
-  const summary = {
+  const summary = <span class="cstat-no" title="statement not covered" >{</span>
     commands: cmds.length,
     lastPosition: pos,
     bounds: {
-      minX: Math.min(...points.map(p =&gt; p.x)),
-      maxX: Math.max(...points.map(p =&gt; p.x)),
-      minY: Math.min(...points.map(p =&gt; p.y)),
-      maxY: Math.max(...points.map(p =&gt; p.y))
+      minX: Math.min(...points.map(<span class="fstat-no" title="function not covered" >p </span>=&gt; <span class="cstat-no" title="statement not covered" >p.x)</span>),
+      maxX: Math.max(...points.map(<span class="fstat-no" title="function not covered" >p </span>=&gt; <span class="cstat-no" title="statement not covered" >p.x)</span>),
+      minY: Math.min(...points.map(<span class="fstat-no" title="function not covered" >p </span>=&gt; <span class="cstat-no" title="statement not covered" >p.y)</span>),
+      maxY: Math.max(...points.map(<span class="fstat-no" title="function not covered" >p </span>=&gt; <span class="cstat-no" title="statement not covered" >p.y)</span>)
     }
   };
 &nbsp;
-  return { cmds, points, summary };
+<span class="cstat-no" title="statement not covered" >  return { cmds, points, summary };</span>
 }
 &nbsp;
 export default { simulateBatchFromText };
@@ -155,7 +155,7 @@ export default { simulateBatchFromText };
     <div class="footer quiet pad2 space-top1 center small">
       Code coverage generated by
       <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-      at 2025-12-11T15:09:57.710Z
+      at 2025-12-11T15:40:45.644Z
     </div>
     <script src="../../prettify.js"></script>
     <script>
