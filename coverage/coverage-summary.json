@@ -1,9 +1,9 @@
 {
   "total": {
     "lines": { "total": 968, "covered": 498, "skipped": 0, "pct": 51.44 },
-    "statements": { "total": 1140, "covered": 545, "skipped": 0, "pct": 47.8 },
+    "statements": { "total": 1140, "covered": 544, "skipped": 0, "pct": 47.71 },
     "functions": { "total": 186, "covered": 105, "skipped": 0, "pct": 56.45 },
-    "branches": { "total": 669, "covered": 280, "skipped": 0, "pct": 41.85 },
+    "branches": { "total": 669, "covered": 279, "skipped": 0, "pct": 41.7 },
     "branchesTrue": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
   },
   "/WRK/RPI-CNC-proj/Simulator/web/js/collab-client.mjs": {
@@ -93,8 +93,8 @@
   "/WRK/RPI-CNC-proj/modules/backend/server/index.js": {
     "lines": { "total": 39, "covered": 17, "skipped": 0, "pct": 43.58 },
     "functions": { "total": 8, "covered": 3, "skipped": 0, "pct": 37.5 },
-    "statements": { "total": 46, "covered": 20, "skipped": 0, "pct": 43.47 },
-    "branches": { "total": 17, "covered": 10, "skipped": 0, "pct": 58.82 }
+    "statements": { "total": 46, "covered": 19, "skipped": 0, "pct": 41.3 },
+    "branches": { "total": 17, "covered": 9, "skipped": 0, "pct": 52.94 }
   },
   "/WRK/RPI-CNC-proj/modules/backend/session/index.js": {
     "lines": { "total": 16, "covered": 16, "skipped": 0, "pct": 100 },
