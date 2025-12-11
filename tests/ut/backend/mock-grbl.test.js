@@ -135,4 +135,35 @@ describe('Mock GRBL firmware interface', () => {
     expect(state.state).toBe('Idle');
     expect(state.position).toEqual({ x: 0, y: 0, z: 0 });
   });
+
+  test('handles unknown commands with ok response', (done) => {
+    grbl.on('data', (data) => {
+      if (data === 'ok\n') {
+        done();
+      }
+    });
+    grbl.send('UNKNOWN_CMD');
+  });
+
+  test('processes M5 to turn off spindle', (done) => {
+    grbl.send('M3 S1000'); // Turn on first
+
+    setTimeout(() => {
+      grbl.on('stateChange', (state) => {
+        if (state.spindle === 'off') {
+          done();
+        }
+      });
+      grbl.send('M5');
+    }, 20);
+  });
+
+  test('handles setting commands starting with $', (done) => {
+    grbl.on('data', (data) => {
+      if (data === 'ok\n') {
+        done();
+      }
+    });
+    grbl.send('$100=250.000');
+  });
 });

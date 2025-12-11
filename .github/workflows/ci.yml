@@ -50,8 +50,8 @@ jobs:
         run: |
           COVERAGE=$(cat coverage/coverage-summary.json | grep -o '"pct":[0-9.]*' | head -1 | cut -d':' -f2)
           echo "Line coverage: $COVERAGE%"
-          if (( $(echo "$COVERAGE < 54.5" | bc -l) )); then
-            echo "::warning::Coverage is below 54.5% threshold"
+          if (( $(echo "$COVERAGE < 57.0" | bc -l) )); then
+            echo "::warning::Coverage is below 57% threshold"
           fi
 
   lint:

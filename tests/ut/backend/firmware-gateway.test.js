@@ -24,7 +24,65 @@ describe('Firmware gateway (simulation)', () => {
     // minimal check that events fired in plausible order
     expect(events[0]).toBe('connected');
     expect(events).toContainEqual(expect.stringMatching(/^sent:/));
-    expect(events.some(e => e.startsWith('data:ok:'))).toBeTruthy();
+    expect(events.some((e) => e.startsWith('data:ok:'))).toBeTruthy();
     expect(events.includes('disconnected')).toBe(true);
+  });
+
+  test('throws error when sending command while disconnected', async () => {
+    const g = createGateway({ simulate: true });
+
+    await expect(g.sendCommand('G0 X0')).rejects.toThrow('not_connected');
+  });
+
+  test('returns false when disconnecting while not connected', async () => {
+    const g = createGateway({ simulate: true });
+
+    const result = await g.disconnect();
+    expect(result).toBe(false);
+  });
+
+  test('can connect, disconnect, and reconnect', async () => {
+    const g = createGateway({ simulate: true });
+
+    await g.connect();
+    expect(g.connected).toBe(true);
+
+    await g.disconnect();
+    expect(g.connected).toBe(false);
+
+    await g.connect();
+    expect(g.connected).toBe(true);
+
+    await g.disconnect();
+  });
+
+  test('returns null lastCommand when no command sent', () => {
+    const g = createGateway({ simulate: true });
+
+    expect(g.lastCommand()).toBeNull();
+  });
+
+  test('throws error when connecting in non-simulated mode', async () => {
+    const g = createGateway({ simulate: false });
+
+    await expect(g.connect()).rejects.toThrow('non-simulated gateway not implemented');
+  });
+
+  test('throws error when sending command in non-simulated mode', async () => {
+    const g = createGateway({ simulate: false });
+    g.connected = true; // Force connected state
+
+    await expect(g.sendCommand('G0 X0')).rejects.toThrow(
+      'sendCommand not implemented for real hardware'
+    );
+  });
+
+  test('handles disconnect in non-simulated mode', async () => {
+    const g = createGateway({ simulate: false });
+    g.connected = true;
+
+    const result = await g.disconnect();
+    expect(result).toBe(true);
+    expect(g.connected).toBe(false);
   });
 });

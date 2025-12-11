@@ -90,9 +90,12 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
 
 **Goal:** Add test coverage and CI/CD.
 
-**Coverage Achievement:** 54.85% lines (531/968), 58.6% functions, 46.63% branches
+**Coverage Achievement:** 57.54% lines (557/968), 60.21% functions, 47.98% branches
 
-- Started: 51.44% baseline
+- Started: 51.44% baseline (498 lines)
+- Progress: +59 lines (+6.1%)
+- Tests: 309 → 362 (+53 tests)
+- Test suites: 72 → 77 (+5 suites)
 - Progress: +31 lines (+3.41%)
 - Tests: 340 passing (up from 309)
 - Test suites: 76 passing
