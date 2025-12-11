@@ -12,7 +12,7 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
 
 ## Project Phases & Task Tracking
 
-### Phase 1: Foundation & Simulator Core [WIP]
+### Phase 1: Foundation & Simulator Core [DONE]
 **Goal:** Establish a working static simulator with basic G-Code visualization.
 
 #### Tasks:
@@ -31,7 +31,7 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
  - [x] **DONE** — Add `scripts/serve.sh` for quick dev server startup
  - [x] **DONE** — Create root `README.md` with project overview and quick-start
 
-### Phase 2: Module Extraction & Code Organization [PLANNED]
+### Phase 2: Module Extraction & Code Organization [DONE]
 **Goal:** Refactor single-file simulator into modular components.
 
 #### Tasks:
@@ -43,7 +43,7 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
 - [x] **DONE** — Update `front.html` to import `type="module"` wrappers and expose them on `window`
 - [x] **DONE** — Document module integration patterns in module READMEs
 
-### Phase 3: Enhanced Visualization & Toolpath [PLANNED]
+### Phase 3: Enhanced Visualization & Toolpath [DONE]
 **Goal:** Improve 3D visualization with actual toolpath rendering.
 
 #### Tasks:
@@ -55,37 +55,37 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
  - [x] **DONE** — Add simulation speed control (playback rate slider)
  - [x] **DONE** — Implement step-by-step command execution mode
 
-### Phase 4: Backend & Firmware Integration [PLANNED]
+### Phase 4: Backend & Firmware Integration [DONE]
 **Goal:** Optional server-side features and real CNC communication.
 
 #### Tasks:
-- [ ] **TODO** — Create minimal static file server in `modules/backend/server/`
-- [ ] **TODO** — Implement GRBL serial communication gateway (WebSocket bridge)
-- [ ] **TODO** — Add G-Code file upload/download endpoints
-- [ ] **TODO** — Create session persistence (save/load simulator state)
-- [ ] **TODO** — Add real-time CNC position streaming (if hardware connected)
-- [ ] **TODO** — Implement firmware command queue visualization
+- [x] **DONE** — Create minimal static file server in `modules/backend/server/`
+- [x] **DONE** — Implement GRBL serial communication gateway (WebSocket bridge)
+- [x] **DONE** — Add G-Code file upload/download endpoints
+- [x] **DONE** — Create session persistence (save/load simulator state)
+- [x] **DONE** — Add real-time CNC position streaming (if hardware connected)
+- [x] **DONE** — Implement firmware command queue visualization
 
-### Phase 5: CLI Tools & Offline Processing [PLANNED]
+### Phase 5: CLI Tools & Offline Processing [DONE]
 **Goal:** Command-line utilities for batch operations.
 
 #### Tasks:
-- [ ] **TODO** — Create `modules/cli/bin/gcode-validate` script
-- [ ] **TODO** — Add `modules/cli/bin/apply-leveling` for mesh compensation
-- [ ] **TODO** — Implement `modules/cli/bin/simulate-batch` for headless runs
-- [ ] **TODO** — Create G-Code format converter (different dialects)
-- [ ] **TODO** — Add toolpath statistics generator (distance, time estimates)
+- [x] **DONE** — Create `modules/cli/bin/gcode-validate` script
+- [x] **DONE** — Add `modules/cli/bin/apply-leveling` for mesh compensation
+- [x] **DONE** — Implement `modules/cli/bin/simulate-batch` for headless runs
+- [x] **DONE** — Create G-Code format converter (different dialects)
+- [x] **DONE** — Add toolpath statistics generator (distance, time estimates)
 
-### Phase 6: Testing & Quality [PLANNED]
+### Phase 6: Testing & Quality [WIP]
 **Goal:** Add test coverage and CI/CD.
 
 #### Tasks:
-- [ ] **TODO** — Set up test framework (Jest or similar)
-- [ ] **TODO** — Add unit tests for G-Code parser
-- [ ] **TODO** — Add integration tests for coordinate transformations
+- [x] **DONE** — Set up test framework (Jest or similar)
+- [x] **DONE** — Add unit tests for G-Code parser
+- [x] **DONE** — Add integration tests for coordinate transformations
 - [ ] **TODO** — Create visual regression tests for Three.js scenes
-- [ ] **TODO** — Set up GitHub Actions CI workflow
-- [ ] **TODO** — Add linting (ESLint) and formatting (Prettier)
+- [x] **DONE** — Set up GitHub Actions CI workflow (coverage: 51.44%, target: 60%+)
+- [x] **DONE** — Add linting (ESLint) and formatting (Prettier)
 
 ### Phase 7: Advanced Features [FUTURE]
 **Goal:** Extended capabilities and polish.

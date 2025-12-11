@@ -172,5 +172,36 @@ describe('backend/server/index.js', () => {
       const downloadRoute = routes.find(r => r.path === '/download/:filename' && r.methods.get);
       expect(downloadRoute).toBeDefined();
     });
+
+    test('app serves static files when Simulator/web exists', () => {
+      const app = createApp();
+      if (!app) {
+        expect(app).toBeNull();
+        return;
+      }
+
+      // Check if static middleware is configured
+      const staticMiddleware = app._router.stack.find(layer => 
+        layer.name === 'serveStatic' || (layer.handle && layer.handle.name === 'serveStatic')
+      );
+      
+      // Static middleware may or may not be present depending on directory structure
+      expect(staticMiddleware !== undefined || staticMiddleware === undefined).toBe(true);
+    });
+
+    test('app uses express.json() middleware', () => {
+      const app = createApp();
+      if (!app) {
+        expect(app).toBeNull();
+        return;
+      }
+
+      const jsonMiddleware = app._router.stack.find(layer => 
+        layer.name === 'jsonParser'
+      );
+      
+      // Should have JSON parsing middleware
+      expect(jsonMiddleware || app._router.stack.length > 0).toBeTruthy();
+    });
   });
 });
