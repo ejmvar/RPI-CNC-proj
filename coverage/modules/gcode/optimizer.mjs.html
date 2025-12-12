@@ -23,27 +23,27 @@
         </h1>
         <div class="clearfix">
           <div class="fl pad1y space-right2">
-            <span class="strong">0% </span>
+            <span class="strong">100% </span>
             <span class="quiet">Statements</span>
-            <span class="fraction">0/15</span>
+            <span class="fraction">15/15</span>
           </div>
 
           <div class="fl pad1y space-right2">
-            <span class="strong">0% </span>
+            <span class="strong">66.66% </span>
             <span class="quiet">Branches</span>
-            <span class="fraction">0/18</span>
+            <span class="fraction">12/18</span>
           </div>
 
           <div class="fl pad1y space-right2">
-            <span class="strong">0% </span>
+            <span class="strong">100% </span>
             <span class="quiet">Functions</span>
-            <span class="fraction">0/1</span>
+            <span class="fraction">1/1</span>
           </div>
 
           <div class="fl pad1y space-right2">
-            <span class="strong">0% </span>
+            <span class="strong">100% </span>
             <span class="quiet">Lines</span>
-            <span class="fraction">0/14</span>
+            <span class="fraction">14/14</span>
           </div>
         </div>
         <p class="quiet">
@@ -57,7 +57,7 @@
           </div>
         </template>
       </div>
-      <div class="status-line low"></div>
+      <div class="status-line high"></div>
       <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -88,49 +88,49 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { parse } from './parser.mjs';
 &nbsp;
 // Remove redundant movement commands (no positional change)
-export function <span class="fstat-no" title="function not covered" >optimizeGCode(</span>text) {
-<span class="cstat-no" title="statement not covered" >  if (!text) <span class="cstat-no" title="statement not covered" >return '';</span></span>
-  const cmds = <span class="cstat-no" title="statement not covered" >parse(text);</span>
-  let lastPos = <span class="cstat-no" title="statement not covered" >{ x: null, y: null, z: null };</span>
-  const outLines = <span class="cstat-no" title="statement not covered" >[];</span>
-<span class="cstat-no" title="statement not covered" >  for (const c of cmds) {</span>
-    const params = <span class="cstat-no" title="statement not covered" >c.params || {};</span>
-    const x = <span class="cstat-no" title="statement not covered" >('X' in params) ? params.X : lastPos.x;</span>
-    const y = <span class="cstat-no" title="statement not covered" >('Y' in params) ? params.Y : lastPos.y;</span>
-    const z = <span class="cstat-no" title="statement not covered" >('Z' in params) ? params.Z : lastPos.z;</span>
+export function optimizeGCode(text) {
+  if (!text) return '';
+  const cmds = parse(text);
+  let lastPos = { x: null, y: null, z: null };
+  const outLines = [];
+  for (const c of cmds) {
+    const params = c.params || <span class="branch-1 cbranch-no" title="branch not covered" >{};</span>
+    const x = ('X' in params) ? params.X : <span class="branch-1 cbranch-no" title="branch not covered" >lastPos.x;</span>
+    const y = ('Y' in params) ? params.Y : <span class="branch-1 cbranch-no" title="branch not covered" >lastPos.y;</span>
+    const z = ('Z' in params) ? <span class="branch-0 cbranch-no" title="branch not covered" >params.Z </span>: lastPos.z;
     // If movement command and position same as last, skip
-<span class="cstat-no" title="statement not covered" >    if (('X' in params || 'Y' in params || 'Z' in params) &amp;&amp; x === lastPos.x &amp;&amp; y === lastPos.y &amp;&amp; z === lastPos.z) {</span>
+    if (('X' in params || <span class="branch-1 cbranch-no" title="branch not covered" >'Y' in params </span>|| <span class="branch-2 cbranch-no" title="branch not covered" >'Z' in params)</span> &amp;&amp; x === lastPos.x &amp;&amp; y === lastPos.y &amp;&amp; z === lastPos.z) {
       // redundant move
-<span class="cstat-no" title="statement not covered" >      continue;</span>
+      continue;
     }
-<span class="cstat-no" title="statement not covered" >    outLines.push(c.raw);</span>
-<span class="cstat-no" title="statement not covered" >    lastPos = { x, y, z };</span>
+    outLines.push(c.raw);
+    lastPos = { x, y, z };
   }
-<span class="cstat-no" title="statement not covered" >  return outLines.join('\n');</span>
+  return outLines.join('\n');
 }
 &nbsp;
 export default { optimizeGCode };
@@ -143,7 +143,7 @@ export default { optimizeGCode };
     <div class="footer quiet pad2 space-top1 center small">
       Code coverage generated by
       <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-      at 2025-12-11T19:39:32.586Z
+      at 2025-12-12T00:20:54.558Z
     </div>
     <script src="../../prettify.js"></script>
     <script>

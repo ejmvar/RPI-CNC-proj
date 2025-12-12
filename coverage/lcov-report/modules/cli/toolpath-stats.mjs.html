@@ -23,27 +23,27 @@
         </h1>
         <div class="clearfix">
           <div class="fl pad1y space-right2">
-            <span class="strong">0% </span>
+            <span class="strong">100% </span>
             <span class="quiet">Statements</span>
-            <span class="fraction">0/18</span>
+            <span class="fraction">18/18</span>
           </div>
 
           <div class="fl pad1y space-right2">
-            <span class="strong">0% </span>
+            <span class="strong">90.9% </span>
             <span class="quiet">Branches</span>
-            <span class="fraction">0/22</span>
+            <span class="fraction">20/22</span>
           </div>
 
           <div class="fl pad1y space-right2">
-            <span class="strong">0% </span>
+            <span class="strong">100% </span>
             <span class="quiet">Functions</span>
-            <span class="fraction">0/2</span>
+            <span class="fraction">2/2</span>
           </div>
 
           <div class="fl pad1y space-right2">
-            <span class="strong">0% </span>
+            <span class="strong">100% </span>
             <span class="quiet">Lines</span>
-            <span class="fraction">0/16</span>
+            <span class="fraction">16/16</span>
           </div>
         </div>
         <p class="quiet">
@@ -57,7 +57,7 @@
           </div>
         </template>
       </div>
-      <div class="status-line low"></div>
+      <div class="status-line high"></div>
       <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -86,54 +86,54 @@
 <a name='L25'></a><a href='#L25'>25</a>
 <a name='L26'></a><a href='#L26'>26</a>
 <a name='L27'></a><a href='#L27'>27</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">export function <span class="fstat-no" title="function not covered" >distance(</span>a, b) {
-  const dx = <span class="cstat-no" title="statement not covered" >(b.x || 0) - (a.x || 0);</span>
-  const dy = <span class="cstat-no" title="statement not covered" >(b.y || 0) - (a.y || 0);</span>
-  const dz = <span class="cstat-no" title="statement not covered" >(b.z || 0) - (a.z || 0);</span>
-<span class="cstat-no" title="statement not covered" >  return Math.sqrt(dx*dx + dy*dy + dz*dz);</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">export function distance(a, b) {
+  const dx = (b.x || 0) - (a.x || 0);
+  const dy = (b.y || 0) - (a.y || 0);
+  const dz = (b.z || 0) - (a.z || 0);
+  return Math.sqrt(dx*dx + dy*dy + dz*dz);
 }
 &nbsp;
-export function <span class="fstat-no" title="function not covered" >computeToolpathStats(</span>points = <span class="branch-0 cbranch-no" title="branch not covered" >[],</span> opts = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> {
+export function computeToolpathStats(points = <span class="branch-0 cbranch-no" title="branch not covered" >[],</span> opts = {}) {
   // points: [{x,y,z,type}, ...]
-  const result = <span class="cstat-no" title="statement not covered" >{ totalDistance: 0, segments: [], estimatedTimeSec: 0 };</span>
-<span class="cstat-no" title="statement not covered" >  if (!Array.isArray(points) || points.length &lt;= 1) <span class="cstat-no" title="statement not covered" >return result;</span></span>
+  const result = { totalDistance: 0, segments: [], estimatedTimeSec: 0 };
+  if (!Array.isArray(points) || points.length &lt;= 1) return result;
 &nbsp;
-  const feedMmPerMin = <span class="cstat-no" title="statement not covered" >opts.feed || 1000;</span> // default mm/min
-  let total = <span class="cstat-no" title="statement not covered" >0;</span>
-<span class="cstat-no" title="statement not covered" >  for (let i = <span class="cstat-no" title="statement not covered" >0;</span> i &lt; points.length - 1; i++) {</span>
-    const d = <span class="cstat-no" title="statement not covered" >distance(points[i], points[i+1]);</span>
-<span class="cstat-no" title="statement not covered" >    total += d;</span>
-<span class="cstat-no" title="statement not covered" >    result.segments.push({ i, from: points[i], to: points[i+1], dist: d, type: points[i+1].type });</span>
+  const feedMmPerMin = opts.feed || 1000; // default mm/min
+  let total = 0;
+  for (let i = 0; i &lt; points.length - 1; i++) {
+    const d = distance(points[i], points[i+1]);
+    total += d;
+    result.segments.push({ i, from: points[i], to: points[i+1], dist: d, type: points[i+1].type });
   }
-<span class="cstat-no" title="statement not covered" >  result.totalDistance = total;</span>
-  const feedMmPerSec = <span class="cstat-no" title="statement not covered" >feedMmPerMin / 60;</span>
-<span class="cstat-no" title="statement not covered" >  result.estimatedTimeSec = feedMmPerSec &gt; 0 ? (total / feedMmPerSec) : 0;</span>
-<span class="cstat-no" title="statement not covered" >  return result;</span>
+  result.totalDistance = total;
+  const feedMmPerSec = feedMmPerMin / 60;
+  result.estimatedTimeSec = feedMmPerSec &gt; 0 ? (total / feedMmPerSec) : <span class="branch-1 cbranch-no" title="branch not covered" >0;</span>
+  return result;
 }
 &nbsp;
 export default { distance, computeToolpathStats };
@@ -146,7 +146,7 @@ export default { distance, computeToolpathStats };
     <div class="footer quiet pad2 space-top1 center small">
       Code coverage generated by
       <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-      at 2025-12-11T19:39:32.528Z
+      at 2025-12-12T00:20:54.492Z
     </div>
     <script src="../../prettify.js"></script>
     <script>

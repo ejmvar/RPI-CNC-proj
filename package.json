@@ -4,12 +4,12 @@
   "private": true,
   "description": "Raspberry Pi CNC simulator — lightweight frontend and tooling",
   "scripts": {
-    "test": "node --experimental-vm-modules node_modules/.bin/jest --runInBand",
-    "test:coverage": "node --experimental-vm-modules node_modules/.bin/jest --coverage --runInBand",
+    "test": "node --experimental-vm-modules node_modules/.bin/jest --testPathIgnorePatterns=tests/e2e --maxWorkers=4",
+    "test:coverage": "node --experimental-vm-modules node_modules/.bin/jest --coverage --testPathIgnorePatterns=tests/e2e --maxWorkers=4",
     "lint": "eslint . --ext .js,.mjs || true",
     "format": "prettier --write .",
-    "test:unit": "node --experimental-vm-modules node_modules/.bin/jest tests/ut --runInBand",
-    "test:integration": "node --experimental-vm-modules node_modules/.bin/jest tests/it --runInBand",
+    "test:unit": "node --experimental-vm-modules node_modules/.bin/jest tests/ut --maxWorkers=4",
+    "test:integration": "node --experimental-vm-modules node_modules/.bin/jest tests/it --maxWorkers=4",
     "test:e2e": "node --experimental-vm-modules node_modules/.bin/jest tests/e2e --runInBand",
     "prepare": "husky"
   },

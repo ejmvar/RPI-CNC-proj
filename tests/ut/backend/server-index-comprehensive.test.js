@@ -91,18 +91,22 @@ describe('Backend server/index utilities', () => {
   });
 
   describe('createApp', () => {
-    test('returns null when express is not available', () => {
+    test('returns Express app when express is available', () => {
       const app = createApp();
 
-      // Express is not installed in this project (optional dependency)
-      expect(app).toBeNull();
+      // Express is now installed as dev dependency
+      expect(app).toBeTruthy();
+      expect(typeof app).toBe('function');
     });
   });
 
   describe('start', () => {
-    test('throws when express is not available', () => {
-      // Express is not installed, so start should throw
-      expect(() => start(3001)).toThrow('express not available');
+    test('starts server when express is available', () => {
+      // Express is now installed, so start should work
+      const server = start(0);
+      expect(server).toBeTruthy();
+      expect(typeof server.close).toBe('function');
+      server.close();
     });
   });
 
