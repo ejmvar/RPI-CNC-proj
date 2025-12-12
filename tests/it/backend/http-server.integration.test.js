@@ -289,5 +289,73 @@ describe('http-server.js', () => {
         done();
       });
     });
+
+    test('returns 404 for non-existent session', (done) => {
+      http.get(`${baseUrl}/session/load/nonexistent-session-xyz.json`, (res) => {
+        expect(res.statusCode).toBe(404);
+        let data = '';
+        res.on('data', (chunk) => (data += chunk));
+        res.on('end', () => {
+          const json = JSON.parse(data);
+          expect(json.error).toBe('not_found');
+          done();
+        });
+      });
+    });
+
+    test('returns 404 for non-existent download file', (done) => {
+      http.get(`${baseUrl}/download/nonexistent-file.nc`, (res) => {
+        expect(res.statusCode).toBe(404);
+        let data = '';
+        res.on('data', (chunk) => (data += chunk));
+        res.on('end', () => {
+          const json = JSON.parse(data);
+          expect(json.error).toBe('not_found');
+          done();
+        });
+      });
+    });
+  });
+
+  describe('Error handling', () => {
+    test('handles session save with missing data gracefully', (done) => {
+      const payload = JSON.stringify({});
+      const req = http.request(
+        `${baseUrl}/session/save`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+        },
+        (res) => {
+          expect(res.statusCode).toBe(400);
+          let data = '';
+          res.on('data', (chunk) => (data += chunk));
+          res.on('end', () => {
+            const json = JSON.parse(data);
+            expect(json.error).toBeDefined();
+            done();
+          });
+        }
+      );
+      req.write(payload);
+      req.end();
+    });
+
+    test('handles upload with missing content gracefully', (done) => {
+      const payload = JSON.stringify({ filename: 'test.nc' });
+      const req = http.request(
+        `${baseUrl}/upload`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+        },
+        (res) => {
+          expect(res.statusCode).toBe(400);
+          done();
+        }
+      );
+      req.write(payload);
+      req.end();
+    });
   });
 });
