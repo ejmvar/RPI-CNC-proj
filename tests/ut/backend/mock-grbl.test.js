@@ -166,4 +166,64 @@ describe('Mock GRBL firmware interface', () => {
     });
     grbl.send('$100=250.000');
   });
+
+  test('G90 sets absolute positioning mode', (done) => {
+    grbl.send('G90');
+    setTimeout(() => {
+      expect(grbl.getState().mode).toBe('G90');
+      done();
+    }, 20);
+  });
+
+  test('G91 sets relative positioning mode', (done) => {
+    grbl.send('G91');
+    setTimeout(() => {
+      expect(grbl.getState().mode).toBe('G91');
+      done();
+    }, 20);
+  });
+
+  test('G20 sets inch units', (done) => {
+    grbl.send('G20');
+    setTimeout(() => {
+      expect(grbl.getState().units).toBe('G20');
+      done();
+    }, 20);
+  });
+
+  test('G21 sets metric units', (done) => {
+    grbl.send('G21');
+    setTimeout(() => {
+      expect(grbl.getState().units).toBe('G21');
+      done();
+    }, 20);
+  });
+
+  test('cycle resume (~) from Hold state returns to Run', (done) => {
+    // First do feed hold
+    grbl.send('!');
+    setTimeout(() => {
+      expect(grbl.getState().state).toBe('Hold');
+
+      let resumed = false;
+      grbl.on('stateChange', (state) => {
+        if (state.state === 'Run' && !resumed) {
+          resumed = true;
+          expect(grbl.getState().state).toBe('Run');
+          done();
+        }
+      });
+
+      grbl.send('~');
+    }, 30);
+  });
+
+  test('M4 spindle counterclockwise command triggers stateChange', (done) => {
+    grbl.on('stateChange', (state) => {
+      if (state.spindle === 'on') {
+        done();
+      }
+    });
+    grbl.send('M4 S500');
+  });
 });
