@@ -1,64 +1,68 @@
-<!DOCTYPE html>
+
+<!doctype html>
 <html lang="en">
-  <head>
+
+<head>
     <title>Code coverage report for modules/backend/collab/ws-server.js</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="../../../prettify.css" />
     <link rel="stylesheet" href="../../../base.css" />
     <link rel="shortcut icon" type="image/x-icon" href="../../../favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <style type="text/css">
-      .coverage-summary .sorter {
-        background-image: url(../../../sort-arrow-sprite.png);
-      }
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../sort-arrow-sprite.png);
+        }
     </style>
-  </head>
-
-  <body>
-    <div class="wrapper">
-      <div class="pad1">
-        <h1>
-          <a href="../../../index.html">All files</a> /
-          <a href="index.html">modules/backend/collab</a> ws-server.js
-        </h1>
-        <div class="clearfix">
-          <div class="fl pad1y space-right2">
-            <span class="strong">36.84% </span>
-            <span class="quiet">Statements</span>
-            <span class="fraction">28/76</span>
-          </div>
-
-          <div class="fl pad1y space-right2">
-            <span class="strong">19.67% </span>
-            <span class="quiet">Branches</span>
-            <span class="fraction">12/61</span>
-          </div>
-
-          <div class="fl pad1y space-right2">
-            <span class="strong">50% </span>
-            <span class="quiet">Functions</span>
-            <span class="fraction">5/10</span>
-          </div>
-
-          <div class="fl pad1y space-right2">
-            <span class="strong">36.61% </span>
-            <span class="quiet">Lines</span>
-            <span class="fraction">26/71</span>
-          </div>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../../index.html">All files</a> / <a href="index.html">modules/backend/collab</a> ws-server.js</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">27.63% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>21/76</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">9.83% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>6/61</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">50% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>5/10</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">26.76% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>19/71</span>
+            </div>
+        
+            
         </div>
         <p class="quiet">
-          Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>,
-          <em>p</em> or <em>k</em> for the previous block.
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
         </p>
         <template id="filterTemplate">
-          <div class="quiet">
-            Filter:
-            <input type="search" id="fileSearch" />
-          </div>
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
         </template>
-      </div>
-      <div class="status-line low"></div>
-      <pre><table class="coverage">
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
 <a name='L3'></a><a href='#L3'>3</a>
@@ -226,84 +230,23 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -313,65 +256,105 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -379,7 +362,28 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
@@ -413,9 +417,9 @@ function createWsCollabServer(collabServer, opts = <span class="branch-0 cbranch
 <span class="cstat-no" title="statement not covered" >    socket._clientId = clientId;</span>
   }
 &nbsp;
-  function removeClient(socket) {
-    const sid = socket._sessionId;
-    <span class="missing-if-branch" title="else path not taken" >E</span>if (!sid) return;
+  function <span class="fstat-no" title="function not covered" >removeClient(</span>socket) {
+    const sid = <span class="cstat-no" title="statement not covered" >socket._sessionId;</span>
+<span class="cstat-no" title="statement not covered" >    if (!sid) <span class="cstat-no" title="statement not covered" >return;</span></span>
     const set = <span class="cstat-no" title="statement not covered" >sessionClients.get(sid);</span>
 <span class="cstat-no" title="statement not covered" >    if (set) {</span>
 <span class="cstat-no" title="statement not covered" >      set.delete(socket);</span>
@@ -424,28 +428,28 @@ function createWsCollabServer(collabServer, opts = <span class="branch-0 cbranch
   }
 &nbsp;
   // broadcast helper
-  function <span class="fstat-no" title="function not covered" >broadcastToSession(</span>sessionId, message) {
-    const set = <span class="cstat-no" title="statement not covered" >sessionClients.get(sessionId);</span>
-<span class="cstat-no" title="statement not covered" >    if (!set) <span class="cstat-no" title="statement not covered" >return;</span></span>
+  function broadcastToSession(sessionId, message) {
+    const set = sessionClients.get(sessionId);
+    <span class="missing-if-branch" title="else path not taken" >E</span>if (!set) return;
     const data = <span class="cstat-no" title="statement not covered" >typeof message === 'string' ? message : JSON.stringify(message);</span>
 <span class="cstat-no" title="statement not covered" >    for (const s of set) {</span>
 <span class="cstat-no" title="statement not covered" >      if (s &amp;&amp; typeof s.send === 'function') <span class="cstat-no" title="statement not covered" >s.send(data);</span></span>
     }
   }
 &nbsp;
-  wss.on('connection', (socket) =&gt; {
+  wss.on('connection', <span class="fstat-no" title="function not covered" >(s</span>ocket) =&gt; {
     // listen for client messages
-    socket.on('message', (raw) =&gt; {
-      let msg = raw;
-      try {
-        msg = typeof raw === 'string' ? <span class="branch-0 cbranch-no" title="branch not covered" >JSON.parse(raw) </span>: raw;
+<span class="cstat-no" title="statement not covered" >    socket.on('message', <span class="fstat-no" title="function not covered" >(r</span>aw) =&gt; {</span>
+      let msg = <span class="cstat-no" title="statement not covered" >raw;</span>
+<span class="cstat-no" title="statement not covered" >      try {</span>
+<span class="cstat-no" title="statement not covered" >        msg = typeof raw === 'string' ? JSON.parse(raw) : raw;</span>
       } catch (e) {
         /* ignore */
       }
-      const action = (msg &amp;&amp; msg.action) || null;
+      const action = <span class="cstat-no" title="statement not covered" >(msg &amp;&amp; msg.action) || null;</span>
 &nbsp;
-      try {
-        <span class="missing-if-branch" title="if path not taken" >I</span>if (action === 'create') {
+<span class="cstat-no" title="statement not covered" >      try {</span>
+<span class="cstat-no" title="statement not covered" >        if (action === 'create') {</span>
           const { sessionId, initialState, permissions } = <span class="cstat-no" title="statement not covered" >msg;</span>
           // if clientId present, store owner info
           const owner = <span class="cstat-no" title="statement not covered" >msg.clientId || null;</span>
@@ -464,7 +468,7 @@ function createWsCollabServer(collabServer, opts = <span class="branch-0 cbranch
             clients: s.clients,
             permissions: s.permissions,
           });
-        } else <span class="missing-if-branch" title="if path not taken" >I</span>if (action === 'join') {
+        } else <span class="cstat-no" title="statement not covered" >if (action === 'join') {</span>
           const { sessionId, clientId } = <span class="cstat-no" title="statement not covered" >msg;</span>
 <span class="cstat-no" title="statement not covered" >          collabServer.joinSession(sessionId, clientId || null);</span>
 <span class="cstat-no" title="statement not covered" >          addClientToSession(sessionId, socket, clientId || null);</span>
@@ -477,7 +481,7 @@ function createWsCollabServer(collabServer, opts = <span class="branch-0 cbranch
             clientId: clientId || null,
             permissions: s.permissions,
           });
-        } else <span class="missing-if-branch" title="if path not taken" >I</span>if (action === 'update') {
+        } else <span class="cstat-no" title="statement not covered" >if (action === 'update') {</span>
           const { sessionId, patch, clientId } = <span class="cstat-no" title="statement not covered" >msg;</span>
 <span class="cstat-no" title="statement not covered" >          collabServer.updateSession(sessionId, patch || {}, clientId);</span>
           // broadcast the update to all clients in session
@@ -488,7 +492,7 @@ function createWsCollabServer(collabServer, opts = <span class="branch-0 cbranch
             state: s2.state,
             clients: s2.clients,
           });
-        } else <span class="missing-if-branch" title="if path not taken" >I</span>if (action === 'setPermissions') {
+        } else <span class="cstat-no" title="statement not covered" >if (action === 'setPermissions') {</span>
           const { sessionId, permissions, clientId } = <span class="cstat-no" title="statement not covered" >msg;</span>
 <span class="cstat-no" title="statement not covered" >          collabServer.setPermissions(sessionId, permissions, clientId);</span>
           const s = <span class="cstat-no" title="statement not covered" >collabServer.getSession(sessionId);</span>
@@ -504,15 +508,15 @@ function createWsCollabServer(collabServer, opts = <span class="branch-0 cbranch
       }
     });
 &nbsp;
-    socket.on('close', () =&gt; {
-      removeClient(socket);
+<span class="cstat-no" title="statement not covered" >    socket.on('close', <span class="fstat-no" title="function not covered" >()</span> =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >      removeClient(socket);</span>
     });
   });
 &nbsp;
   // when server-side collab updates happen, broadcast to clients
-  collabServer.on('sessionUpdated', <span class="fstat-no" title="function not covered" >({</span> sessionId }) =&gt; {
-    const s3 = <span class="cstat-no" title="statement not covered" >collabServer.getSession(sessionId) || {};</span>
-<span class="cstat-no" title="statement not covered" >    broadcastToSession(sessionId, {</span>
+  collabServer.on('sessionUpdated', ({ sessionId }) =&gt; {
+    const s3 = collabServer.getSession(sessionId) || <span class="branch-1 cbranch-no" title="branch not covered" >{};</span>
+    broadcastToSession(sessionId, {
       type: 'sessionUpdated',
       sessionId,
       state: s3.state,
@@ -521,8 +525,8 @@ function createWsCollabServer(collabServer, opts = <span class="branch-0 cbranch
   });
 &nbsp;
   // when sessions are created in the collab server, broadcast
-  collabServer.on('sessionCreated', <span class="fstat-no" title="function not covered" >(s</span>) =&gt; {
-<span class="cstat-no" title="statement not covered" >    broadcastToSession(s.id, {</span>
+  collabServer.on('sessionCreated', (s) =&gt; {
+    broadcastToSession(s.id, {
       type: 'sessionCreated',
       sessionId: s.id,
       state: s.state,
@@ -531,9 +535,9 @@ function createWsCollabServer(collabServer, opts = <span class="branch-0 cbranch
   });
 &nbsp;
   // when a client joins, broadcast the join to session clients
-  collabServer.on('clientJoined', <span class="fstat-no" title="function not covered" >({</span> sessionId, clientId }) =&gt; {
-    const s4 = <span class="cstat-no" title="statement not covered" >collabServer.getSession(sessionId) || {};</span>
-<span class="cstat-no" title="statement not covered" >    broadcastToSession(sessionId, {</span>
+  collabServer.on('clientJoined', ({ sessionId, clientId }) =&gt; {
+    const s4 = collabServer.getSession(sessionId) || <span class="branch-1 cbranch-no" title="branch not covered" >{};</span>
+    broadcastToSession(sessionId, {
       type: 'clientJoined',
       sessionId,
       clientId,
@@ -547,22 +551,21 @@ function createWsCollabServer(collabServer, opts = <span class="branch-0 cbranch
 module.exports = { createWsCollabServer };
 &nbsp;</pre></td></tr></table></pre>
 
-      <div class="push"></div>
-      <!-- for sticky footer -->
-    </div>
-    <!-- /wrapper -->
-    <div class="footer quiet pad2 space-top1 center small">
-      Code coverage generated by
-      <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-      at 2025-12-12T00:20:54.558Z
-    </div>
-    <script src="../../../prettify.js"></script>
-    <script>
-      window.onload = function () {
-        prettyPrint();
-      };
-    </script>
-    <script src="../../../sorter.js"></script>
-    <script src="../../../block-navigation.js"></script>
-  </body>
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2025-12-12T01:49:47.886Z
+            </div>
+        <script src="../../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../../sorter.js"></script>
+        <script src="../../../block-navigation.js"></script>
+    </body>
 </html>
+    
