@@ -1,0 +1,10 @@
+# Browser-only code (needs JSDOM)
+Simulator/web/js/*.mjs
+Simulator/web/static/three.min.js
+
+# E2E tests (browser globals expected)
+tests/e2e/*.js
+
+# Module wrappers (THREE global expected)
+modules/presentation/three-helper.mjs
+modules/presentation/mesh.mjs
