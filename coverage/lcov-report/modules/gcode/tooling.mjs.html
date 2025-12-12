@@ -23,27 +23,27 @@
         </h1>
         <div class="clearfix">
           <div class="fl pad1y space-right2">
-            <span class="strong">100% </span>
+            <span class="strong">0% </span>
             <span class="quiet">Statements</span>
-            <span class="fraction">14/14</span>
+            <span class="fraction">0/14</span>
           </div>
 
           <div class="fl pad1y space-right2">
-            <span class="strong">91.66% </span>
+            <span class="strong">0% </span>
             <span class="quiet">Branches</span>
-            <span class="fraction">11/12</span>
+            <span class="fraction">0/12</span>
           </div>
 
           <div class="fl pad1y space-right2">
-            <span class="strong">100% </span>
+            <span class="strong">0% </span>
             <span class="quiet">Functions</span>
-            <span class="fraction">2/2</span>
+            <span class="fraction">0/2</span>
           </div>
 
           <div class="fl pad1y space-right2">
-            <span class="strong">100% </span>
+            <span class="strong">0% </span>
             <span class="quiet">Lines</span>
-            <span class="fraction">13/13</span>
+            <span class="fraction">0/13</span>
           </div>
         </div>
         <p class="quiet">
@@ -57,7 +57,7 @@
           </div>
         </template>
       </div>
-      <div class="status-line high"></div>
+      <div class="status-line low"></div>
       <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -87,50 +87,50 @@
 <a name='L26'></a><a href='#L26'>26</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">11x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// Tool change scanning utilities
 &nbsp;
-export function scanToolChanges(parsedCmds) {
-  if (!Array.isArray(parsedCmds)) return [];
-  const changes = [];
-  let currentTool = null;
-  parsedCmds.forEach((c, idx) =&gt; {
-    const params = c.params || <span class="branch-1 cbranch-no" title="branch not covered" >{};</span>
+export function <span class="fstat-no" title="function not covered" >scanToolChanges(</span>parsedCmds) {
+<span class="cstat-no" title="statement not covered" >  if (!Array.isArray(parsedCmds)) <span class="cstat-no" title="statement not covered" >return [];</span></span>
+  const changes = <span class="cstat-no" title="statement not covered" >[];</span>
+  let currentTool = <span class="cstat-no" title="statement not covered" >null;</span>
+<span class="cstat-no" title="statement not covered" >  parsedCmds.forEach(<span class="fstat-no" title="function not covered" >(c</span>, idx) =&gt; {</span>
+    const params = <span class="cstat-no" title="statement not covered" >c.params || {};</span>
     // tool selection token 'T' or explicit M6 'M6' command
-    if ('T' in params) {
-      currentTool = params.T;
-      changes.push({ index: idx, tool: currentTool, raw: c.raw });
+<span class="cstat-no" title="statement not covered" >    if ('T' in params) {</span>
+<span class="cstat-no" title="statement not covered" >      currentTool = params.T;</span>
+<span class="cstat-no" title="statement not covered" >      changes.push({ index: idx, tool: currentTool, raw: c.raw });</span>
     }
-    if (c.raw &amp;&amp; /(^|\s)M6(\s|$)/i.test(c.raw)) {
+<span class="cstat-no" title="statement not covered" >    if (c.raw &amp;&amp; /(^|\s)M6(\s|$)/i.test(c.raw)) {</span>
       // tool change command — look for nearby T param or mark as change
-      if ('T' in params) {
-        currentTool = params.T;
+<span class="cstat-no" title="statement not covered" >      if ('T' in params) {</span>
+<span class="cstat-no" title="statement not covered" >        currentTool = params.T;</span>
       }
-      changes.push({ index: idx, tool: currentTool, raw: c.raw });
+<span class="cstat-no" title="statement not covered" >      changes.push({ index: idx, tool: currentTool, raw: c.raw });</span>
     }
   });
-  return changes;
+<span class="cstat-no" title="statement not covered" >  return changes;</span>
 }
 &nbsp;
 export default { scanToolChanges };
@@ -143,7 +143,7 @@ export default { scanToolChanges };
     <div class="footer quiet pad2 space-top1 center small">
       Code coverage generated by
       <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-      at 2025-12-11T15:40:45.644Z
+      at 2025-12-11T19:39:32.528Z
     </div>
     <script src="../../prettify.js"></script>
     <script>
