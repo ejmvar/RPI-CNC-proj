@@ -11,7 +11,7 @@ export function parseGCodeToPoints(input) {
   let currentTool = null;
   const points = [];
 
-  cmds.forEach(c => {
+  cmds.forEach((c) => {
     // c can be { raw, params }
     const params = c.params || {};
     if ('X' in params) pos.x = params.X;
@@ -21,14 +21,14 @@ export function parseGCodeToPoints(input) {
     // update tool if command selects one (T) or is an explicit tool change (M6)
     if ('T' in params) currentTool = params.T;
     if (c.raw && /(^|\s)M6(\s|$)/i.test(c.raw)) {
-      // explicit tool change — keep numeric tool if present, otherwise mark change
+      // explicit tool change — keep numeric tool if present
       if ('T' in params) currentTool = params.T;
-      else currentTool = currentTool;
+      // else: currentTool stays as-is (no self-assignment needed)
     }
 
     // decide type: G0 = rapid, G1 = feed/cut, default to other
     const g = params.G === true ? 0 : params.G || null;
-    const type = (g === 0 ? 'G0' : g === 1 ? 'G1' : (c.raw || '').split(/\s+/)[0] || 'UNK');
+    const type = g === 0 ? 'G0' : g === 1 ? 'G1' : (c.raw || '').split(/\s+/)[0] || 'UNK';
 
     points.push({ x: pos.x, y: pos.y, z: pos.z, type, tool: currentTool });
   });
@@ -46,7 +46,7 @@ export function interpolatePoints(points, subdivisions = 1) {
   const out = [];
   for (let i = 0; i < points.length - 1; i++) {
     const a = points[i];
-    const b = points[i+1];
+    const b = points[i + 1];
     out.push(a);
     for (let s = 1; s < subdivisions; s++) {
       const t = s / subdivisions;
@@ -54,7 +54,7 @@ export function interpolatePoints(points, subdivisions = 1) {
         x: a.x + (b.x - a.x) * t,
         y: a.y + (b.y - a.y) * t,
         z: a.z + (b.z - a.z) * t,
-        type: a.type
+        type: a.type,
       });
     }
   }

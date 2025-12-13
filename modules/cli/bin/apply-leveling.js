@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 const fs = require('fs');
-const path = require('path');
 
 async function main() {
   const argv = process.argv.slice(2);
@@ -9,8 +8,14 @@ async function main() {
     process.exit(2);
   }
   const [gcodeFile, meshFile, outFlag, outFile] = argv;
-  if (!fs.existsSync(gcodeFile)) { console.error('gcode file not found'); process.exit(2); }
-  if (!fs.existsSync(meshFile)) { console.error('mesh file not found'); process.exit(2); }
+  if (!fs.existsSync(gcodeFile)) {
+    console.error('gcode file not found');
+    process.exit(2);
+  }
+  if (!fs.existsSync(meshFile)) {
+    console.error('mesh file not found');
+    process.exit(2);
+  }
 
   const gcodeText = fs.readFileSync(gcodeFile, 'utf8');
   const mesh = JSON.parse(fs.readFileSync(meshFile, 'utf8'));
@@ -26,4 +31,7 @@ async function main() {
   }
 }
 
-main().catch(e => { console.error(e); process.exit(1); });
+main().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});

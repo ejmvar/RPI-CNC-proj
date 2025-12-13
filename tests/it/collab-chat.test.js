@@ -3,7 +3,6 @@
  */
 
 const http = require('http');
-const path = require('path');
 
 describe('Chat integration with WebSocket server', () => {
   let server;

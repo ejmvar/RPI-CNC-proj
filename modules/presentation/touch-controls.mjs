@@ -3,11 +3,21 @@ export function createTouchControls({ onPan, onPinch } = {}) {
   // returns a stubbed object for integration with front-end
   let isAttached = false;
   return {
-    attach: (el) => { isAttached = true; return true; },
-    detach: () => { isAttached = false; return true; },
+    attach: () => {
+      isAttached = true;
+      return true;
+    },
+    detach: () => {
+      isAttached = false;
+      return true;
+    },
     isAttached: () => isAttached,
-    simulatePan: (dx, dy) => { if (onPan) onPan(dx, dy); },
-    simulatePinch: (scale) => { if (onPinch) onPinch(scale); }
+    simulatePan: (dx, dy) => {
+      if (onPan) onPan(dx, dy);
+    },
+    simulatePinch: (scale) => {
+      if (onPinch) onPinch(scale);
+    },
   };
 }
 

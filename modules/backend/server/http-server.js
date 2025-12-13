@@ -2,15 +2,19 @@ const http = require('http');
 const url = require('url');
 const fs = require('fs');
 const path = require('path');
-const { writeGCodeFile, readGCodeFile, STORAGE_DIR } = require('./index');
+const { writeGCodeFile, STORAGE_DIR } = require('./index');
 const { saveSession, loadSession } = require('../session');
 
 function parseJSONBody(req) {
   return new Promise((resolve, reject) => {
     let data = '';
-    req.on('data', chunk => data += chunk);
+    req.on('data', (chunk) => (data += chunk));
     req.on('end', () => {
-      try { resolve(JSON.parse(data || '{}')); } catch (e) { reject(new Error('invalid_json')); }
+      try {
+        resolve(JSON.parse(data || '{}'));
+      } catch (e) {
+        reject(new Error('invalid_json'));
+      }
     });
     req.on('error', reject);
   });
@@ -20,7 +24,10 @@ function createSimpleHttpServer() {
   const server = http.createServer(async (req, res) => {
     const parsed = url.parse(req.url, true);
     res.setHeader('Access-Control-Allow-Origin', '*');
-    if (req.method === 'OPTIONS') { res.writeHead(204); return res.end(); }
+    if (req.method === 'OPTIONS') {
+      res.writeHead(204);
+      return res.end();
+    }
 
     // health
     if (req.method === 'GET' && parsed.pathname === '/health') {
@@ -74,7 +81,10 @@ function createSimpleHttpServer() {
     if (req.method === 'GET' && parsed.pathname.startsWith('/download/')) {
       const safe = path.basename(parsed.pathname.replace('/download/', ''));
       const fp = path.join(STORAGE_DIR, safe);
-      if (!fs.existsSync(fp)) { res.writeHead(404); return res.end(JSON.stringify({ error: 'not_found' })); }
+      if (!fs.existsSync(fp)) {
+        res.writeHead(404);
+        return res.end(JSON.stringify({ error: 'not_found' }));
+      }
       res.setHeader('Content-Type', 'text/plain');
       res.writeHead(200);
       return fs.createReadStream(fp).pipe(res);
@@ -83,7 +93,10 @@ function createSimpleHttpServer() {
     // try to serve static files from Simulator/web if present
     const staticRoot = path.join(process.cwd(), 'Simulator', 'web');
     if (fs.existsSync(staticRoot)) {
-      let filePath = path.join(staticRoot, parsed.pathname === '/' ? '/front.html' : parsed.pathname);
+      let filePath = path.join(
+        staticRoot,
+        parsed.pathname === '/' ? '/front.html' : parsed.pathname
+      );
       if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
         const ext = path.extname(filePath).toLowerCase();
         if (ext === '.html') res.setHeader('Content-Type', 'text/html');

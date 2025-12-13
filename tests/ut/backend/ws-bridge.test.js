@@ -15,22 +15,6 @@ describe('WebSocket bridge (optional)', () => {
     jest.doMock(
       'ws',
       () => {
-        class MockSocket {
-          constructor() {
-            this._handlers = {};
-            this.sent = [];
-          }
-          on(ev, cb) {
-            this._handlers[ev] = cb;
-          }
-          send(msg) {
-            this.sent.push(msg);
-          }
-          _trigger(ev, ...args) {
-            if (this._handlers[ev]) this._handlers[ev](...args);
-          }
-        }
-
         class MockServer {
           constructor(opts) {
             this.opts = opts;
