@@ -12,20 +12,20 @@ describe('gcode/toolpath.mjs integration', () => {
       const points = parseGCodeToPoints(gcode);
 
       expect(points).toHaveLength(2);
-      expect(points[0]).toEqual({ x: 10, y: 20, z: 0, type: 'G0', tool: null });
-      expect(points[1]).toEqual({ x: 30, y: 40, z: 5, type: 'G1', tool: null });
+      expect(points[0]).toMatchObject({ x: 10, y: 20, z: 0, type: 'rapid', tool: 0 });
+      expect(points[1]).toMatchObject({ x: 30, y: 40, z: 5, type: 'cut', tool: 0 });
     });
 
     test('handles parsed command arrays', () => {
       const cmds = [
         { raw: 'G0 X10 Y10', params: { G: 0, X: 10, Y: 10 } },
-        { raw: 'G1 X20 Y20 Z5', params: { G: 1, X: 20, Y: 20, Z: 5 } }
+        { raw: 'G1 X20 Y20 Z5', params: { G: 1, X: 20, Y: 20, Z: 5 } },
       ];
       const points = parseGCodeToPoints(cmds);
 
       expect(points).toHaveLength(2);
-      expect(points[0].type).toBe('G0');
-      expect(points[1].type).toBe('G1');
+      expect(points[0].type).toBe('rapid');
+      expect(points[1].type).toBe('cut');
     });
 
     test('tracks tool changes with T parameter', () => {
@@ -42,13 +42,14 @@ describe('gcode/toolpath.mjs integration', () => {
       const gcode = 'T1\nM6\nG1 X10 Y10\nT2\nM6\nG1 X20 Y20\n';
       const points = parseGCodeToPoints(gcode);
 
-      // M6 without new T parameter keeps current tool
-      expect(points[0].tool).toBe(1);
-      expect(points[1].tool).toBe(1); // M6 confirms T1
-      expect(points[2].tool).toBe(1); // Still T1
-      expect(points[3].tool).toBe(2); // T2 selected
-      expect(points[4].tool).toBe(2); // M6 confirms T2
-      expect(points[5].tool).toBe(2); // Still T2
+      // M6 without new T parameter creates tool-change marker, then G1 uses current tool
+      const toolChangePoints = points.filter((p) => p.type === 'tool-change');
+      expect(toolChangePoints.length).toBe(2); // Two M6 commands
+
+      // Find movement points
+      const movePoints = points.filter((p) => p.type === 'cut');
+      expect(movePoints[0].tool).toBe(1); // First move with T1
+      expect(movePoints[1].tool).toBe(2); // Second move with T2
     });
 
     test('maintains position state across commands', () => {
@@ -78,7 +79,7 @@ describe('gcode/toolpath.mjs integration', () => {
     test('adds subdivisions between points', () => {
       const points = [
         { x: 0, y: 0, z: 0, type: 'G0' },
-        { x: 10, y: 0, z: 0, type: 'G1' }
+        { x: 10, y: 0, z: 0, type: 'G1' },
       ];
       const result = interpolatePoints(points, 3);
 
@@ -91,7 +92,7 @@ describe('gcode/toolpath.mjs integration', () => {
     test('keeps points as-is when subdivisions <= 1', () => {
       const points = [
         { x: 0, y: 0, z: 0, type: 'G0' },
-        { x: 10, y: 0, z: 0, type: 'G1' }
+        { x: 10, y: 0, z: 0, type: 'G1' },
       ];
       expect(interpolatePoints(points, 1)).toEqual(points);
       expect(interpolatePoints(points, 0)).toEqual(points);
@@ -109,7 +110,7 @@ describe('gcode/toolpath.mjs integration', () => {
     test('interpolates intermediate coordinates correctly', () => {
       const points = [
         { x: 0, y: 0, z: 0, type: 'G1' },
-        { x: 10, y: 10, z: 10, type: 'G1' }
+        { x: 10, y: 10, z: 10, type: 'G1' },
       ];
       const result = interpolatePoints(points, 3);
 
@@ -124,7 +125,7 @@ describe('gcode/toolpath.mjs integration', () => {
     test('preserves type from first point of segment', () => {
       const points = [
         { x: 0, y: 0, z: 0, type: 'G1' },
-        { x: 10, y: 0, z: 0, type: 'G0' }
+        { x: 10, y: 0, z: 0, type: 'G0' },
       ];
       const result = interpolatePoints(points, 3);
 

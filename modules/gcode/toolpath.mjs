@@ -2,42 +2,93 @@
 
 import { parse } from './parser.mjs';
 
-// parseGCodeToPoints(text)
-// - Accepts gcode text (string) or an array of parsed command objects
-// - Returns an array of { x, y, z, type } where type is 'G0' or 'G1' or the G-code command
-export function parseGCodeToPoints(input) {
+/**
+ * Parse G-Code into toolpath points with tool tracking
+ * @param {string|Array} input - G-Code text or parsed command objects
+ * @param {object} options - Options including toolLibrary
+ * @returns {Array} Array of {x, y, z, type, tool, toolConfig} objects
+ */
+export function parseGCodeToPoints(input, options = {}) {
   const cmds = Array.isArray(input) ? input : parse(input);
+  const toolLibrary = options.toolLibrary || null;
   let pos = { x: 0, y: 0, z: 0 };
-  let currentTool = null;
+  let currentTool = 0;
+  let toolOffsetActive = false;
   const points = [];
 
   cmds.forEach((c) => {
-    // c can be { raw, params }
+    // c can be { raw, params, toolSelect, toolChange, toolLengthOffset, etc. }
     const params = c.params || {};
+
+    // Handle tool selection
+    if (c.toolSelect !== undefined) {
+      currentTool = c.toolSelect;
+      if (toolLibrary) {
+        toolLibrary.selectTool(currentTool);
+      }
+    }
+
+    // Handle tool change (M6)
+    if (c.toolChange) {
+      const toolConfig = toolLibrary ? toolLibrary.getTool(currentTool) : null;
+      points.push({
+        ...pos,
+        type: 'tool-change',
+        tool: currentTool,
+        toolConfig,
+      });
+    }
+
+    // Handle tool length offset enable (G43)
+    if (c.toolLengthOffset) {
+      toolOffsetActive = true;
+      // If H parameter specified, it overrides the current tool
+      if (c.toolOffsetIndex !== undefined) {
+        currentTool = c.toolOffsetIndex;
+        if (toolLibrary) {
+          toolLibrary.selectTool(currentTool);
+        }
+      }
+    }
+
+    // Handle tool offset cancel (G49)
+    if (c.cancelToolOffset) {
+      toolOffsetActive = false;
+    }
+
+    // Update position
     if ('X' in params) pos.x = params.X;
     if ('Y' in params) pos.y = params.Y;
     if ('Z' in params) pos.z = params.Z;
 
-    // update tool if command selects one (T) or is an explicit tool change (M6)
-    if ('T' in params) currentTool = params.T;
-    if (c.raw && /(^|\s)M6(\s|$)/i.test(c.raw)) {
-      // explicit tool change — keep numeric tool if present
-      if ('T' in params) currentTool = params.T;
-      // else: currentTool stays as-is (no self-assignment needed)
+    // Apply tool offset if active
+    let adjustedPos = { ...pos };
+    if (toolOffsetActive && toolLibrary) {
+      const activeTool = toolLibrary.getTool(currentTool);
+      if (activeTool && activeTool.offsetZ) {
+        adjustedPos.z += activeTool.offsetZ;
+      }
     }
 
-    // decide type: G0 = rapid, G1 = feed/cut, default to other
-    const g = params.G === true ? 0 : params.G || null;
-    const type = g === 0 ? 'G0' : g === 1 ? 'G1' : (c.raw || '').split(/\s+/)[0] || 'UNK';
+    // Determine move type: G0 = rapid, G1 = feed/cut
+    const g = params.G === true ? 0 : params.G !== undefined ? params.G : null;
+    const type = g === 0 ? 'rapid' : g === 1 ? 'cut' : (c.raw || '').split(/\s+/)[0] || 'unknown';
 
-    points.push({ x: pos.x, y: pos.y, z: pos.z, type, tool: currentTool });
+    // Add point with tool information
+    const toolConfig = toolLibrary ? toolLibrary.getTool(currentTool) : null;
+    points.push({
+      ...adjustedPos,
+      type,
+      tool: currentTool,
+      toolConfig,
+    });
   });
 
   return points;
 }
 
 // Simple linear subdivision between consecutive points
-// points: [{x,y,z,type}, ...]
+// points: [{x,y,z,type,tool,toolConfig}, ...]
 // subdivisions: number of segments to add between each pair (1 means keep original points as-is)
 export function interpolatePoints(points, subdivisions = 1) {
   if (!Array.isArray(points) || points.length <= 1) return points;
@@ -48,6 +99,12 @@ export function interpolatePoints(points, subdivisions = 1) {
     const a = points[i];
     const b = points[i + 1];
     out.push(a);
+
+    // Skip interpolation for tool-change points
+    if (a.type === 'tool-change' || b.type === 'tool-change') {
+      continue;
+    }
+
     for (let s = 1; s < subdivisions; s++) {
       const t = s / subdivisions;
       out.push({
@@ -55,6 +112,8 @@ export function interpolatePoints(points, subdivisions = 1) {
         y: a.y + (b.y - a.y) * t,
         z: a.z + (b.z - a.z) * t,
         type: a.type,
+        tool: a.tool,
+        toolConfig: a.toolConfig,
       });
     }
   }

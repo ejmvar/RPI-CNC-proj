@@ -44,7 +44,7 @@ describe('toolpath edge cases', () => {
     const points = parseGCodeToPoints(gcode);
 
     expect(points.length).toBe(1);
-    expect(points[0].type).toBe('G0');
+    expect(points[0].type).toBe('rapid');
   });
 
   test('classifies G1 commands as feed movements', () => {
@@ -52,7 +52,7 @@ describe('toolpath edge cases', () => {
     const points = parseGCodeToPoints(gcode);
 
     expect(points.length).toBe(1);
-    expect(points[0].type).toBe('G1');
+    expect(points[0].type).toBe('cut');
   });
 
   test('classifies other commands correctly', () => {

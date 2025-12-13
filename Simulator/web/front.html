@@ -291,6 +291,165 @@
             <p class="text-gray-500">Log de sondaje listo.</p>
           </div>
         </div>
+
+        <!-- Tool Library Panel -->
+        <div class="bg-white p-5 rounded-xl shadow-lg border border-gray-100">
+          <h2 class="text-xl font-semibold mb-4 text-gray-700 flex items-center">
+            <svg
+              class="w-5 h-5 mr-2 text-orange-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"
+              ></path>
+            </svg>
+            Tool Library (Multi-Tool / Multi-Material)
+          </h2>
+          <p class="text-sm text-gray-500 mb-3">
+            Manage tools for multi-tool CNC milling or multi-material 3D printing.
+          </p>
+
+          <!-- Tool selector -->
+          <div class="mb-4">
+            <label class="block mb-1 text-sm font-medium text-gray-700">Active Tool:</label>
+            <select id="tool-select" class="w-full border border-gray-300 rounded-lg p-2">
+              <option value="0">T0 - Tool 0</option>
+            </select>
+          </div>
+
+          <!-- Tool configuration -->
+          <div id="tool-config" class="space-y-3 mb-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Tool Name:</label>
+              <input
+                type="text"
+                id="tool-name"
+                class="w-full border border-gray-300 rounded-lg p-2"
+                value="Tool 0"
+              />
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Diameter (mm):</label>
+                <input
+                  type="number"
+                  id="tool-diameter"
+                  class="w-full border border-gray-300 rounded-lg p-2"
+                  value="3.0"
+                  step="0.1"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Color:</label>
+                <input
+                  type="color"
+                  id="tool-color"
+                  class="w-full border border-gray-300 rounded-lg p-2 h-10"
+                  value="#888888"
+                />
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Z Offset (mm):</label>
+                <input
+                  type="number"
+                  id="tool-offset-z"
+                  class="w-full border border-gray-300 rounded-lg p-2"
+                  value="0.0"
+                  step="0.1"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Speed/Temp:</label>
+                <input
+                  type="number"
+                  id="tool-speed"
+                  class="w-full border border-gray-300 rounded-lg p-2"
+                  value="10000"
+                  step="100"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Tool library actions -->
+          <div class="flex gap-2 mb-4">
+            <button
+              id="tool-add"
+              class="flex-1 bg-blue-500 text-white p-2 rounded-lg text-sm font-bold hover:bg-blue-600"
+            >
+              ➕ Add Tool
+            </button>
+            <button
+              id="tool-update"
+              class="flex-1 bg-green-500 text-white p-2 rounded-lg text-sm font-bold hover:bg-green-600"
+            >
+              ✏️ Update
+            </button>
+            <button
+              id="tool-remove"
+              class="flex-1 bg-red-500 text-white p-2 rounded-lg text-sm font-bold hover:bg-red-600"
+            >
+              🗑️ Remove
+            </button>
+          </div>
+
+          <!-- Tool library presets -->
+          <div class="flex gap-2 mb-4">
+            <button
+              id="tool-preset-3d"
+              class="flex-1 bg-purple-500 text-white p-2 rounded-lg text-sm font-bold hover:bg-purple-600"
+            >
+              🖨️ 3D Print Preset
+            </button>
+            <button
+              id="tool-preset-cnc"
+              class="flex-1 bg-indigo-500 text-white p-2 rounded-lg text-sm font-bold hover:bg-indigo-600"
+            >
+              🔧 CNC Preset
+            </button>
+          </div>
+
+          <!-- Save/load tool library -->
+          <div class="flex gap-2">
+            <button
+              id="tool-save"
+              class="flex-1 bg-gray-600 text-white p-2 rounded-lg text-sm font-bold hover:bg-gray-700"
+            >
+              💾 Save Library
+            </button>
+            <button
+              id="tool-load"
+              class="flex-1 bg-gray-600 text-white p-2 rounded-lg text-sm font-bold hover:bg-gray-700"
+            >
+              📂 Load Library
+            </button>
+          </div>
+
+          <!-- Tool statistics -->
+          <div id="tool-stats" class="mt-4 p-3 bg-gray-100 rounded-lg text-sm">
+            <div class="font-semibold mb-2 text-gray-700">Toolpath Statistics:</div>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div>Tool changes: <span id="stat-tool-changes" class="font-bold">0</span></div>
+              <div>
+                Total distance: <span id="stat-total-distance" class="font-bold">0.00 mm</span>
+              </div>
+            </div>
+            <div class="mt-2">
+              <div class="text-xs font-semibold mb-1">Distance by tool:</div>
+              <ul id="stat-tool-distances" class="ml-4 list-disc text-xs">
+                <li class="text-gray-500">No data yet</li>
+              </ul>
+            </div>
+          </div>
+        </div>
       </section>
     </main>
 
@@ -303,6 +462,8 @@
       import * as GCODE_TOOLPATH from './js/toolpath.mjs';
       import * as THREE_MESH from './js/mesh.mjs';
       import * as COLLAB_CLIENT from './js/collab-client.mjs';
+      import * as TOOL_LIBRARY from './js/tool-library.mjs';
+      import * as TOOLPATH_RENDERER from './js/toolpath-renderer.mjs';
       // expose parser and three helpers to the inline script environment
       window.GCODE_PARSER = GParser;
       window.THREE_HELPER = THREE_HELPER;
@@ -311,6 +472,8 @@
       window.GCODE_TOOLPATH = GCODE_TOOLPATH;
       window.THREE_MESH = THREE_MESH;
       window.COLLAB_CLIENT = COLLAB_CLIENT;
+      window.TOOL_LIBRARY = TOOL_LIBRARY;
+      window.TOOLPATH_RENDERER = TOOLPATH_RENDERER;
     </script>
 
     <script>
@@ -325,6 +488,242 @@
       let currentCommandIndex = 0;
       let currentPosition = { x: 0, y: 0, z: 0 };
       const CONTAINER = document.getElementById('visualization-container');
+
+      // --- Tool Library ---
+      let toolLibrary = null;
+      let toolpathPoints = [];
+
+      // Initialize tool library
+      function initToolLibrary() {
+        toolLibrary = new window.TOOL_LIBRARY.ToolLibrary();
+
+        // Start with default 3D print tools
+        window.TOOL_LIBRARY.DEFAULT_3D_PRINT_TOOLS.forEach((t) => {
+          toolLibrary.addTool(t.index, t);
+        });
+
+        // Select first tool
+        toolLibrary.selectTool(0);
+
+        // Populate tool selector
+        refreshToolSelector();
+
+        // Update tool config display
+        updateToolConfigDisplay();
+      }
+
+      // Refresh tool selector dropdown
+      function refreshToolSelector() {
+        const select = document.getElementById('tool-select');
+        select.innerHTML = '';
+
+        toolLibrary.getToolIndices().forEach((idx) => {
+          const tool = toolLibrary.getTool(idx);
+          const option = document.createElement('option');
+          option.value = idx;
+          option.textContent = `T${idx} - ${tool.name}`;
+          select.appendChild(option);
+        });
+
+        if (toolLibrary.activeTool !== null) {
+          select.value = toolLibrary.activeTool;
+        }
+      }
+
+      // Update tool configuration display
+      function updateToolConfigDisplay() {
+        const tool = toolLibrary.getActiveTool();
+        if (!tool) return;
+
+        document.getElementById('tool-name').value = tool.name;
+        document.getElementById('tool-diameter').value = tool.diameter;
+        document.getElementById('tool-color').value = tool.color;
+        document.getElementById('tool-offset-z').value = tool.offsetZ;
+        document.getElementById('tool-speed').value = tool.spindleSpeed;
+      }
+
+      // Tool selector change handler
+      document.getElementById('tool-select').addEventListener('change', (e) => {
+        const toolIndex = parseInt(e.target.value, 10);
+        toolLibrary.selectTool(toolIndex);
+        updateToolConfigDisplay();
+      });
+
+      // Add new tool
+      document.getElementById('tool-add').addEventListener('click', () => {
+        const nextIndex = Math.max(...toolLibrary.getToolIndices(), -1) + 1;
+        toolLibrary.addTool(nextIndex, {
+          name: document.getElementById('tool-name').value,
+          diameter: parseFloat(document.getElementById('tool-diameter').value),
+          color: document.getElementById('tool-color').value,
+          offsetZ: parseFloat(document.getElementById('tool-offset-z').value),
+          spindleSpeed: parseInt(document.getElementById('tool-speed').value, 10),
+        });
+        refreshToolSelector();
+        toolLibrary.selectTool(nextIndex);
+        document.getElementById('tool-select').value = nextIndex;
+        showMessage(`Tool T${nextIndex} added: ${toolLibrary.getTool(nextIndex).name}`, 'success');
+      });
+
+      // Update current tool
+      document.getElementById('tool-update').addEventListener('click', () => {
+        const toolIndex = toolLibrary.activeTool;
+        if (toolIndex === null) return;
+
+        toolLibrary.addTool(toolIndex, {
+          name: document.getElementById('tool-name').value,
+          diameter: parseFloat(document.getElementById('tool-diameter').value),
+          color: document.getElementById('tool-color').value,
+          offsetZ: parseFloat(document.getElementById('tool-offset-z').value),
+          spindleSpeed: parseInt(document.getElementById('tool-speed').value, 10),
+        });
+        refreshToolSelector();
+        showMessage(`Tool T${toolIndex} updated`, 'success');
+
+        // Re-render toolpath if exists
+        if (toolpathPoints.length > 0) {
+          renderToolpath();
+        }
+      });
+
+      // Remove current tool
+      document.getElementById('tool-remove').addEventListener('click', () => {
+        const toolIndex = toolLibrary.activeTool;
+        if (toolIndex === null) return;
+        if (toolLibrary.size <= 1) {
+          showMessage('Cannot remove the last tool', 'error');
+          return;
+        }
+
+        toolLibrary.removeTool(toolIndex);
+        refreshToolSelector();
+
+        // Select first available tool
+        const firstTool = toolLibrary.getToolIndices()[0];
+        toolLibrary.selectTool(firstTool);
+        document.getElementById('tool-select').value = firstTool;
+        updateToolConfigDisplay();
+
+        showMessage(`Tool T${toolIndex} removed`, 'info');
+      });
+
+      // Load 3D print preset
+      document.getElementById('tool-preset-3d').addEventListener('click', () => {
+        toolLibrary.clear();
+        window.TOOL_LIBRARY.DEFAULT_3D_PRINT_TOOLS.forEach((t) => {
+          toolLibrary.addTool(t.index, t);
+        });
+        toolLibrary.selectTool(0);
+        refreshToolSelector();
+        updateToolConfigDisplay();
+        showMessage('Loaded 3D printing tool preset', 'success');
+      });
+
+      // Load CNC preset
+      document.getElementById('tool-preset-cnc').addEventListener('click', () => {
+        toolLibrary.clear();
+        window.TOOL_LIBRARY.DEFAULT_CNC_TOOLS.forEach((t) => {
+          toolLibrary.addTool(t.index, t);
+        });
+        toolLibrary.selectTool(1);
+        refreshToolSelector();
+        updateToolConfigDisplay();
+        showMessage('Loaded CNC milling tool preset', 'success');
+      });
+
+      // Save tool library to file
+      document.getElementById('tool-save').addEventListener('click', () => {
+        const json = JSON.stringify(toolLibrary.toJSON(), null, 2);
+        const blob = new Blob([json], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'tool-library.json';
+        a.click();
+        URL.revokeObjectURL(url);
+        showMessage('Tool library saved', 'success');
+      });
+
+      // Load tool library from file
+      document.getElementById('tool-load').addEventListener('click', () => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+        input.onchange = async (e) => {
+          try {
+            const file = e.target.files[0];
+            const text = await file.text();
+            toolLibrary.loadFromJSON(text);
+            refreshToolSelector();
+            updateToolConfigDisplay();
+            showMessage('Tool library loaded', 'success');
+          } catch (err) {
+            showMessage('Failed to load tool library: ' + err.message, 'error');
+          }
+        };
+        input.click();
+      });
+
+      // Update tool statistics
+      function updateToolStats(points) {
+        if (!points || points.length === 0) {
+          document.getElementById('stat-tool-changes').textContent = '0';
+          document.getElementById('stat-total-distance').textContent = '0.00 mm';
+          document.getElementById('stat-tool-distances').innerHTML =
+            '<li class="text-gray-500">No data yet</li>';
+          return;
+        }
+
+        const stats = window.TOOLPATH_RENDERER.calculateToolpathStats(points);
+
+        document.getElementById('stat-tool-changes').textContent = stats.toolChanges;
+        document.getElementById('stat-total-distance').textContent =
+          stats.totalDistance.toFixed(2) + ' mm';
+
+        const statList = document.getElementById('stat-tool-distances');
+        statList.innerHTML = '';
+
+        if (stats.toolDistances.size === 0) {
+          statList.innerHTML = '<li class="text-gray-500">No movement data</li>';
+        } else {
+          stats.toolDistances.forEach((dist, toolIdx) => {
+            const toolConfig = toolLibrary.getTool(toolIdx);
+            const li = document.createElement('li');
+            li.textContent = `${toolConfig?.name || `T${toolIdx}`}: ${dist.toFixed(2)} mm`;
+            li.style.color = toolConfig?.color || '#888';
+            statList.appendChild(li);
+          });
+        }
+      }
+
+      // Render toolpath with multi-tool visualization
+      function renderToolpath() {
+        if (!toolpathPoints || toolpathPoints.length === 0) return;
+        if (!scene || !window.TOOLPATH_RENDERER) return;
+
+        try {
+          // Read smoothing setting
+          const subdivisionsEl = document.getElementById('toolpath-smooth');
+          const subdivisions = subdivisionsEl ? Number(subdivisionsEl.value) : 1;
+
+          // Interpolate points if needed
+          let points = toolpathPoints;
+          if (subdivisions > 1) {
+            points = window.GCODE_TOOLPATH.interpolatePoints(toolpathPoints, subdivisions);
+          }
+
+          // Render with multi-tool support
+          window.TOOLPATH_RENDERER.renderMultiToolToolpath(scene, points, {
+            THREE: window.THREE,
+            toolChangeMarkerSize: 0.8,
+          });
+
+          // Update statistics
+          updateToolStats(points);
+        } catch (e) {
+          console.warn('renderToolpath failed', e);
+        }
+      }
 
       // --- Configuración Inicial de Three.js ---
       function initThreeJS() {
@@ -409,25 +808,22 @@
           const parsed = window.GCODE_PARSER.parse(gcodeText);
           gcodeCommands = parsed.map((c) => c.raw.trim().toUpperCase());
 
-          // create toolpath points and render into scene if the renderer exists
+          // create toolpath points with tool library and render into scene
           if (
             window.GCODE_TOOLPATH &&
             typeof window.GCODE_TOOLPATH.parseGCodeToPoints === 'function'
           ) {
-            const points = window.GCODE_TOOLPATH.parseGCodeToPoints(parsed);
+            // Pass tool library to parseGCodeToPoints
+            const points = window.GCODE_TOOLPATH.parseGCodeToPoints(parsed, { toolLibrary });
+            toolpathPoints = points; // store for later use
             window.LAST_TOOLPATH = points; // expose for debugging/tests
+
+            // Update tool statistics
+            updateToolStats(points);
+
             if (typeof window.THREE_HELPER !== 'undefined' && scene) {
-              // remove any previous toolpath lines
-              const prev = scene.getObjectByName('toolpath-line');
-              if (prev) scene.remove(prev);
-              try {
-                // read smoothing setting and pass subdivisions to the renderer
-                const subdivisionsEl = document.getElementById('toolpath-smooth');
-                const subdivisions = subdivisionsEl ? Number(subdivisionsEl.value) : 1;
-                window.GCODE_TOOLPATH.renderToolpath(scene, points, { subdivisions, linewidth: 2 });
-              } catch (e) {
-                console.warn('renderToolpath failed', e);
-              }
+              // Render using multi-tool renderer
+              renderToolpath();
             }
           }
         } else {
@@ -751,6 +1147,9 @@
 
       // --- Inicialización al cargar la ventana ---
       window.onload = function () {
+        // Initialize tool library
+        initToolLibrary();
+
         // initThreeJS returns internals via the module helper and already sets up the tool
         initThreeJS();
         // Create a visual position indicator (DOM overlay + small 3D marker)

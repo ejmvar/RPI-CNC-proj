@@ -1,6 +1,8 @@
 // ES module version of the minimal G-Code parser (same behavior as CommonJS parser.js)
 function normalizeLine(line) {
-  return String(line || '').trim().toUpperCase();
+  return String(line || '')
+    .trim()
+    .toUpperCase();
 }
 
 export function parseLine(line) {
@@ -10,7 +12,7 @@ export function parseLine(line) {
   const tokens = l.split(/\s+/);
   const cmd = { raw: line, codes: [], params: {} };
 
-  tokens.forEach(tok => {
+  tokens.forEach((tok) => {
     if (!tok) return;
     const m = tok.match(/^([A-Z])(.*)$/i);
     if (m) {
@@ -23,6 +25,31 @@ export function parseLine(line) {
     }
   });
 
+  // Parse tool-related commands
+  // T command: tool selection (T0, T1, T2, etc.)
+  if ('T' in cmd.params) {
+    cmd.toolSelect = cmd.params.T;
+  }
+
+  // M6: tool change command
+  if (cmd.raw && /(^|\s)M6(\s|$)/i.test(cmd.raw)) {
+    cmd.toolChange = true;
+  }
+
+  // G43: tool length offset enable
+  if (cmd.raw && /(^|\s)G43(\s|$)/i.test(cmd.raw)) {
+    cmd.toolLengthOffset = true;
+    // H parameter specifies which offset to use
+    if ('H' in cmd.params) {
+      cmd.toolOffsetIndex = cmd.params.H;
+    }
+  }
+
+  // G49: cancel tool length offset
+  if (cmd.raw && /(^|\s)G49(\s|$)/i.test(cmd.raw)) {
+    cmd.cancelToolOffset = true;
+  }
+
   return cmd;
 }
 
@@ -30,8 +57,8 @@ export function parse(text) {
   if (!text) return [];
   return String(text)
     .split(/\r?\n/)
-    .map(line => parseLine(line))
-    .filter(x => x !== null);
+    .map((line) => parseLine(line))
+    .filter((x) => x !== null);
 }
 
 export default { parse, parseLine };

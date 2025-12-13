@@ -6,7 +6,7 @@ describe('Front-end toolpath smoothing integration', () => {
     const p = path.join(process.cwd(), 'Simulator/web/front.html');
     const html = fs.readFileSync(p, 'utf8');
     expect(html).toMatch(/id="toolpath-smooth"/);
-    // ensure the code calls renderToolpath with subdivisions option
-    expect(html).toMatch(/renderToolpath\(scene, points, \{\s*subdivisions/);
+    // ensure the code uses interpolatePoints with subdivisions
+    expect(html).toMatch(/interpolatePoints\(toolpathPoints, subdivisions\)/);
   });
 });
