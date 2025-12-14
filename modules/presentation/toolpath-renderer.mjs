@@ -127,13 +127,21 @@ export function calculateToolpathStats(points) {
 
   const toolDistances = new Map();
   let toolChanges = 0;
+  let prevTool = points[0]?.tool ?? 0;
 
   for (let i = 1; i < points.length; i++) {
     const prev = points[i - 1];
     const curr = points[i];
 
-    if (curr.type === 'tool-change') {
+    // Count actual tool changes (when tool index changes, not tool-change markers)
+    const currTool = curr.tool ?? 0;
+    if (currTool !== prevTool) {
       toolChanges++;
+      prevTool = currTool;
+    }
+
+    // Skip tool-change markers for distance calculation
+    if (curr.type === 'tool-change' || prev.type === 'tool-change') {
       continue;
     }
 
