@@ -118,19 +118,31 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
 - [ ] **TODO** — Create visual regression tests for Three.js scenes
 - [ ] **TODO** — Push coverage beyond 65% (requires more edge case or integration testing)
 
-### Phase 7: Advanced Features [FUTURE]
+### Phase 7: Advanced Features [IN-PROGRESS]
 
 **Goal:** Extended capabilities and polish.
 
-#### Ideas:
+**Coverage Status (Dec 14, 2024):** **548/564 tests passing** (16 skipped by design)
 
-- [ ] **FUTURE** — Multi-tool support and tool change visualization
-- [ ] **FUTURE** — Material removal simulation (actual mesh subtraction)
-- [ ] **FUTURE** — Collision detection and bounds checking
-- [ ] **FUTURE** — G-Code optimization (remove redundant moves)
-- [ ] **FUTURE** — Alternative renderer (SVG/Canvas 2D for low-end devices)
-- [ ] **FUTURE** — Mobile-optimized touch controls
-- [ ] **FUTURE** — Collaborative editing (multi-user G-Code sessions)
+#### Tasks:
+
+- [x] **DONE** — Multi-tool support and tool change visualization (Phase 7.1 - Dec 13-14, 2024)
+  - [x] Created ToolLibrary class with full CRUD operations
+  - [x] Extended G-Code parser for T, M6, G43, G49 commands
+  - [x] Enhanced toolpath generation with tool tracking and offsets
+  - [x] Built multi-tool renderer with color-coded visualization
+  - [x] Added comprehensive UI panel for tool management
+  - [x] Created 38 unit tests for new modules
+  - [x] Created 133+ edge case tests for quality assurance
+  - [x] Fixed calculateToolpathStats for accurate tool change counting
+  - [x] Added example G-Code files (3D printing + CNC milling)
+  - [x] All 548 tests passing (16 skipped rendering tests)
+- [ ] **TODO** — Material removal simulation (actual mesh subtraction)
+- [ ] **TODO** — Collision detection and bounds checking
+- [ ] **TODO** — G-Code optimization (remove redundant moves)
+- [ ] **TODO** — Alternative renderer (SVG/Canvas 2D for low-end devices)
+- [ ] **TODO** — Mobile-optimized touch controls
+- [ ] **TODO** — Collaborative editing (multi-user G-Code sessions)
 
 ---
 
