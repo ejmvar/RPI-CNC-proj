@@ -43,7 +43,7 @@
           <div class="fl pad1y space-right2">
             <span class="strong">100% </span>
             <span class="quiet">Lines</span>
-            <span class="fraction">70/70</span>
+            <span class="fraction">76/76</span>
           </div>
         </div>
         <p class="quiet">
@@ -163,7 +163,20 @@
 <a name='L102'></a><a href='#L102'>102</a>
 <a name='L103'></a><a href='#L103'>103</a>
 <a name='L104'></a><a href='#L104'>104</a>
-<a name='L105'></a><a href='#L105'>105</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">4x</span>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
@@ -176,6 +189,10 @@
 <span class="cline-any cline-yes">12x</span>
 <span class="cline-any cline-yes">12x</span>
 <span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">12x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -186,6 +203,9 @@
 <span class="cline-any cline-yes">27x</span>
 <span class="cline-any cline-yes">27x</span>
 <span class="cline-any cline-yes">27x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">26x</span>
@@ -242,6 +262,9 @@
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -249,6 +272,9 @@
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
@@ -271,15 +297,19 @@
 const url = require('url');
 const fs = require('fs');
 const path = require('path');
-const { writeGCodeFile, readGCodeFile, STORAGE_DIR } = require('./index');
+const { writeGCodeFile, STORAGE_DIR } = require('./index');
 const { saveSession, loadSession } = require('../session');
 &nbsp;
 function parseJSONBody(req) {
   return new Promise((resolve, reject) =&gt; {
     let data = '';
-    req.on('data', chunk =&gt; data += chunk);
+    req.on('data', (chunk) =&gt; (data += chunk));
     req.on('end', () =&gt; {
-      try { resolve(JSON.parse(data || <span class="branch-1 cbranch-no" title="branch not covered" >'{}')</span>); } catch (e) { reject(new Error('invalid_json')); }
+      try {
+        resolve(JSON.parse(data || <span class="branch-1 cbranch-no" title="branch not covered" >'{}')</span>);
+      } catch (e) {
+        reject(new Error('invalid_json'));
+      }
     });
     req.on('error', reject);
   });
@@ -289,7 +319,10 @@ function createSimpleHttpServer() {
   const server = http.createServer(async (req, res) =&gt; {
     const parsed = url.parse(req.url, true);
     res.setHeader('Access-Control-Allow-Origin', '*');
-    if (req.method === 'OPTIONS') { res.writeHead(204); return res.end(); }
+    if (req.method === 'OPTIONS') {
+      res.writeHead(204);
+      return res.end();
+    }
 &nbsp;
     // health
     if (req.method === 'GET' &amp;&amp; parsed.pathname === '/health') {
@@ -343,7 +376,10 @@ function createSimpleHttpServer() {
     if (req.method === 'GET' &amp;&amp; parsed.pathname.startsWith('/download/')) {
       const safe = path.basename(parsed.pathname.replace('/download/', ''));
       const fp = path.join(STORAGE_DIR, safe);
-      if (!fs.existsSync(fp)) { res.writeHead(404); return res.end(JSON.stringify({ error: 'not_found' })); }
+      if (!fs.existsSync(fp)) {
+        res.writeHead(404);
+        return res.end(JSON.stringify({ error: 'not_found' }));
+      }
       res.setHeader('Content-Type', 'text/plain');
       res.writeHead(200);
       return fs.createReadStream(fp).pipe(res);
@@ -352,7 +388,10 @@ function createSimpleHttpServer() {
     // try to serve static files from Simulator/web if present
     const staticRoot = path.join(process.cwd(), 'Simulator', 'web');
     <span class="missing-if-branch" title="else path not taken" >E</span>if (fs.existsSync(staticRoot)) {
-      let filePath = path.join(staticRoot, parsed.pathname === '/' ? '/front.html' : parsed.pathname);
+      let filePath = path.join(
+        staticRoot,
+        parsed.pathname === '/' ? '/front.html' : parsed.pathname
+      );
       if (fs.existsSync(filePath) &amp;&amp; fs.statSync(filePath).isFile()) {
         const ext = path.extname(filePath).toLowerCase();
         <span class="missing-if-branch" title="else path not taken" >E</span>if (ext === '.html') res.setHeader('Content-Type', 'text/html');
@@ -380,7 +419,7 @@ module.exports = { createSimpleHttpServer };
     <div class="footer quiet pad2 space-top1 center small">
       Code coverage generated by
       <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-      at 2025-12-12T16:05:14.994Z
+      at 2025-12-14T13:01:24.439Z
     </div>
     <script src="../../../prettify.js"></script>
     <script>

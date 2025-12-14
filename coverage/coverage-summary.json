@@ -1,9 +1,9 @@
 {
   "total": {
-    "lines": { "total": 968, "covered": 579, "skipped": 0, "pct": 59.81 },
-    "statements": { "total": 1140, "covered": 653, "skipped": 0, "pct": 57.28 },
-    "functions": { "total": 186, "covered": 120, "skipped": 0, "pct": 64.51 },
-    "branches": { "total": 669, "covered": 333, "skipped": 0, "pct": 49.77 },
+    "lines": { "total": 1121, "covered": 662, "skipped": 0, "pct": 59.05 },
+    "statements": { "total": 1282, "covered": 731, "skipped": 0, "pct": 57.02 },
+    "functions": { "total": 210, "covered": 136, "skipped": 0, "pct": 64.76 },
+    "branches": { "total": 808, "covered": 425, "skipped": 0, "pct": 52.59 },
     "branchesTrue": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
   },
   "/WRK/RPI-CNC-proj/Simulator/web/js/collab-client.mjs": {
@@ -41,6 +41,18 @@
     "functions": { "total": 2, "covered": 2, "skipped": 0, "pct": 100 },
     "statements": { "total": 36, "covered": 36, "skipped": 0, "pct": 100 },
     "branches": { "total": 11, "covered": 11, "skipped": 0, "pct": 100 }
+  },
+  "/WRK/RPI-CNC-proj/Simulator/web/js/tool-library.mjs": {
+    "lines": { "total": 4, "covered": 0, "skipped": 0, "pct": 0 },
+    "functions": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 },
+    "statements": { "total": 4, "covered": 0, "skipped": 0, "pct": 0 },
+    "branches": { "total": 2, "covered": 0, "skipped": 0, "pct": 0 }
+  },
+  "/WRK/RPI-CNC-proj/Simulator/web/js/toolpath-renderer.mjs": {
+    "lines": { "total": 3, "covered": 0, "skipped": 0, "pct": 0 },
+    "functions": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 },
+    "statements": { "total": 3, "covered": 0, "skipped": 0, "pct": 0 },
+    "branches": { "total": 2, "covered": 0, "skipped": 0, "pct": 0 }
   },
   "/WRK/RPI-CNC-proj/Simulator/web/js/toolpath.mjs": {
     "lines": { "total": 21, "covered": 0, "skipped": 0, "pct": 0 },
@@ -85,7 +97,7 @@
     "branches": { "total": 12, "covered": 0, "skipped": 0, "pct": 0 }
   },
   "/WRK/RPI-CNC-proj/modules/backend/server/http-server.js": {
-    "lines": { "total": 70, "covered": 70, "skipped": 0, "pct": 100 },
+    "lines": { "total": 76, "covered": 76, "skipped": 0, "pct": 100 },
     "functions": { "total": 6, "covered": 6, "skipped": 0, "pct": 100 },
     "statements": { "total": 80, "covered": 78, "skipped": 0, "pct": 97.5 },
     "branches": { "total": 42, "covered": 36, "skipped": 0, "pct": 85.71 }
@@ -115,9 +127,9 @@
     "branches": { "total": 7, "covered": 7, "skipped": 0, "pct": 100 }
   },
   "/WRK/RPI-CNC-proj/modules/cli/gcode-validate.mjs": {
-    "lines": { "total": 15, "covered": 15, "skipped": 0, "pct": 100 },
+    "lines": { "total": 16, "covered": 16, "skipped": 0, "pct": 100 },
     "functions": { "total": 5, "covered": 5, "skipped": 0, "pct": 100 },
-    "statements": { "total": 18, "covered": 18, "skipped": 0, "pct": 100 },
+    "statements": { "total": 17, "covered": 17, "skipped": 0, "pct": 100 },
     "branches": { "total": 10, "covered": 10, "skipped": 0, "pct": 100 }
   },
   "/WRK/RPI-CNC-proj/modules/cli/simulate-batch.mjs": {
@@ -133,9 +145,9 @@
     "branches": { "total": 22, "covered": 20, "skipped": 0, "pct": 90.9 }
   },
   "/WRK/RPI-CNC-proj/modules/cli/bin/apply-leveling.js": {
-    "lines": { "total": 18, "covered": 0, "skipped": 0, "pct": 0 },
+    "lines": { "total": 23, "covered": 0, "skipped": 0, "pct": 0 },
     "functions": { "total": 2, "covered": 0, "skipped": 0, "pct": 0 },
-    "statements": { "total": 24, "covered": 0, "skipped": 0, "pct": 0 },
+    "statements": { "total": 23, "covered": 0, "skipped": 0, "pct": 0 },
     "branches": { "total": 10, "covered": 0, "skipped": 0, "pct": 0 }
   },
   "/WRK/RPI-CNC-proj/modules/cli/bin/gcode-convert.js": {
@@ -175,10 +187,16 @@
     "branches": { "total": 17, "covered": 15, "skipped": 0, "pct": 88.23 }
   },
   "/WRK/RPI-CNC-proj/modules/gcode/parser.mjs": {
-    "lines": { "total": 19, "covered": 19, "skipped": 0, "pct": 100 },
+    "lines": { "total": 29, "covered": 29, "skipped": 0, "pct": 100 },
     "functions": { "total": 6, "covered": 6, "skipped": 0, "pct": 100 },
-    "statements": { "total": 22, "covered": 21, "skipped": 0, "pct": 95.45 },
-    "branches": { "total": 17, "covered": 14, "skipped": 0, "pct": 82.35 }
+    "statements": { "total": 32, "covered": 31, "skipped": 0, "pct": 96.87 },
+    "branches": { "total": 33, "covered": 30, "skipped": 0, "pct": 90.9 }
+  },
+  "/WRK/RPI-CNC-proj/modules/gcode/tool-library.mjs": {
+    "lines": { "total": 27, "covered": 27, "skipped": 0, "pct": 100 },
+    "functions": { "total": 14, "covered": 14, "skipped": 0, "pct": 100 },
+    "statements": { "total": 30, "covered": 30, "skipped": 0, "pct": 100 },
+    "branches": { "total": 36, "covered": 36, "skipped": 0, "pct": 100 }
   },
   "/WRK/RPI-CNC-proj/modules/gcode/tooling.mjs": {
     "lines": { "total": 13, "covered": 13, "skipped": 0, "pct": 100 },
@@ -187,10 +205,10 @@
     "branches": { "total": 12, "covered": 11, "skipped": 0, "pct": 91.66 }
   },
   "/WRK/RPI-CNC-proj/modules/gcode/toolpath.mjs": {
-    "lines": { "total": 29, "covered": 29, "skipped": 0, "pct": 100 },
+    "lines": { "total": 50, "covered": 49, "skipped": 0, "pct": 98 },
     "functions": { "total": 3, "covered": 3, "skipped": 0, "pct": 100 },
-    "statements": { "total": 38, "covered": 38, "skipped": 0, "pct": 100 },
-    "branches": { "total": 37, "covered": 33, "skipped": 0, "pct": 89.18 }
+    "statements": { "total": 57, "covered": 56, "skipped": 0, "pct": 98.24 },
+    "branches": { "total": 62, "covered": 57, "skipped": 0, "pct": 91.93 }
   },
   "/WRK/RPI-CNC-proj/modules/gcode/transform.mjs": {
     "lines": { "total": 40, "covered": 40, "skipped": 0, "pct": 100 },
@@ -228,8 +246,14 @@
     "statements": { "total": 92, "covered": 0, "skipped": 0, "pct": 0 },
     "branches": { "total": 53, "covered": 0, "skipped": 0, "pct": 0 }
   },
+  "/WRK/RPI-CNC-proj/modules/presentation/toolpath-renderer.mjs": {
+    "lines": { "total": 74, "covered": 19, "skipped": 0, "pct": 25.67 },
+    "functions": { "total": 10, "covered": 2, "skipped": 0, "pct": 20 },
+    "statements": { "total": 78, "covered": 21, "skipped": 0, "pct": 26.92 },
+    "branches": { "total": 58, "covered": 16, "skipped": 0, "pct": 27.58 }
+  },
   "/WRK/RPI-CNC-proj/modules/presentation/touch-controls.mjs": {
-    "lines": { "total": 7, "covered": 0, "skipped": 0, "pct": 0 },
+    "lines": { "total": 9, "covered": 0, "skipped": 0, "pct": 0 },
     "functions": { "total": 6, "covered": 0, "skipped": 0, "pct": 0 },
     "statements": { "total": 11, "covered": 0, "skipped": 0, "pct": 0 },
     "branches": { "total": 5, "covered": 0, "skipped": 0, "pct": 0 }
