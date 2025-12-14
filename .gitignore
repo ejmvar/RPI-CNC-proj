@@ -3,3 +3,6 @@ coverage
 #*.log
 .DS_Store
 modules/backend/server/storage
+
+# Visual regression test artifacts
+tests/visual/__diffs__/

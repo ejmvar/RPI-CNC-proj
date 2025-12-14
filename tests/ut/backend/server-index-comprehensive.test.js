@@ -12,6 +12,13 @@ describe('Backend server/index utilities', () => {
   const testFile = 'test-comprehensive.gcode';
   const testPath = path.join(STORAGE_DIR, testFile);
 
+  beforeEach(() => {
+    // Ensure storage directory exists
+    if (!fs.existsSync(STORAGE_DIR)) {
+      fs.mkdirSync(STORAGE_DIR, { recursive: true });
+    }
+  });
+
   afterEach(() => {
     // Clean up test files
     if (fs.existsSync(testPath)) fs.unlinkSync(testPath);

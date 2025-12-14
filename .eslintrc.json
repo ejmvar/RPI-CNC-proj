@@ -9,5 +9,14 @@
   "rules": {
     "no-unused-vars": ["warn"],
     "no-console": "off"
-  }
+  },
+  "overrides": [
+    {
+      "files": ["tests/visual/**/*.{js,mjs}"],
+      "env": {
+        "browser": true,
+        "node": true
+      }
+    }
+  ]
 }

@@ -4,13 +4,15 @@
   "private": true,
   "description": "Raspberry Pi CNC simulator — lightweight frontend and tooling",
   "scripts": {
-    "test": "node --experimental-vm-modules node_modules/.bin/jest --testPathIgnorePatterns=tests/e2e --maxWorkers=4",
-    "test:coverage": "node --experimental-vm-modules node_modules/.bin/jest --coverage --testPathIgnorePatterns=tests/e2e --maxWorkers=4",
+    "test": "node --experimental-vm-modules node_modules/.bin/jest --testPathIgnorePatterns=tests/e2e --testPathIgnorePatterns=tests/visual --maxWorkers=4",
+    "test:coverage": "node --experimental-vm-modules node_modules/.bin/jest --coverage --testPathIgnorePatterns=tests/e2e --testPathIgnorePatterns=tests/visual --maxWorkers=4",
     "lint": "eslint . --ext .js,.mjs || true",
     "format": "prettier --write .",
     "test:unit": "node --experimental-vm-modules node_modules/.bin/jest tests/ut --maxWorkers=4",
     "test:integration": "node --experimental-vm-modules node_modules/.bin/jest tests/it --maxWorkers=4",
     "test:e2e": "node --experimental-vm-modules node_modules/.bin/jest tests/e2e --runInBand",
+    "test:visual": "node --experimental-vm-modules node_modules/.bin/jest tests/visual/specs --runInBand --testTimeout=60000",
+    "test:visual:update": "UPDATE_SNAPSHOTS=1 npm run test:visual",
     "prepare": "husky"
   },
   "lint-staged": {
@@ -32,8 +34,11 @@
     "jest-image-snapshot": "^6.0.0",
     "jsdom": "^27.3.0",
     "lint-staged": "^16.2.7",
+    "pixelmatch": "^7.1.0",
     "playwright": "^1.39.1",
+    "pngjs": "^7.0.0",
     "prettier": "^2.8.8",
+    "puppeteer": "^24.33.0",
     "ws": "^8.13.0"
   }
 }

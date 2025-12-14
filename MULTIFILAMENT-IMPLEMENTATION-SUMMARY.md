@@ -548,15 +548,15 @@ npm run lint              # ESLint (0 errors, 0 warnings)
 ### Coverage Report
 
 ```
-File                          | Stmts | Branch | Funcs | Lines
-------------------------------|-------|--------|-------|-------
-modules/gcode/parser.mjs      | 68.2% | 61.5%  | 75.0% | 68.2%
-modules/gcode/toolpath.mjs    | 54.1% | 48.3%  | 62.5% | 54.1%
-modules/gcode/transform.mjs   | 49.7% | 43.2%  | 58.3% | 49.7%
-modules/presentation/mesh.mjs | 51.3% | 45.1%  | 55.6% | 51.3%
-toolpath-renderer.mjs         | 62.8% | 57.9%  | 70.0% | 62.8%
-------------------------------|-------|--------|-------|-------
-TOTAL                         | 56.66%| 50.4%  | 63.5% | 56.66%
+| File                           | Stmts   | Branch   | Funcs   | Lines   |
+| ------------------------------ | ------- | -------- | ------- | ------- |
+| modules/gcode/parser.mjs       | 68.2%   | 61.5%    | 75.0%   | 68.2%   |
+| modules/gcode/toolpath.mjs     | 54.1%   | 48.3%    | 62.5%   | 54.1%   |
+| modules/gcode/transform.mjs    | 49.7%   | 43.2%    | 58.3%   | 49.7%   |
+| modules/presentation/mesh.mjs  | 51.3%   | 45.1%    | 55.6%   | 51.3%   |
+| toolpath-renderer.mjs          | 62.8%   | 57.9%    | 70.0%   | 62.8%   |
+| ------------------------------ | ------- | -------- | ------- | ------- |
+| TOTAL                          | 56.66%  | 50.4%    | 63.5%   | 56.66%  |
 ```
 
 **Improvement:** +18% line coverage (from 38% baseline)

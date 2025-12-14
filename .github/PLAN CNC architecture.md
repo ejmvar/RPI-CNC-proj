@@ -115,7 +115,14 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
 - [x] **DONE** — Added browser wrapper tests (tests/ut/browser/) for ES modules
 - [x] **DONE** — **Achieved 60% coverage target** (59.81% lines)
 - [x] **DONE** — Fixed all linter issues (13 problems → 0)
-- [ ] **TODO** — Create visual regression tests for Three.js scenes
+- [x] **WIP** — Visual regression testing framework (helpers complete, tests written, needs server setup)
+  - [x] Installed dependencies (Puppeteer, Pixelmatch, PNGJS)
+  - [x] Created screenshot helpers (tests/visual/helpers/screenshot.mjs)
+  - [x] Created image comparison helpers (tests/visual/helpers/compare.mjs)
+  - [x] Written 5 test specs (single-tool: 2, multi-tool: 3)
+  - [x] Added npm scripts (test:visual, test:visual:update)
+  - [ ] Create baseline snapshots (blocked by server stability)
+  - [ ] Add CI integration
 - [ ] **TODO** — Push coverage beyond 65% (requires more edge case or integration testing)
 
 ### Phase 7: Advanced Features [IN-PROGRESS]

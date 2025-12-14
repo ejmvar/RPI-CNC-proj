@@ -1,8 +1,57 @@
 # Visual Regression Testing Framework
 
-**Status:** 🚧 Framework Setup (Not Yet Implemented)  
-**Priority:** Low (polish feature)  
+**Status:** 🚧 **Implementation In Progress** (helpers complete, tests require server troubleshooting)  
+**Priority:** Medium  
 **Complexity:** High (requires Puppeteer + image comparison)
+
+---
+
+## Implementation Status
+
+### ✅ Completed (Dec 14, 2024)
+
+1. **Dependencies Installed**
+
+   - ✅ puppeteer@21+ (headless Chrome automation)
+   - ✅ pixelmatch@5.3.0 (pixel-level image comparison)
+   - ✅ pngjs@7.0.0 (PNG manipulation)
+
+2. **Helper Functions Created**
+
+   - ✅ `tests/visual/helpers/screenshot.mjs` - Puppeteer screenshot capture
+   - ✅ `tests/visual/helpers/compare.mjs` - Pixelmatch image comparison
+
+3. **Test Specs Written**
+
+   - ✅ `tests/visual/specs/single-tool.test.mjs` (2 tests)
+     - Red square rendering
+     - Blue circle rendering
+   - ✅ `tests/visual/specs/multi-tool.test.mjs` (3 tests)
+     - Three-color toolpath
+     - Tool change markers
+     - Z offset application
+
+4. **Infrastructure**
+   - ✅ Directory structure created (**snapshots**, **diffs**, helpers, specs)
+   - ✅ npm scripts added (`test:visual`, `test:visual:update`)
+   - ✅ .gitignore updated (exclude **diffs** from version control)
+   - ✅ package.json updated (exclude visual tests from default test run)
+
+### 🚧 In Progress
+
+1. **Server Setup** - Requires stable HTTP server for tests
+
+   - Issue: Port 8000 conflicts during test execution
+   - Solution needed: Use dedicated port or better server management
+
+2. **Baseline Creation** - Need to generate initial snapshots
+
+   - Blocked by: Server stability issues
+   - Next step: Run `UPDATE_SNAPSHOTS=1 npm run test:visual` once server stable
+
+3. **CI Integration** - GitHub Actions workflow
+   - Draft ready in original README
+   - Needs baseline snapshots committed first
 
 ---
 
