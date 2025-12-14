@@ -1,9 +1,6 @@
 // Unit tests for toolpath renderer
 
-import {
-  renderMultiToolToolpath,
-  calculateToolpathStats,
-} from '../../../modules/presentation/toolpath-renderer.mjs';
+import { calculateToolpathStats } from '../../../modules/presentation/toolpath-renderer.mjs';
 
 describe('calculateToolpathStats', () => {
   test('handles empty points array', () => {
