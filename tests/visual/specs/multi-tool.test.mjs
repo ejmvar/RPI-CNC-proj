@@ -31,7 +31,12 @@ G1 X0 Y40
       { name: 'Green', diameter: 0.4, color: '#00ff00', zOffset: 0, speed: 220 },
     ];
 
-    const screenshot = await captureSimulator({ gcode, tools, waitFor: 4000 });
+    const screenshot = await captureSimulator({
+      gcode,
+      tools,
+      waitFor: 4000,
+      serverUrl: 'http://localhost:8080/Simulator/web',
+    });
 
     const snapshotPath = path.join(SNAPSHOTS_DIR, 'multi-tool-three-colors.png');
     const diffPath = path.join(DIFFS_DIR, 'multi-tool-three-colors-diff.png');
@@ -73,7 +78,12 @@ G1 X50 Y50 Z5
       { name: 'Tool 2', diameter: 1.0, color: '#00ff00', zOffset: -2.0 },
     ];
 
-    const screenshot = await captureSimulator({ gcode, tools, waitFor: 4000 });
+    const screenshot = await captureSimulator({
+      gcode,
+      tools,
+      waitFor: 4000,
+      serverUrl: 'http://localhost:8080/Simulator/web',
+    });
 
     const snapshotPath = path.join(SNAPSHOTS_DIR, 'multi-tool-change-markers.png');
     const diffPath = path.join(DIFFS_DIR, 'multi-tool-change-markers-diff.png');
@@ -109,7 +119,12 @@ G49
       { name: 'Tool 1', diameter: 3.0, color: '#ff8800', zOffset: -52.5, speed: 12000 },
     ];
 
-    const screenshot = await captureSimulator({ gcode, tools, waitFor: 4000 });
+    const screenshot = await captureSimulator({
+      gcode,
+      tools,
+      waitFor: 4000,
+      serverUrl: 'http://localhost:8080/Simulator/web',
+    });
 
     const snapshotPath = path.join(SNAPSHOTS_DIR, 'multi-tool-z-offset.png');
     const diffPath = path.join(DIFFS_DIR, 'multi-tool-z-offset-diff.png');

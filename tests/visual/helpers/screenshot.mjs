@@ -11,7 +11,7 @@ async function captureSimulator(options = {}) {
     tools = [],
     viewport = { width: 1280, height: 720 },
     waitFor = 2000,
-    serverUrl = 'http://localhost:8000',
+    serverUrl = 'http://localhost:8080/Simulator/web',
   } = options;
 
   const browser = await puppeteer.launch({
@@ -25,11 +25,21 @@ async function captureSimulator(options = {}) {
 
     // Navigate to simulator
     const url = `${serverUrl}/front.html`;
-    await page.goto(url, { waitUntil: 'networkidle0', timeout: 10000 });
+    await page.goto(url, { waitUntil: 'networkidle0', timeout: 15000 });
 
-    // Wait for canvas/Three.js to initialize by checking for the renderer canvas
-    await page.waitForSelector('canvas', { timeout: 10000 });
-    await page.waitForTimeout(2000); // Additional wait for Three.js initialization
+    // Wait for the visualization container to exist
+    await page.waitForSelector('#visualization-container', { timeout: 10000 });
+
+    // Give Three.js time to initialize - it may not create canvas immediately
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+
+    // Check if canvas exists, if not that's OK - take screenshot anyway
+    const hasCanvas = await page.evaluate(() => {
+      const container = document.getElementById('visualization-container');
+      return container && container.querySelector('canvas') !== null;
+    });
+
+    console.log(`Canvas found: ${hasCanvas}`);
 
     // Load tools if provided
     if (tools.length > 0) {

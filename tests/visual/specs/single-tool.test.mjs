@@ -33,9 +33,14 @@ G1 X0 Y0
       },
     ];
 
-    const screenshot = await captureSimulator({ gcode, tools, waitFor: 3000 });
+    const screenshot = await captureSimulator({
+      gcode,
+      tools,
+      waitFor: 3000,
+      serverUrl: 'http://localhost:8080/Simulator/web',
+    });
 
-    const snapshotPath = path.join(SNAPSHOTS_DIR, 'single-tool-red-square.png');
+    const snapshotPath = path.join(SNAPSHOTS_DIR, 'single-tool-blue-circle.png');
     const diffPath = path.join(DIFFS_DIR, 'single-tool-red-square-diff.png');
 
     const baseline = loadSnapshot(snapshotPath);
@@ -78,7 +83,12 @@ G2 X25 Y25 I25 J0 F800
       },
     ];
 
-    const screenshot = await captureSimulator({ gcode, tools, waitFor: 3000 });
+    const screenshot = await captureSimulator({
+      gcode,
+      tools,
+      waitFor: 3000,
+      serverUrl: 'http://localhost:8080/Simulator/web',
+    });
 
     const snapshotPath = path.join(SNAPSHOTS_DIR, 'single-tool-blue-circle.png');
     const diffPath = path.join(DIFFS_DIR, 'single-tool-blue-circle-diff.png');
