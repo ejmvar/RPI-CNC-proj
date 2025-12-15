@@ -139,6 +139,13 @@
             🛡️ Check Safety
           </button>
           <button
+            id="toggle-renderer-btn"
+            onclick="toggleRenderer()"
+            class="w-full bg-violet-500 text-white p-3 rounded-lg font-bold hover:bg-violet-600 control-btn shadow-violet-800"
+          >
+            📐 2D View
+          </button>
+          <button
             id="pause-btn"
             onclick="pauseSimulation()"
             class="w-full bg-amber-500 text-white p-3 rounded-lg font-bold hover:bg-amber-600 control-btn shadow-amber-800"
@@ -478,6 +485,8 @@
       import * as TOOLPATH_RENDERER from './js/toolpath-renderer.mjs';
       import * as GCODE_OPTIMIZER from './js/gcode-optimizer.mjs';
       import * as COLLISION_DETECTOR from './js/collision-detector.mjs';
+      import * as TOUCH_CONTROLS from './js/touch-controls.mjs';
+      import * as RENDERER_2D from './js/renderer-2d.mjs';
       // expose parser and three helpers to the inline script environment
       window.GCODE_PARSER = GParser;
       window.THREE_HELPER = THREE_HELPER;
@@ -490,6 +499,8 @@
       window.TOOLPATH_RENDERER = TOOLPATH_RENDERER;
       window.GCODE_OPTIMIZER = GCODE_OPTIMIZER;
       window.COLLISION_DETECTOR = COLLISION_DETECTOR;
+      window.TOUCH_CONTROLS = TOUCH_CONTROLS;
+      window.RENDERER_2D = RENDERER_2D;
     </script>
 
     <script>
@@ -508,6 +519,10 @@
       // --- Tool Library ---
       let toolLibrary = null;
       let toolpathPoints = [];
+
+      // --- 2D Renderer ---
+      let renderer2D = null;
+      let currentRenderMode = '3d'; // '3d' or '2d'
 
       // Initialize tool library
       function initToolLibrary() {
@@ -778,6 +793,33 @@
           }
         } catch (err) {
           console.warn('controls attach failed', err);
+        }
+        // Initialize mobile touch controls if on a touch device
+        try {
+          if (
+            window.TOUCH_CONTROLS &&
+            typeof window.TOUCH_CONTROLS.isTouchDevice === 'function' &&
+            window.TOUCH_CONTROLS.isTouchDevice()
+          ) {
+            // Apply mobile-optimized styles
+            if (typeof window.TOUCH_CONTROLS.applyMobileStyles === 'function') {
+              window.TOUCH_CONTROLS.applyMobileStyles();
+            }
+            // Initialize touch controls
+            if (typeof window.TOUCH_CONTROLS.MobileTouchControls === 'function') {
+              window.MOBILE_TOUCH = new window.TOUCH_CONTROLS.MobileTouchControls(
+                CONTAINER,
+                camera,
+                window.CONTROLS || null
+              );
+              console.log(
+                'Mobile touch controls initialized:',
+                window.TOUCH_CONTROLS.getDeviceType()
+              );
+            }
+          }
+        } catch (err) {
+          console.warn('Touch controls initialization failed', err);
         }
       }
 
@@ -1188,6 +1230,9 @@
           console.warn('createPositionIndicator failed', err);
         }
         animate();
+
+        // Restore render mode preference
+        restoreRenderMode();
       };
 
       function applyLevelingToGCode() {
@@ -1457,6 +1502,86 @@ Performance gain: Fewer moves = faster execution
         `.trim();
 
         alert(report);
+      }
+
+      // Toggle between 2D and 3D renderer
+      function toggleRenderer() {
+        const btn = document.getElementById('toggle-renderer-btn');
+
+        if (currentRenderMode === '3d') {
+          // Switch to 2D
+          currentRenderMode = '2d';
+          btn.textContent = '🎲 3D View';
+          btn.classList.remove('bg-violet-500', 'hover:bg-violet-600', 'shadow-violet-800');
+          btn.classList.add('bg-indigo-500', 'hover:bg-indigo-600', 'shadow-indigo-800');
+
+          // Stop 3D animation
+          if (animationFrameId) {
+            cancelAnimationFrame(animationFrameId);
+            animationFrameId = null;
+          }
+
+          // Hide 3D renderer
+          if (renderer) {
+            renderer.domElement.style.display = 'none';
+          }
+
+          // Initialize and show 2D renderer
+          if (!renderer2D && window.RENDERER_2D) {
+            renderer2D = new window.RENDERER_2D.Renderer2D(CONTAINER, {
+              strokeWidth: 2,
+              rapidColor: '#888888',
+              linearColor: '#00ff00',
+              arcColor: '#00ffff',
+              scale: 5,
+            });
+          }
+
+          // Render current toolpath in 2D
+          if (toolpathPoints.length > 0) {
+            const segments = window.RENDERER_2D.toolpathToSegments(toolpathPoints);
+            renderer2D.renderToolpath(segments);
+            showMessage('Switched to 2D view', 'bg-indigo-500');
+          } else {
+            showMessage('Load G-Code first to see 2D view', 'bg-yellow-500');
+          }
+
+          // Save preference
+          localStorage.setItem('renderMode', '2d');
+        } else {
+          // Switch to 3D
+          currentRenderMode = '3d';
+          btn.textContent = '📐 2D View';
+          btn.classList.remove('bg-indigo-500', 'hover:bg-indigo-600', 'shadow-indigo-800');
+          btn.classList.add('bg-violet-500', 'hover:bg-violet-600', 'shadow-violet-800');
+
+          // Clear 2D renderer
+          if (renderer2D) {
+            renderer2D.clear();
+          }
+
+          // Show 3D renderer
+          if (renderer) {
+            renderer.domElement.style.display = 'block';
+          }
+
+          // Restart 3D animation
+          animate();
+
+          showMessage('Switched to 3D view', 'bg-violet-500');
+
+          // Save preference
+          localStorage.setItem('renderMode', '3d');
+        }
+      }
+
+      // Check for saved render mode preference on load
+      function restoreRenderMode() {
+        const savedMode = localStorage.getItem('renderMode');
+        if (savedMode === '2d' && toolpathPoints.length > 0) {
+          // Delay to ensure 3D is fully initialized first
+          setTimeout(() => toggleRenderer(), 500);
+        }
       }
     </script>
   </body>

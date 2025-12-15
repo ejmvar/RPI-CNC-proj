@@ -534,4 +534,143 @@ npm test -- tests/ut/gcode/collision-detector.test.mjs
 
 ---
 
+## 8. Mobile Touch Controls
+
+**Module:** `modules/presentation/touch-controls.mjs`
+
+**Description:** Mobile-optimized touch gesture support for 3D visualization on tablets and phones.
+
+**Features:**
+
+- 📱 Automatic device detection (mobile/tablet/desktop)
+- 👆 Single-finger pan gesture
+- 🤏 Two-finger pinch-to-zoom
+- 🔄 Two-finger rotation
+- 📐 Configurable gesture speeds and sensitivity
+- 📊 Gesture statistics tracking
+- 🎨 Mobile-optimized CSS injection (44px buttons, touch-action)
+
+**Usage in Simulator:**
+
+The simulator automatically detects touch devices and enables touch controls:
+
+```javascript
+// Auto-initialized in front.html when touch device detected
+if (TOUCH_CONTROLS.isTouchDevice()) {
+  TOUCH_CONTROLS.applyMobileStyles();
+  const touchControls = new TOUCH_CONTROLS.MobileTouchControls(container, camera, controls);
+}
+```
+
+**Manual Usage:**
+
+```javascript
+import { MobileTouchControls, isTouchDevice, applyMobileStyles } from './touch-controls.mjs';
+
+// Check for touch support
+if (isTouchDevice()) {
+  // Apply mobile styles
+  applyMobileStyles();
+
+  // Initialize touch controls
+  const touchControls = new MobileTouchControls(
+    container, // DOM element
+    camera, // Three.js camera
+    orbitControls, // Three.js OrbitControls (optional)
+    {
+      enablePan: true,
+      enableZoom: true,
+      enableRotate: true,
+      panSpeed: 1.0,
+      zoomSpeed: 1.0,
+      rotateSpeed: 1.0,
+      minDistance: 10,
+    }
+  );
+
+  // Get statistics
+  const stats = touchControls.getStats();
+  console.log(`Total gestures: ${stats.totalGestures}`);
+
+  // Cleanup when done
+  touchControls.dispose();
+}
+```
+
+**Gestures:**
+
+- **Pan:** Single finger drag → moves camera position
+- **Zoom:** Two fingers pinch/spread → dolly in/out
+- **Rotate:** Two fingers rotate → rotate camera around target
+
+**Configuration:**
+
+```javascript
+// Update configuration at runtime
+touchControls.setConfig({
+  panSpeed: 2.0, // Increase pan sensitivity
+  enableRotate: false, // Disable rotation
+});
+
+// Disable/enable touch controls
+touchControls.setEnabled(false);
+touchControls.setEnabled(true);
+```
+
+**Device Detection:**
+
+```javascript
+import { getDeviceType } from './touch-controls.mjs';
+
+const deviceType = getDeviceType();
+// Returns: 'mobile', 'tablet', or 'desktop'
+
+if (deviceType === 'mobile') {
+  console.log('Optimizing for mobile device');
+}
+```
+
+**Testing:**
+
+```bash
+npm test -- tests/ut/presentation/touch-controls.test.mjs
+```
+
+**Browser Compatibility:**
+
+- ✅ iOS Safari (iPhone/iPad)
+- ✅ Android Chrome
+- ✅ Android Firefox
+- ✅ Desktop browsers with touch screens
+
+---
+
+## 9. Alternative 2D Renderer
+
+**Module:** `modules/presentation/renderer-2d.mjs`
+
+**Description:** Lightweight SVG-based renderer as an alternative to Three.js 3D visualization.
+
+**Features:**
+
+- 📐 SVG path generation from G-Code toolpath
+- 🎨 Color coding (rapids=gray, linear=green, arcs=cyan)
+- 🖱️ Pan/zoom viewport controls (mouse drag, wheel)
+- 📏 Automatic fit-to-view
+- 💾 Export to SVG file
+- ⚡ Lower memory footprint than 3D
+- 🔋 Better battery life on mobile devices
+
+**Usage in Simulator:**
+
+Click the **📐 2D View** button to toggle between 3D and 2D rendering modes.
+
+**Testing:**
+
+```bash
+npm test -- tests/ut/presentation/renderer-2d.test.mjs
+```
+
+---
+
 **Happy Simulating!** 🚀

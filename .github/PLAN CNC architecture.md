@@ -169,9 +169,36 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
   - [x] Created safe.gcode and unsafe.gcode examples
   - [x] Updated documentation in examples/README.md
   - [x] All 611 tests passing (no regressions)
+- [x] **DONE** — Mobile-optimized touch controls (Phase 7.4 - Dec 14, 2024)
+  - [x] Implemented MobileTouchControls class with full gesture support
+  - [x] TouchState class for tracking touch positions and gestures
+  - [x] Gesture 1: Single-finger pan (camera position control)
+  - [x] Gesture 2: Two-finger pinch-to-zoom (dolly in/out)
+  - [x] Gesture 3: Two-finger rotation (rotate around target)
+  - [x] Device detection utilities (isTouchDevice, getDeviceType)
+  - [x] Mobile CSS injection (44px buttons, touch-action: none)
+  - [x] Configurable speeds and enable/disable per gesture
+  - [x] Statistics tracking (gesture counts)
+  - [x] Created 32 unit tests (100% passing)
+  - [x] Auto-detection and initialization in simulator UI
+  - [x] Updated documentation in examples/README.md
+  - [x] All 643 tests passing (+32 new tests, no regressions)
+- [x] **DONE** — Alternative 2D renderer (Phase 7.5 - Dec 14, 2024)
+  - [x] Implemented SVGPathBuilder class for path generation
+  - [x] Implemented Viewport2D class for pan/zoom controls
+  - [x] Implemented Renderer2D main class
+  - [x] SVG path generation from toolpath points
+  - [x] Color coding: rapids (gray/dashed), linear (green), arcs (cyan)
+  - [x] Mouse controls: drag to pan, wheel to zoom
+  - [x] Automatic fit-to-view on load
+  - [x] Export to SVG functionality
+  - [x] Created 22 unit tests + 21 integration tests (100% passing)
+  - [x] Added "📐 2D View" / "🎲 3D View" toggle button
+  - [x] LocalStorage preference persistence
+  - [x] Integrated toolpathToSegments converter
+  - [x] Updated documentation in examples/README.md
+  - [x] All 702 tests passing (+43 new tests, no regressions)
 - [ ] **TODO** — Material removal simulation (actual mesh subtraction)
-- [ ] **TODO** — Alternative renderer (SVG/Canvas 2D for low-end devices)
-- [ ] **TODO** — Mobile-optimized touch controls
 - [ ] **TODO** — Collaborative editing (multi-user G-Code sessions)
 
 ---
