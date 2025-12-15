@@ -129,7 +129,7 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
 
 **Goal:** Extended capabilities and polish.
 
-**Coverage Status (Dec 14, 2024):** **580/596 tests passing** (16 skipped by design)
+**Coverage Status (Dec 14, 2024):** **611/627 tests passing** (16 skipped by design)
 
 #### Tasks:
 
@@ -155,8 +155,21 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
   - [x] Created example files showing 60% reduction
   - [x] Updated documentation in examples/README.md
   - [x] All 580 tests passing (no regressions)
+- [x] **DONE** — Collision detection and bounds checking (Phase 7.3 - Dec 14, 2024)
+  - [x] Implemented comprehensive collision detector module
+  - [x] Check 1: Machine bounds validation (X/Y/Z limits)
+  - [x] Check 2: Rapid plunge detection (unsafe Z drops)
+  - [x] Check 3: Feed rate validation (missing/excessive)
+  - [x] Check 4: Spindle speed validation
+  - [x] Check 5: Workpiece collision detection
+  - [x] Check 6: Negative Z rapid warnings
+  - [x] Created 31 unit tests (100% passing)
+  - [x] Added "🛡️ Check Safety" button to simulator UI
+  - [x] Color-coded warning display (critical/error/warning/info)
+  - [x] Created safe.gcode and unsafe.gcode examples
+  - [x] Updated documentation in examples/README.md
+  - [x] All 611 tests passing (no regressions)
 - [ ] **TODO** — Material removal simulation (actual mesh subtraction)
-- [ ] **TODO** — Collision detection and bounds checking
 - [ ] **TODO** — Alternative renderer (SVG/Canvas 2D for low-end devices)
 - [ ] **TODO** — Mobile-optimized touch controls
 - [ ] **TODO** — Collaborative editing (multi-user G-Code sessions)

@@ -133,6 +133,12 @@
             ⚡ Optimize
           </button>
           <button
+            onclick="checkSafetyUI()"
+            class="w-full bg-cyan-500 text-white p-3 rounded-lg font-bold hover:bg-cyan-600 control-btn shadow-cyan-800"
+          >
+            🛡️ Check Safety
+          </button>
+          <button
             id="pause-btn"
             onclick="pauseSimulation()"
             class="w-full bg-amber-500 text-white p-3 rounded-lg font-bold hover:bg-amber-600 control-btn shadow-amber-800"
@@ -471,6 +477,7 @@
       import * as TOOL_LIBRARY from './js/tool-library.mjs';
       import * as TOOLPATH_RENDERER from './js/toolpath-renderer.mjs';
       import * as GCODE_OPTIMIZER from './js/gcode-optimizer.mjs';
+      import * as COLLISION_DETECTOR from './js/collision-detector.mjs';
       // expose parser and three helpers to the inline script environment
       window.GCODE_PARSER = GParser;
       window.THREE_HELPER = THREE_HELPER;
@@ -482,6 +489,7 @@
       window.TOOL_LIBRARY = TOOL_LIBRARY;
       window.TOOLPATH_RENDERER = TOOLPATH_RENDERER;
       window.GCODE_OPTIMIZER = GCODE_OPTIMIZER;
+      window.COLLISION_DETECTOR = COLLISION_DETECTOR;
     </script>
 
     <script>
@@ -1281,6 +1289,74 @@
         } catch (error) {
           showMessage(`ERROR optimizing G-Code: ${error.message}`, 'bg-red-500');
           console.error('Optimization error:', error);
+        }
+      }
+
+      function checkSafetyUI() {
+        const gcodeText = document.getElementById('gcode-input').value;
+        if (!gcodeText || !gcodeText.trim()) {
+          showMessage('ERROR: No G-Code to check.', 'bg-red-500');
+          return;
+        }
+
+        // Check if collision detector module is available
+        if (
+          !window.COLLISION_DETECTOR ||
+          typeof window.COLLISION_DETECTOR.detectCollisions !== 'function'
+        ) {
+          showMessage('ERROR: Collision detector module not loaded.', 'bg-red-500');
+          return;
+        }
+
+        try {
+          // Detect collisions and safety issues
+          const result = window.COLLISION_DETECTOR.detectCollisions(gcodeText);
+          const summary = window.COLLISION_DETECTOR.getSummaryText(result);
+
+          // Determine message color based on severity
+          let bgColor = 'bg-green-600'; // Safe
+          if (result.summary.critical > 0) {
+            bgColor = 'bg-red-600'; // Critical
+          } else if (result.summary.error > 0) {
+            bgColor = 'bg-orange-600'; // Error
+          } else if (result.summary.warning > 0) {
+            bgColor = 'bg-yellow-600'; // Warning
+          }
+
+          // Build detailed message
+          let message = summary + '\n\n';
+
+          // Add top warnings (up to 5)
+          const topWarnings = result.warnings.slice(0, 5);
+          if (topWarnings.length > 0) {
+            message += '━━━━━━━━━━━━━━━━━━━━━━\n';
+            message += 'Top Issues:\n';
+            topWarnings.forEach((w, i) => {
+              const icon =
+                w.severity === 'critical'
+                  ? '🔴'
+                  : w.severity === 'error'
+                  ? '🟠'
+                  : w.severity === 'warning'
+                  ? '🟡'
+                  : 'ℹ️';
+              message += `${i + 1}. ${icon} ${w.message}\n`;
+            });
+
+            if (result.warnings.length > 5) {
+              message += `\n... and ${result.warnings.length - 5} more issue(s)`;
+            }
+          }
+
+          showMessage(message, bgColor);
+
+          // Log detailed warnings to console for debugging
+          if (result.warnings.length > 0) {
+            console.log('Safety Check Results:', result);
+          }
+        } catch (error) {
+          showMessage(`ERROR checking safety: ${error.message}`, 'bg-red-500');
+          console.error('Safety check error:', error);
         }
       }
 

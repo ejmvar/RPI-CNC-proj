@@ -441,4 +441,97 @@ npm test -- tests/ut/gcode/optimizer.test.mjs
 
 ---
 
+## Collision Detection & Safety Examples
+
+### 5. unsafe.gcode
+
+**Description:** Example G-Code with intentional safety violations for testing
+
+**Safety Violations:**
+
+- Out of bounds X/Y/Z positions
+- Rapid plunge (unsafe Z drop > 10mm)
+- Excessive feed rate (> 3000 mm/min)
+- Excessive spindle speed (> 24000 RPM)
+- Missing feed rate on cutting move
+
+**Expected Results:**
+
+- 🔴 **3 CRITICAL** issues (bounds violations)
+- 🟠 **8 ERROR** issues (feed/spindle/plunge)
+- ❌ **NOT SAFE TO RUN**
+
+### 6. safe.gcode
+
+**Description:** Example G-Code with no safety violations
+
+**Safety Features:**
+
+- All movements within machine bounds
+- Safe Z approach and retract sequences
+- Proper spindle speed (12000 RPM)
+- Correct feed rates (500-1000 mm/min)
+- Feed moves for plunging and retracting
+
+**Expected Results:**
+
+- ✅ **SAFE** - No issues detected
+- Ready for machining
+
+**How to Use Safety Checking:**
+
+1. **In the Simulator:**
+
+   - Open http://localhost:8001/front.html
+   - Load or paste G-Code into the editor
+   - Click the **🛡️ Check Safety** button
+   - Review warnings in message area
+   - Address critical/error issues before running
+
+2. **From Command Line:**
+
+   ```bash
+   node --input-type=module -e "
+   import { detectCollisions, getSummaryText } from './modules/gcode/collision-detector.mjs';
+   import { readFileSync } from 'fs';
+   const result = detectCollisions(readFileSync('./examples/unsafe.gcode', 'utf-8'));
+   console.log(getSummaryText(result));
+   "
+   ```
+
+3. **As a Module:**
+
+   ```javascript
+   import { detectCollisions, SEVERITY } from './modules/gcode/collision-detector.mjs';
+
+   const result = detectCollisions(gcodeString, {
+     xMin: 0,
+     xMax: 200,
+     maxFeedRate: 3000,
+     maxSpindleSpeed: 24000,
+   });
+
+   if (!result.safe) {
+     console.error('UNSAFE G-Code!');
+     result.warnings.forEach((w) => console.log(w.message));
+   }
+   ```
+
+**Safety Checks:**
+
+- 🛡️ Bounds checking (X/Y/Z limits)
+- ⚡ Rapid plunge detection (> 10mm)
+- 📏 Feed rate validation
+- 🔧 Spindle speed validation
+- 🎯 Workpiece collision detection
+- ⚠️ Negative Z rapid warnings
+
+**Testing:**
+
+```bash
+npm test -- tests/ut/gcode/collision-detector.test.mjs
+```
+
+---
+
 **Happy Simulating!** 🚀
