@@ -8,9 +8,22 @@ import { CollaborativeClient } from '../../../modules/presentation/collaborative
 
 // Mock WebSocket
 global.WebSocket = class MockWebSocket {
+  static get OPEN() {
+    return 1;
+  }
+  static get CONNECTING() {
+    return 0;
+  }
+  static get CLOSING() {
+    return 2;
+  }
+  static get CLOSED() {
+    return 3;
+  }
+
   constructor(url) {
     this.url = url;
-    this.readyState = 0; // CONNECTING
+    this.readyState = MockWebSocket.CONNECTING;
     this.onopen = null;
     this.onmessage = null;
     this.onerror = null;
@@ -22,7 +35,7 @@ global.WebSocket = class MockWebSocket {
 
     // Simulate connection after short delay
     setTimeout(() => {
-      ws.readyState = 1; // OPEN
+      ws.readyState = MockWebSocket.OPEN;
       // Call onopen if it was set
       if (ws.onopen) {
         ws.onopen();
@@ -35,7 +48,7 @@ global.WebSocket = class MockWebSocket {
   }
 
   close() {
-    this.readyState = 3; // CLOSED
+    this.readyState = MockWebSocket.CLOSED;
     if (this.onclose) this.onclose();
   }
 
@@ -259,6 +272,10 @@ describe('CollaborativeClient', () => {
     // Wait for mock WebSocket to "open"
     await new Promise((resolve) => setTimeout(resolve, 50));
 
+    // Check if onopen was called
+    expect(client.connected).toBe(true); // Should be true after onopen
+    expect(client.ws).not.toBeNull(); // WebSocket should exist
+
     // Now simulate server joining response
     client.ws.simulateMessage({
       type: 'joined',
@@ -268,6 +285,8 @@ describe('CollaborativeClient', () => {
     // Wait for promise to resolve
     await connectPromise;
 
+    // Final check
+    expect(client.connected).toBe(true); // Still connected?
     expect(client.isConnected()).toBe(true);
   });
 
