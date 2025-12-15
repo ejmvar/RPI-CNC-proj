@@ -127,6 +127,12 @@
             Apply Leveling
           </button>
           <button
+            onclick="optimizeGCodeUI()"
+            class="w-full bg-green-500 text-white p-3 rounded-lg font-bold hover:bg-green-600 control-btn shadow-green-800"
+          >
+            ⚡ Optimize
+          </button>
+          <button
             id="pause-btn"
             onclick="pauseSimulation()"
             class="w-full bg-amber-500 text-white p-3 rounded-lg font-bold hover:bg-amber-600 control-btn shadow-amber-800"
@@ -464,6 +470,7 @@
       import * as COLLAB_CLIENT from './js/collab-client.mjs';
       import * as TOOL_LIBRARY from './js/tool-library.mjs';
       import * as TOOLPATH_RENDERER from './js/toolpath-renderer.mjs';
+      import * as GCODE_OPTIMIZER from './js/gcode-optimizer.mjs';
       // expose parser and three helpers to the inline script environment
       window.GCODE_PARSER = GParser;
       window.THREE_HELPER = THREE_HELPER;
@@ -474,6 +481,7 @@
       window.COLLAB_CLIENT = COLLAB_CLIENT;
       window.TOOL_LIBRARY = TOOL_LIBRARY;
       window.TOOLPATH_RENDERER = TOOLPATH_RENDERER;
+      window.GCODE_OPTIMIZER = GCODE_OPTIMIZER;
     </script>
 
     <script>
@@ -1236,6 +1244,44 @@
         URL.revokeObjectURL(url);
 
         showMessage(`G-Code exported as ${filename}`, 'bg-green-600');
+      }
+
+      function optimizeGCodeUI() {
+        const gcodeText = document.getElementById('gcode-input').value;
+        if (!gcodeText || !gcodeText.trim()) {
+          showMessage('ERROR: No G-Code to optimize.', 'bg-red-500');
+          return;
+        }
+
+        // Check if optimizer module is available
+        if (!window.GCODE_OPTIMIZER || typeof window.GCODE_OPTIMIZER.optimizeGCode !== 'function') {
+          showMessage('ERROR: Optimizer module not loaded.', 'bg-red-500');
+          return;
+        }
+
+        try {
+          // Optimize the G-Code
+          const result = window.GCODE_OPTIMIZER.optimizeGCode(gcodeText);
+
+          // Update the textarea with optimized code
+          document.getElementById('gcode-input').value = result.gcode;
+
+          // Display optimization statistics
+          const stats = result.stats;
+          const reductionPercent = stats.reductionPercent.toFixed(1);
+          const message =
+            `✅ G-Code Optimized!\n` +
+            `📉 Reduction: ${reductionPercent}%\n` +
+            `🔄 Redundant moves removed: ${stats.redundantMovesRemoved}\n` +
+            `📐 Collinear segments combined: ${stats.collinearSegmentsCombined}\n` +
+            `🔢 Duplicate commands removed: ${stats.duplicateCommandsRemoved}\n` +
+            `📊 Lines: ${stats.originalLines} → ${stats.optimizedLines}`;
+
+          showMessage(message, 'bg-green-600');
+        } catch (error) {
+          showMessage(`ERROR optimizing G-Code: ${error.message}`, 'bg-red-500');
+          console.error('Optimization error:', error);
+        }
       }
 
       function loadGCodeFromFile(event) {

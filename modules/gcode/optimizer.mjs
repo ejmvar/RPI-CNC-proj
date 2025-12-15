@@ -66,10 +66,15 @@ function areCollinear(p1, p2, p3, angleTolerance = 0.5) {
  * Reconstruct G-Code line from parsed command
  */
 function reconstructLine(cmd) {
-  if (!cmd || !cmd.command) return cmd.raw || '';
+  if (!cmd || !cmd.params) return cmd.raw || '';
 
-  const parts = [cmd.command];
-  const params = cmd.params || {};
+  const parts = [];
+  const params = cmd.params;
+
+  // Add G/M/T commands first
+  if ('G' in params) parts.push(`G${params.G}`);
+  if ('M' in params) parts.push(`M${params.M}`);
+  if ('T' in params) parts.push(`T${params.T}`);
 
   // Add parameters in standard order
   if ('X' in params) parts.push(`X${params.X.toFixed(4)}`);
@@ -80,12 +85,17 @@ function reconstructLine(cmd) {
   if ('K' in params) parts.push(`K${params.K.toFixed(4)}`);
   if ('F' in params) parts.push(`F${params.F}`);
   if ('S' in params) parts.push(`S${params.S}`);
-  if ('T' in params) parts.push(`T${params.T}`);
   if ('P' in params) parts.push(`P${params.P}`);
   if ('R' in params) parts.push(`R${params.R}`);
 
-  const line = parts.join(' ');
-  return cmd.comment ? `${line} ; ${cmd.comment}` : line;
+  return parts.length > 0 ? parts.join(' ') : cmd.raw || '';
+}
+
+/**
+ * Check if command is a move command (G0, G1, G2, G3)
+ */
+function isMoveCommand(cmd) {
+  return cmd.params && 'G' in cmd.params && [0, 1, 2, 3].includes(cmd.params.G);
 }
 
 /**
@@ -97,38 +107,38 @@ function removeRedundantMoves(commands, tolerance) {
   let removed = 0;
 
   for (const cmd of commands) {
-    if (!cmd.command || cmd.command.startsWith(';') || cmd.command.startsWith('(')) {
+    if (!cmd.params) {
       optimized.push(cmd);
       continue;
     }
 
-    const params = cmd.params || {};
+    const params = cmd.params;
     const newPos = {
       x: 'X' in params ? params.X : currentPos.x,
       y: 'Y' in params ? params.Y : currentPos.y,
       z: 'Z' in params ? params.Z : currentPos.z,
     };
 
-    // Check if it's a move command
-    const isMove = cmd.command.match(/^G[0123]/);
+    const isMove = isMoveCommand(cmd);
+    const hasCoords = 'X' in params || 'Y' in params || 'Z' in params;
 
-    if (
-      isMove &&
-      ('X' in params || 'Y' in params || 'Z' in params) &&
-      positionsEqual(currentPos, newPos, tolerance)
-    ) {
-      // Redundant move - skip if no F/S, else keep F/S only
+    if (isMove && hasCoords && positionsEqual(currentPos, newPos, tolerance)) {
+      // Redundant move detected
+      removed++;
+
+      // Keep F/S commands if present
       if ('F' in params || 'S' in params) {
-        const reducedCmd = {
+        const reducedParams = {};
+        if ('G' in params) reducedParams.G = params.G;
+        if ('F' in params) reducedParams.F = params.F;
+        if ('S' in params) reducedParams.S = params.S;
+        optimized.push({
           ...cmd,
-          params: {},
-        };
-        if ('F' in params) reducedCmd.params.F = params.F;
-        if ('S' in params) reducedCmd.params.S = params.S;
-        optimized.push(reducedCmd);
-      } else {
-        removed++;
+          params: reducedParams,
+          raw: reconstructLine({ params: reducedParams }),
+        });
       }
+      // Otherwise skip entirely
     } else {
       optimized.push(cmd);
       if (isMove) {
@@ -151,7 +161,7 @@ function combineCollinearSegments(commands, angleTolerance) {
   while (i < commands.length) {
     const cmd = commands[i];
 
-    if (!cmd.command || cmd.command !== 'G1') {
+    if (!cmd.params || !('G' in cmd.params) || cmd.params.G !== 1) {
       optimized.push(cmd);
       i++;
       continue;
@@ -159,39 +169,39 @@ function combineCollinearSegments(commands, angleTolerance) {
 
     // Found G1, look for collinear segments
     const segment = [cmd];
-    const feedRate = cmd.params?.F || null;
+    const feedRate = cmd.params.F || null;
     let j = i + 1;
 
     while (j < commands.length) {
       const next = commands[j];
 
-      if (!next.command) {
+      if (!next.params || !('G' in next.params)) {
         j++;
         continue;
       }
 
-      if (next.command !== 'G1') break;
+      if (next.params.G !== 1) break;
 
       // Check feed rate matches
-      const nextFeed = next.params?.F || null;
+      const nextFeed = next.params.F || null;
       if (feedRate !== null && nextFeed !== null && feedRate !== nextFeed) break;
 
       // Check collinearity
       if (segment.length >= 2) {
         const p1 = {
-          x: segment[segment.length - 2].params?.X || 0,
-          y: segment[segment.length - 2].params?.Y || 0,
-          z: segment[segment.length - 2].params?.Z || 0,
+          x: segment[segment.length - 2].params.X || 0,
+          y: segment[segment.length - 2].params.Y || 0,
+          z: segment[segment.length - 2].params.Z || 0,
         };
         const p2 = {
-          x: segment[segment.length - 1].params?.X || 0,
-          y: segment[segment.length - 1].params?.Y || 0,
-          z: segment[segment.length - 1].params?.Z || 0,
+          x: segment[segment.length - 1].params.X || 0,
+          y: segment[segment.length - 1].params.Y || 0,
+          z: segment[segment.length - 1].params.Z || 0,
         };
         const p3 = {
-          x: next.params?.X || 0,
-          y: next.params?.Y || 0,
-          z: next.params?.Z || 0,
+          x: next.params.X || 0,
+          y: next.params.Y || 0,
+          z: next.params.Z || 0,
         };
 
         if (!areCollinear(p1, p2, p3, angleTolerance)) break;
@@ -204,12 +214,13 @@ function combineCollinearSegments(commands, angleTolerance) {
     if (segment.length > 2) {
       // Combine into single move
       const lastCmd = segment[segment.length - 1];
-      const combinedCmd = {
-        ...segment[0],
-        params: { ...lastCmd.params },
-        comment: `optimized: ${segment.length} segments`,
-      };
-      optimized.push(combinedCmd);
+      const combinedParams = { ...lastCmd.params };
+      if (feedRate !== null) combinedParams.F = feedRate;
+
+      optimized.push({
+        raw: reconstructLine({ params: combinedParams }),
+        params: combinedParams,
+      });
       combined += segment.length - 1;
       i = j;
     } else {
@@ -231,18 +242,19 @@ function removeDuplicateCommands(commands) {
   let removed = 0;
 
   for (const cmd of commands) {
-    if (!cmd.command) {
+    if (!cmd.params) {
       optimized.push(cmd);
       continue;
     }
 
-    const params = { ...(cmd.params || {}) };
-    let modified = false;
+    const params = { ...cmd.params };
+    let removedFromThisCmd = false;
 
     if ('F' in params) {
       if (params.F === lastF) {
         delete params.F;
-        modified = true;
+        removed++;
+        removedFromThisCmd = true;
       } else {
         lastF = params.F;
       }
@@ -251,18 +263,24 @@ function removeDuplicateCommands(commands) {
     if ('S' in params) {
       if (params.S === lastS) {
         delete params.S;
-        modified = true;
+        removed++;
+        removedFromThisCmd = true;
       } else {
         lastS = params.S;
       }
     }
 
-    // If command becomes empty, skip it
-    if (modified && Object.keys(params).length === 0 && !cmd.command.match(/^[GMT]/)) {
-      removed++;
-    } else {
-      optimized.push({ ...cmd, params });
+    // If command becomes empty (no G/M/T and all params removed), skip entire command
+    const hasCommand = 'G' in params || 'M' in params || 'T' in params;
+    const hasParams =
+      'X' in params || 'Y' in params || 'Z' in params || 'F' in params || 'S' in params;
+
+    if (removedFromThisCmd && !hasCommand && !hasParams) {
+      // Skip this entire command (it's now empty)
+      continue;
     }
+
+    optimized.push({ ...cmd, params, raw: reconstructLine({ params }) });
   }
 
   return { commands: optimized, removed };
@@ -275,13 +293,43 @@ function removeDuplicateCommands(commands) {
  * @returns {Object} Optimized G-Code and statistics
  */
 export function optimizeGCode(gcode, options = {}) {
-  if (!gcode) return { gcode: '', stats: {} };
+  if (!gcode) {
+    return {
+      gcode: '',
+      stats: {
+        originalLines: 0,
+        originalCommands: 0,
+        redundantMovesRemoved: 0,
+        collinearSegmentsCombined: 0,
+        duplicateCommandsRemoved: 0,
+        optimizedLines: 0,
+        reductionPercent: 0,
+      },
+    };
+  }
 
   const opts = { ...DEFAULT_OPTIONS, ...options };
+  const originalLines = gcode.split('\n');
   let commands = parse(gcode);
 
+  // If parser returned empty (all comments), return original
+  if (commands.length === 0) {
+    return {
+      gcode,
+      stats: {
+        originalLines: originalLines.length,
+        originalCommands: 0,
+        redundantMovesRemoved: 0,
+        collinearSegmentsCombined: 0,
+        duplicateCommandsRemoved: 0,
+        optimizedLines: originalLines.length,
+        reductionPercent: 0,
+      },
+    };
+  }
+
   const stats = {
-    originalLines: gcode.split('\n').length,
+    originalLines: originalLines.length,
     originalCommands: commands.length,
     redundantMovesRemoved: 0,
     collinearSegmentsCombined: 0,
@@ -363,4 +411,5 @@ export function analyzeOptimizationPotential(gcode, options = {}) {
   return analysis;
 }
 
+export { DEFAULT_OPTIONS };
 export default { optimizeGCode, analyzeOptimizationPotential, DEFAULT_OPTIONS };
