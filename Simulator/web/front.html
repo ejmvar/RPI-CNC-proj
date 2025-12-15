@@ -99,12 +99,69 @@
           >
             📂 Upload File
           </button>
+          <button
+            id="collab-btn"
+            onclick="toggleCollaboration()"
+            class="flex-1 bg-purple-600 text-white p-2 rounded-lg font-bold hover:bg-purple-700 text-sm"
+            title="Enable collaborative editing"
+          >
+            👥 Collaborate
+          </button>
         </div>
         <textarea
           id="gcode-input"
           class="gcode-textarea w-full p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
           placeholder="Pega tu G-Code aquí... (ej: G0 Z10 F500)"
         ></textarea>
+
+        <!-- Collaboration Status -->
+        <div id="collab-status" class="hidden mt-2 p-2 bg-purple-100 rounded-lg">
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-semibold text-purple-800">
+              <span id="collab-status-text">Connecting...</span>
+            </span>
+            <button
+              onclick="disconnectCollaboration()"
+              class="text-xs bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
+            >
+              Disconnect
+            </button>
+          </div>
+          <div id="collab-users" class="mt-2 flex flex-wrap gap-2"></div>
+        </div>
+
+        <!-- Chat Panel -->
+        <div id="chat-panel" class="hidden mt-3 border-2 border-purple-300 rounded-lg">
+          <div
+            class="bg-purple-600 text-white p-2 rounded-t-lg font-semibold flex justify-between items-center"
+          >
+            <span>💬 Chat</span>
+            <button
+              onclick="toggleChatPanel()"
+              class="text-xs bg-purple-800 px-2 py-1 rounded hover:bg-purple-900"
+            >
+              Hide
+            </button>
+          </div>
+          <div id="chat-messages" class="h-32 overflow-y-auto p-2 bg-gray-50"></div>
+          <div class="p-2 border-t border-purple-200">
+            <div class="flex gap-2">
+              <input
+                type="text"
+                id="chat-input"
+                class="flex-1 p-2 border border-gray-300 rounded text-sm"
+                placeholder="Type a message..."
+                onkeydown="if(event.key==='Enter') sendChatMessage()"
+              />
+              <button
+                onclick="sendChatMessage()"
+                class="bg-purple-600 text-white px-3 py-2 rounded hover:bg-purple-700 text-sm"
+              >
+                Send
+              </button>
+            </div>
+          </div>
+        </div>
 
         <div class="mt-4 grid grid-cols-2 gap-3">
           <button
@@ -488,6 +545,7 @@
       import * as GCODE_TOOLPATH from './js/toolpath.mjs';
       import * as THREE_MESH from './js/mesh.mjs';
       import * as COLLAB_CLIENT from './js/collab-client.mjs';
+      import * as COLLABORATIVE_CLIENT from './js/collaborative-client.mjs';
       import * as TOOL_LIBRARY from './js/tool-library.mjs';
       import * as TOOLPATH_RENDERER from './js/toolpath-renderer.mjs';
       import * as GCODE_OPTIMIZER from './js/gcode-optimizer.mjs';
@@ -495,6 +553,7 @@
       import * as TOUCH_CONTROLS from './js/touch-controls.mjs';
       import * as RENDERER_2D from './js/renderer-2d.mjs';
       import * as MATERIAL_REMOVAL from './js/material-removal.mjs';
+      import * as COLLABORATIVE_CLIENT from './js/collaborative-client.mjs';
       // expose parser and three helpers to the inline script environment
       window.GCODE_PARSER = GParser;
       window.THREE_HELPER = THREE_HELPER;
@@ -503,6 +562,7 @@
       window.GCODE_TOOLPATH = GCODE_TOOLPATH;
       window.THREE_MESH = THREE_MESH;
       window.COLLAB_CLIENT = COLLAB_CLIENT;
+      window.COLLABORATIVE_CLIENT = COLLABORATIVE_CLIENT;
       window.TOOL_LIBRARY = TOOL_LIBRARY;
       window.TOOLPATH_RENDERER = TOOLPATH_RENDERER;
       window.GCODE_OPTIMIZER = GCODE_OPTIMIZER;
@@ -536,6 +596,13 @@
       // --- Material Removal ---
       let materialSimulator = null;
       let materialRemovalEnabled = false;
+
+      // --- Collaborative Editing ---
+      let collabClient = null;
+      let collabEnabled = false;
+      let gcodeTextarea = null;
+      let suppressTextareaEvents = false;
+
       // Initialize tool library
       function initToolLibrary() {
         toolLibrary = new window.TOOL_LIBRARY.ToolLibrary();
@@ -1675,6 +1742,307 @@ Performance gain: Fewer moves = faster execution
         } catch (err) {
           // Ignore errors during stats update
         }
+      }
+
+      // --- Collaborative Editing Functions ---
+
+      async function toggleCollaboration() {
+        if (!COLLABORATIVE_CLIENT) {
+          showMessage('Collaborative module not loaded', 'bg-red-500');
+          return;
+        }
+
+        if (collabEnabled) {
+          disconnectCollaboration();
+          return;
+        }
+
+        const btn = document.getElementById('collab-btn');
+        const statusDiv = document.getElementById('collab-status');
+        const statusText = document.getElementById('collab-status-text');
+
+        try {
+          // Prompt for session ID
+          const sessionId =
+            prompt('Enter session ID (or leave empty for new session):') || `session-${Date.now()}`;
+
+          // Prompt for user name
+          const userName =
+            prompt('Enter your name:') || `User-${Math.random().toString(36).substring(2, 8)}`;
+
+          // Create client
+          collabClient = new COLLABORATIVE_CLIENT.CollaborativeClient({
+            serverUrl: 'ws://localhost:8765',
+            userName: userName,
+          });
+
+          // Setup event handlers
+          setupCollaborationEvents();
+
+          // Connect to session
+          statusText.textContent = 'Connecting...';
+          statusDiv.classList.remove('hidden');
+
+          const state = await collabClient.connect(sessionId);
+
+          collabEnabled = true;
+          statusText.textContent = `Connected to ${sessionId}`;
+
+          // Update button
+          btn.textContent = '👥 Connected';
+          btn.classList.remove('bg-purple-600', 'hover:bg-purple-700');
+          btn.classList.add('bg-green-600', 'hover:bg-green-700');
+
+          // Load initial content
+          if (state.gcode) {
+            suppressTextareaEvents = true;
+            document.getElementById('gcode-input').value = state.gcode;
+            suppressTextareaEvents = false;
+          }
+
+          // Show connected users
+          updateUserList(state.clients);
+
+          // Show chat panel
+          document.getElementById('chat-panel').classList.remove('hidden');
+
+          showMessage(`Connected to collaborative session: ${sessionId}`, 'bg-green-500');
+        } catch (err) {
+          showMessage(`Connection failed: ${err.message}`, 'bg-red-500');
+          statusDiv.classList.add('hidden');
+          if (collabClient) {
+            collabClient.disconnect();
+            collabClient = null;
+          }
+        }
+      }
+
+      function disconnectCollaboration() {
+        if (collabClient) {
+          collabClient.disconnect();
+          collabClient = null;
+        }
+
+        collabEnabled = false;
+
+        const btn = document.getElementById('collab-btn');
+        btn.textContent = '👥 Collaborate';
+        btn.classList.remove('bg-green-600', 'hover:bg-green-700');
+        btn.classList.add('bg-purple-600', 'hover:bg-purple-700');
+
+        document.getElementById('collab-status').classList.add('hidden');
+        document.getElementById('chat-panel').classList.add('hidden');
+        document.getElementById('collab-users').innerHTML = '';
+        document.getElementById('chat-messages').innerHTML = '';
+
+        showMessage('Disconnected from collaborative session', 'bg-gray-700');
+      }
+
+      function setupCollaborationEvents() {
+        if (!collabClient) return;
+
+        // User joined
+        collabClient.on('user-joined', (data) => {
+          showMessage(`${data.userName} joined the session`, 'bg-green-500');
+          addUserToList(data);
+        });
+
+        // User left
+        collabClient.on('user-left', (data) => {
+          showMessage(`User ${data.userId.substring(0, 8)} left`, 'bg-gray-500');
+          removeUserFromList(data.userId);
+        });
+
+        // Remote operation
+        collabClient.on('remote-operation', (operation) => {
+          applyRemoteOperation(operation);
+        });
+
+        // Cursor update
+        collabClient.on('cursor', (data) => {
+          updateRemoteCursor(data);
+        });
+
+        // Chat message
+        collabClient.on('chat', (data) => {
+          addChatMessage(data);
+        });
+
+        // Disconnected
+        collabClient.on('disconnected', () => {
+          showMessage('Disconnected from server', 'bg-red-500');
+          disconnectCollaboration();
+        });
+
+        // Setup textarea event listeners
+        gcodeTextarea = document.getElementById('gcode-input');
+
+        // Track text changes
+        let lastValue = gcodeTextarea.value;
+        gcodeTextarea.addEventListener('input', (e) => {
+          if (suppressTextareaEvents) return;
+
+          const newValue = e.target.value;
+          const operation = calculateOperation(lastValue, newValue);
+
+          if (operation) {
+            collabClient.sendOperation(operation);
+          }
+
+          lastValue = newValue;
+        });
+
+        // Track cursor position
+        gcodeTextarea.addEventListener('selectionchange', () => {
+          if (suppressTextareaEvents) return;
+
+          const cursor = {
+            start: gcodeTextarea.selectionStart,
+            end: gcodeTextarea.selectionEnd,
+          };
+          collabClient.updateCursor(cursor);
+        });
+      }
+
+      function calculateOperation(oldText, newText) {
+        // Simple diff algorithm
+        if (newText.length > oldText.length) {
+          // Insertion
+          const pos = findFirstDiff(oldText, newText);
+          const inserted = newText.substring(pos, pos + (newText.length - oldText.length));
+          return {
+            type: 'insert',
+            position: pos,
+            text: inserted,
+          };
+        } else if (newText.length < oldText.length) {
+          // Deletion
+          const pos = findFirstDiff(oldText, newText);
+          return {
+            type: 'delete',
+            position: pos,
+            length: oldText.length - newText.length,
+          };
+        }
+
+        return null;
+      }
+
+      function findFirstDiff(str1, str2) {
+        for (let i = 0; i < Math.min(str1.length, str2.length); i++) {
+          if (str1[i] !== str2[i]) {
+            return i;
+          }
+        }
+        return Math.min(str1.length, str2.length);
+      }
+
+      function applyRemoteOperation(operation) {
+        if (!gcodeTextarea) return;
+
+        suppressTextareaEvents = true;
+
+        const currentValue = gcodeTextarea.value;
+        let newValue = currentValue;
+
+        if (operation.type === 'insert') {
+          newValue =
+            currentValue.substring(0, operation.position) +
+            operation.text +
+            currentValue.substring(operation.position);
+        } else if (operation.type === 'delete') {
+          newValue =
+            currentValue.substring(0, operation.position) +
+            currentValue.substring(operation.position + operation.length);
+        }
+
+        gcodeTextarea.value = newValue;
+
+        suppressTextareaEvents = false;
+      }
+
+      function updateUserList(users) {
+        const userList = document.getElementById('collab-users');
+        userList.innerHTML = '';
+
+        users.forEach((user) => {
+          addUserToList(user);
+        });
+      }
+
+      function addUserToList(user) {
+        const userList = document.getElementById('collab-users');
+
+        const userDiv = document.createElement('div');
+        userDiv.id = `user-${user.userId}`;
+        userDiv.className = 'flex items-center gap-1 text-xs bg-white px-2 py-1 rounded shadow';
+        userDiv.innerHTML = `
+          <div class="w-2 h-2 rounded-full" style="background-color: ${user.color || '#666'}"></div>
+          <span class="font-semibold">${user.userName}</span>
+        `;
+
+        userList.appendChild(userDiv);
+      }
+
+      function removeUserFromList(userId) {
+        const userDiv = document.getElementById(`user-${userId}`);
+        if (userDiv) {
+          userDiv.remove();
+        }
+      }
+
+      function updateRemoteCursor(data) {
+        // Visual cursor indicators could be added here
+        // For now, we just track the data
+      }
+
+      function addChatMessage(data) {
+        const chatMessages = document.getElementById('chat-messages');
+
+        const msgDiv = document.createElement('div');
+        msgDiv.className = 'mb-2 p-2 bg-white rounded shadow-sm';
+
+        const isOwnMessage = collabClient && data.userId === collabClient.userId;
+
+        msgDiv.innerHTML = `
+          <div class="flex items-center gap-2 mb-1">
+            <span class="font-semibold text-xs ${
+              isOwnMessage ? 'text-purple-600' : 'text-gray-700'
+            }">
+              ${data.userName}${isOwnMessage ? ' (You)' : ''}
+            </span>
+            <span class="text-xs text-gray-400">
+              ${new Date(data.timestamp).toLocaleTimeString()}
+            </span>
+          </div>
+          <div class="text-sm text-gray-800">${escapeHtml(data.message)}</div>
+        `;
+
+        chatMessages.appendChild(msgDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+
+      function sendChatMessage() {
+        if (!collabClient || !collabEnabled) return;
+
+        const input = document.getElementById('chat-input');
+        const message = input.value.trim();
+
+        if (message) {
+          collabClient.sendChat(message);
+          input.value = '';
+        }
+      }
+
+      function toggleChatPanel() {
+        const panel = document.getElementById('chat-panel');
+        panel.classList.toggle('hidden');
+      }
+
+      function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
       }
     </script>
   </body>
