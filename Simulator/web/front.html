@@ -146,6 +146,13 @@
             📐 2D View
           </button>
           <button
+            id="toggle-material-btn"
+            onclick="toggleMaterialRemoval()"
+            class="w-full bg-orange-500 text-white p-3 rounded-lg font-bold hover:bg-orange-600 control-btn shadow-orange-800"
+          >
+            🔨 Material Removal
+          </button>
+          <button
             id="pause-btn"
             onclick="pauseSimulation()"
             class="w-full bg-amber-500 text-white p-3 rounded-lg font-bold hover:bg-amber-600 control-btn shadow-amber-800"
@@ -487,6 +494,7 @@
       import * as COLLISION_DETECTOR from './js/collision-detector.mjs';
       import * as TOUCH_CONTROLS from './js/touch-controls.mjs';
       import * as RENDERER_2D from './js/renderer-2d.mjs';
+      import * as MATERIAL_REMOVAL from './js/material-removal.mjs';
       // expose parser and three helpers to the inline script environment
       window.GCODE_PARSER = GParser;
       window.THREE_HELPER = THREE_HELPER;
@@ -501,6 +509,7 @@
       window.COLLISION_DETECTOR = COLLISION_DETECTOR;
       window.TOUCH_CONTROLS = TOUCH_CONTROLS;
       window.RENDERER_2D = RENDERER_2D;
+      window.MATERIAL_REMOVAL = MATERIAL_REMOVAL;
     </script>
 
     <script>
@@ -524,6 +533,9 @@
       let renderer2D = null;
       let currentRenderMode = '3d'; // '3d' or '2d'
 
+      // --- Material Removal ---
+      let materialSimulator = null;
+      let materialRemovalEnabled = false;
       // Initialize tool library
       function initToolLibrary() {
         toolLibrary = new window.TOOL_LIBRARY.ToolLibrary();
@@ -996,6 +1008,7 @@
         const parts = command.match(/([GXM])(\d+(\.\d+)?)/g) || [];
         let nextPos = { ...currentPosition };
         let isMovement = false;
+        let isLinearMove = false;
         parts.forEach((part) => {
           const type = part.charAt(0);
           const value = parseFloat(part.substring(1));
@@ -1013,11 +1026,22 @@
           }
           if (type === 'G' && (value === 0 || value === 1)) {
             isMovement = true;
+            if (value === 1) isLinearMove = true;
           }
         });
         if (isMovement) {
           // apply movement to the tool & position
           if (tool) tool.position.set(nextPos.x, nextPos.z, nextPos.y);
+
+          // Material removal simulation
+          if (materialSimulator && materialRemovalEnabled && isLinearMove && toolLibrary) {
+            const activeTool = toolLibrary.getActiveTool();
+            if (activeTool && activeTool.diameter) {
+              const toolRadius = activeTool.diameter / 2;
+              materialSimulator.processCut(currentPosition, nextPos, toolRadius);
+            }
+          }
+
           currentPosition = nextPos;
           if (
             window.CURRENT_POSITION_INDICATOR &&
@@ -1581,6 +1605,75 @@ Performance gain: Fewer moves = faster execution
         if (savedMode === '2d' && toolpathPoints.length > 0) {
           // Delay to ensure 3D is fully initialized first
           setTimeout(() => toggleRenderer(), 500);
+        }
+      }
+
+      // Toggle material removal simulation
+      function toggleMaterialRemoval() {
+        if (!MATERIAL_REMOVAL) {
+          showMessage('Material removal module not loaded', 'bg-red-500');
+          return;
+        }
+
+        materialRemovalEnabled = !materialRemovalEnabled;
+        const btn = document.getElementById('toggle-material-btn');
+
+        if (materialRemovalEnabled) {
+          // Initialize or enable simulator
+          if (!materialSimulator && scene && toolpathPoints.length > 0) {
+            try {
+              const bounds = MATERIAL_REMOVAL.estimateWorkpieceBounds(toolpathPoints, 5);
+              materialSimulator = new MATERIAL_REMOVAL.MaterialRemovalSimulator(scene, bounds, {
+                resolution: 2.0,
+                materialColor: 0x8b7355,
+                materialOpacity: 0.3,
+                showRemovedVoxels: false,
+                updateInterval: 10,
+              });
+              showMessage('Material removal simulator initialized', 'bg-green-500');
+            } catch (err) {
+              showMessage(`Error initializing material removal: ${err.message}`, 'bg-red-500');
+              materialRemovalEnabled = false;
+              return;
+            }
+          } else if (materialSimulator) {
+            materialSimulator.setEnabled(true);
+          }
+
+          if (btn) {
+            btn.textContent = '🔨 Material Removal (ON)';
+            btn.classList.remove('bg-orange-500', 'hover:bg-orange-600');
+            btn.classList.add('bg-green-500', 'hover:bg-green-600');
+          }
+          showMessage('Material removal enabled', 'bg-green-500');
+        } else {
+          if (materialSimulator) {
+            materialSimulator.setEnabled(false);
+          }
+          if (btn) {
+            btn.textContent = '🔨 Material Removal';
+            btn.classList.remove('bg-green-500', 'hover:bg-green-600');
+            btn.classList.add('bg-orange-500', 'hover:bg-orange-600');
+          }
+          showMessage('Material removal disabled', 'bg-gray-700');
+        }
+
+        // Update stats display
+        updateMaterialStats();
+      }
+
+      // Update material removal statistics display
+      function updateMaterialStats() {
+        if (!materialSimulator || !materialRemovalEnabled) return;
+
+        try {
+          const stats = materialSimulator.getStats();
+          const message = `Material: ${stats.removedPercentage.toFixed(
+            1
+          )}% removed (${stats.removedVolume.toFixed(2)}cm³ / ${stats.totalVolume.toFixed(2)}cm³)`;
+          showMessage(message, 'bg-blue-500');
+        } catch (err) {
+          // Ignore errors during stats update
         }
       }
     </script>

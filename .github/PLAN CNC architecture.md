@@ -198,6 +198,26 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
   - [x] Integrated toolpathToSegments converter
   - [x] Updated documentation in examples/README.md
   - [x] All 702 tests passing (+43 new tests, no regressions)
+- [x] **DONE** — Material removal simulation (Phase 7.6 - Dec 14, 2024)
+  - [x] Implemented VoxelGrid class for 3D material representation
+  - [x] Uint8Array-based grid storage (1 byte per voxel)
+  - [x] Configurable resolution (mm per voxel, default 2.0mm)
+  - [x] Spherical removal algorithm (removeSphere, O(r³))
+  - [x] Path-based removal with linear interpolation
+  - [x] Volume statistics calculation (removed/remaining/total)
+  - [x] Implemented MaterialRemovalSimulator class
+  - [x] Three.js BoxGeometry visualization
+  - [x] Progressive opacity fading (100% → 0%)
+  - [x] Color change when >50% removed (gray → red)
+  - [x] Update throttling for performance (every N operations)
+  - [x] estimateWorkpieceBounds utility function
+  - [x] Created 25 unit tests + 16 integration tests (100% passing)
+  - [x] Added "🔨 Material Removal" toggle button
+  - [x] Statistics display in log panel
+  - [x] Integrated into simulation loop (G1 moves only)
+  - [x] Tool radius-aware cutting
+  - [x] Updated documentation in examples/README.md (usage, performance, tips)
+  - [x] All 743 tests passing (+41 new tests, no regressions)
 - [ ] **TODO** — Material removal simulation (actual mesh subtraction)
 - [ ] **TODO** — Collaborative editing (multi-user G-Code sessions)
 

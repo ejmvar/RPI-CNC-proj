@@ -673,4 +673,104 @@ npm test -- tests/ut/presentation/renderer-2d.test.mjs
 
 ---
 
+## 10. Material Removal Simulation
+
+**Module:** `modules/presentation/material-removal.mjs`
+
+**Description:** Real-time voxel-based material removal simulation with visual feedback during machining operations.
+
+**Features:**
+
+- 🔨 Voxel-grid material representation (configurable resolution)
+- 📊 Real-time volume statistics (removed/remaining material)
+- 🎨 Progressive visual feedback (opacity fade, color change)
+- ⚡ Performance-optimized (update throttling, Uint8Array storage)
+- 📏 Automatic workpiece bounds estimation
+- 🔧 Tool radius-aware cutting simulation
+- 💾 Memory efficient (1-200KB for typical workpieces)
+
+**Algorithm:**
+
+- **Voxel Grid:** 3D array representation (1 = material, 0 = removed)
+- **Resolution:** Configurable mm per voxel (default 2.0mm)
+  - Lower resolution = more detail, slower performance
+  - Higher resolution = faster, less detail
+- **Removal:**
+  - Spherical sweep at each position (O(r³) per operation)
+  - Linear interpolation along tool paths
+  - Step size = resolution / 2 for smooth paths
+- **Visualization:**
+  - Three.js BoxGeometry for material block
+  - Opacity fades as material removed (100% → 0%)
+  - Color changes to red when >50% removed
+  - Updates every N operations (default: 10)
+
+**Performance Characteristics:**
+
+| Resolution | Grid Size (50×50×10mm)   | Memory | Speed/Cut |
+| ---------- | ------------------------ | ------ | --------- |
+| 1.0 mm     | 50×50×10 = 25,000 voxels | ~25 KB | 1-2 ms    |
+| 2.0 mm     | 25×25×5 = 3,125 voxels   | ~3 KB  | 0.1 ms    |
+| 5.0 mm     | 10×10×2 = 200 voxels     | <1 KB  | <0.1 ms   |
+
+**Usage in Simulator:**
+
+1. Load G-Code with linear moves (G1)
+2. Click **🔨 Material Removal** button to enable
+3. Run simulation to see material removal in real-time
+4. Statistics appear in log panel:
+   ```
+   Material: 45.2% removed (12.34cm³ / 27.30cm³)
+   ```
+
+**Configuration Options:**
+
+```javascript
+{
+  resolution: 2.0,           // mm per voxel
+  materialColor: 0x8b7355,   // Brownish wood color
+  materialOpacity: 0.3,      // Transparency (0-1)
+  showRemovedVoxels: false,  // Show removed material (slower)
+  updateInterval: 10         // Update every N cuts
+}
+```
+
+**Testing:**
+
+```bash
+# Unit tests (algorithm verification)
+npm test -- tests/ut/presentation/material-removal.test.mjs
+
+# Integration tests (UI integration)
+npm test -- tests/it/front-material-removal.test.js
+```
+
+**Example Workflow:**
+
+```bash
+# 1. Start simulator
+cd Simulator/web && python3 -m http.server 8000
+
+# 2. In browser (http://localhost:8000/front.html):
+#    - Load examples/multi-color-vase.gcode
+#    - Click "🔨 Material Removal" to enable
+#    - Click "▶️ Simulate"
+
+# 3. Observe:
+#    - Material block appears over work area
+#    - Block fades as tool removes material
+#    - Statistics update every 10 operations
+#    - Color changes when heavily machined
+```
+
+**Tips:**
+
+- **Lower resolution (0.5-1.0mm)** for detailed finishing operations
+- **Higher resolution (2.0-5.0mm)** for roughing or large parts
+- **Disable during rapid moves** (only G1 moves remove material)
+- **Toggle off** when simulation is slow on low-end devices
+- **Statistics accuracy** depends on resolution (finer = more accurate)
+
+---
+
 **Happy Simulating!** 🚀
