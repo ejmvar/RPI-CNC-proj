@@ -344,4 +344,101 @@ Have a cool multi-tool example? Contributions welcome!
 
 ---
 
+## G-Code Optimizer Examples
+
+### 3. inefficient.gcode
+
+**Description:** Example G-Code with common inefficiencies demonstrating optimizer capabilities
+
+**Inefficiencies Present:**
+
+- Redundant moves to same position
+- Collinear segments broken into multiple moves
+- Duplicate feed rate (F) commands
+
+**File Details:**
+
+- Original: 37 lines, 20 commands
+- Contains: Rapid moves, linear interpolation, feed rates, spindle commands
+
+### 4. inefficient-optimized.gcode
+
+**Description:** Optimized version of `inefficient.gcode`
+
+**Optimization Results:**
+
+- **60% reduction** in file size (37 lines → 8 lines)
+- **6 redundant moves** removed
+- **9 collinear segments** combined
+- **2 duplicate commands** removed
+
+**How to Use the Optimizer:**
+
+1. **In the Simulator:**
+
+   - Open http://localhost:8001/front.html
+   - Load or paste G-Code into the editor
+   - Click the **⚡ Optimize** button
+   - View statistics in the message area
+   - Optimized code replaces the original
+
+2. **From Command Line:**
+
+   ```bash
+   node --input-type=module -e "
+   import { optimizeGCode } from './modules/gcode/optimizer.mjs';
+   import { readFileSync } from 'fs';
+   const result = optimizeGCode(readFileSync('./examples/inefficient.gcode', 'utf-8'));
+   console.log(result.gcode);
+   "
+   ```
+
+3. **As a Module:**
+
+   ```javascript
+   import { optimizeGCode } from './modules/gcode/optimizer.mjs';
+
+   const result = optimizeGCode(gcodeString, {
+     removeRedundantMoves: true,
+     combineCollinear: true,
+     removeDuplicateCommands: true,
+     positionTolerance: 0.001, // mm
+     collinearTolerance: 0.5, // degrees
+   });
+
+   console.log('Stats:', result.stats);
+   console.log('Optimized:', result.gcode);
+   ```
+
+**Optimization Algorithms:**
+
+1. **Redundant Move Removal** - Removes consecutive moves to same position (tolerance: 0.001mm)
+2. **Collinear Segment Combination** - Merges straight-line segments (angle tolerance: 0.5°)
+3. **Duplicate Command Removal** - Removes repeated F/S values
+
+**Configuration Options:**
+
+| Option                    | Default | Description                                |
+| ------------------------- | ------- | ------------------------------------------ |
+| `removeRedundantMoves`    | `true`  | Remove moves to same position              |
+| `combineCollinear`        | `true`  | Combine straight-line segments             |
+| `removeDuplicateCommands` | `true`  | Remove duplicate F/S values                |
+| `positionTolerance`       | `0.001` | Position equality tolerance (mm)           |
+| `collinearTolerance`      | `0.5`   | Angle tolerance for collinearity (degrees) |
+
+**Benefits:**
+
+- ⚡ Faster machining time (fewer commands)
+- 📐 Smoother paths (continuous motion)
+- 📉 Smaller file sizes
+- 🎯 Better CNC controller performance
+
+**Testing:**
+
+```bash
+npm test -- tests/ut/gcode/optimizer.test.mjs
+```
+
+---
+
 **Happy Simulating!** 🚀

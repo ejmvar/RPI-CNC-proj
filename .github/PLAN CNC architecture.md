@@ -129,7 +129,7 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
 
 **Goal:** Extended capabilities and polish.
 
-**Coverage Status (Dec 14, 2024):** **548/564 tests passing** (16 skipped by design)
+**Coverage Status (Dec 14, 2024):** **580/596 tests passing** (16 skipped by design)
 
 #### Tasks:
 
@@ -144,9 +144,19 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
   - [x] Fixed calculateToolpathStats for accurate tool change counting
   - [x] Added example G-Code files (3D printing + CNC milling)
   - [x] All 548 tests passing (16 skipped rendering tests)
+- [x] **DONE** — G-Code optimization (Phase 7.2 - Dec 14, 2024)
+  - [x] Implemented comprehensive optimizer module with 3 algorithms
+  - [x] Algorithm 1: Redundant move removal (position tolerance: 0.001mm)
+  - [x] Algorithm 2: Collinear segment combination (angle tolerance: 0.5°)
+  - [x] Algorithm 3: Duplicate command removal (F/S values)
+  - [x] Created 32 unit tests + 4 integration tests (100% passing)
+  - [x] Added "⚡ Optimize" button to simulator UI
+  - [x] Statistics display (reduction %, operations performed)
+  - [x] Created example files showing 60% reduction
+  - [x] Updated documentation in examples/README.md
+  - [x] All 580 tests passing (no regressions)
 - [ ] **TODO** — Material removal simulation (actual mesh subtraction)
 - [ ] **TODO** — Collision detection and bounds checking
-- [ ] **TODO** — G-Code optimization (remove redundant moves)
 - [ ] **TODO** — Alternative renderer (SVG/Canvas 2D for low-end devices)
 - [ ] **TODO** — Mobile-optimized touch controls
 - [ ] **TODO** — Collaborative editing (multi-user G-Code sessions)
