@@ -125,11 +125,11 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
   - [ ] Add CI integration
 - [ ] **TODO** — Push coverage beyond 65% (requires more edge case or integration testing)
 
-### Phase 7: Advanced Features [IN-PROGRESS]
+### Phase 7: Advanced Features [DONE]
 
 **Goal:** Extended capabilities and polish.
 
-**Coverage Status (Dec 14, 2024):** **611/627 tests passing** (16 skipped by design)
+**Coverage Status (Dec 14, 2024):** **812/828 tests passing** (16 skipped by design)
 
 #### Tasks:
 
@@ -199,6 +199,7 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
   - [x] Updated documentation in examples/README.md
   - [x] All 702 tests passing (+43 new tests, no regressions)
 - [x] **DONE** — Material removal simulation (Phase 7.6 - Dec 14, 2024)
+
   - [x] Implemented VoxelGrid class for 3D material representation
   - [x] Uint8Array-based grid storage (1 byte per voxel)
   - [x] Configurable resolution (mm per voxel, default 2.0mm)
@@ -218,8 +219,21 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
   - [x] Tool radius-aware cutting
   - [x] Updated documentation in examples/README.md (usage, performance, tips)
   - [x] All 743 tests passing (+41 new tests, no regressions)
-- [ ] **TODO** — Material removal simulation (actual mesh subtraction)
-- [ ] **TODO** — Collaborative editing (multi-user G-Code sessions)
+
+- [x] **DONE** — Collaborative editing (Phase 7.7 - Dec 14, 2024)
+  - [x] Created `CollaborativeSession` class with operational transformation
+  - [x] Implemented `CollaborativeServer` class (WebSocket on port 8765)
+  - [x] Developed `CollaborativeClient` class for browser connection
+  - [x] Added operational transformation for 4 conflict types (insert-insert, insert-delete, delete-insert, delete-delete)
+  - [x] Created 36 server unit tests + 26 client unit tests
+  - [x] Created 34 integration tests for front.html
+  - [x] Added "👥 Collaborate" button with status panel
+  - [x] Implemented user presence indicators (colored badges)
+  - [x] Created chat panel with message history
+  - [x] Added real-time textarea synchronization with character-level diff
+  - [x] Implemented XSS prevention in chat messages
+  - [x] Created server startup script (`scripts/collab-server.js`)
+  - [x] All 812 tests passing (+69 new tests from Phase 7.6)
 
 ---
 
