@@ -235,6 +235,168 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
   - [x] Created server startup script (`scripts/collab-server.js`)
   - [x] All 812 tests passing (+69 new tests from Phase 7.6)
 
+### Phase 8: Production Readiness [TODO]
+
+**Goal:** Prepare the application for production deployment with containerization, CI/CD, and infrastructure.
+
+**Coverage Status:** 812/828 tests passing (16 skipped by design)
+
+#### Tasks:
+
+- [ ] **TODO** — Docker containerization (Phase 8.1)
+
+  - [ ] Create Dockerfile for simulator frontend
+  - [ ] Create Dockerfile for WebSocket collaborative server
+  - [ ] Add docker-compose.yml for full stack
+  - [ ] Document Docker deployment in README
+  - [ ] Add health check endpoints
+  - [ ] Optimize image size (multi-stage builds)
+
+- [ ] **TODO** — CI/CD pipeline (Phase 8.2)
+
+  - [ ] Set up GitHub Actions workflow
+  - [ ] Add automated testing on push/PR
+  - [ ] Add automated linting checks
+  - [ ] Add code coverage reporting
+  - [ ] Add automated deployment to staging
+  - [ ] Create release automation
+
+- [ ] **TODO** — Security hardening (Phase 8.3)
+
+  - [ ] Implement HTTPS/WSS support
+  - [ ] Add authentication system (JWT tokens)
+  - [ ] Implement rate limiting middleware
+  - [ ] Add CORS configuration
+  - [ ] Security headers (helmet.js)
+  - [ ] Input validation and sanitization
+  - [ ] Secrets management (environment variables)
+
+- [ ] **TODO** — Monitoring & logging (Phase 8.4)
+
+  - [ ] Structured logging system (winston/pino)
+  - [ ] Application performance monitoring (APM)
+  - [ ] Error tracking (Sentry or similar)
+  - [ ] Metrics collection (Prometheus)
+  - [ ] Health check dashboard
+  - [ ] Alert system for critical errors
+
+- [ ] **TODO** — Configuration management (Phase 8.5)
+  - [ ] Environment-based configuration (.env files)
+  - [ ] Configuration validation schema
+  - [ ] Feature flags system
+  - [ ] Database connection pooling
+  - [ ] Cache configuration (Redis)
+
+### Phase 9: Advanced Features & Polish [TODO]
+
+**Goal:** Enhanced functionality, improved UX, and database integration.
+
+#### Tasks:
+
+- [ ] **TODO** — Database integration (Phase 9.1)
+
+  - [ ] Set up PostgreSQL/MySQL for persistent storage
+  - [ ] Create database schema for users, sessions, files
+  - [ ] Implement ORM (Prisma/TypeORM)
+  - [ ] Add migration system
+  - [ ] Database seeding scripts
+  - [ ] Backup and restore utilities
+
+- [ ] **TODO** — User authentication & authorization (Phase 9.2)
+
+  - [ ] User registration and login
+  - [ ] Password hashing (bcrypt)
+  - [ ] JWT token generation and validation
+  - [ ] Role-based access control (RBAC)
+  - [ ] OAuth2 integration (Google, GitHub)
+  - [ ] Session management
+
+- [ ] **TODO** — G-Code file library (Phase 9.3)
+
+  - [ ] File upload/download API
+  - [ ] File versioning system
+  - [ ] Folder/project organization
+  - [ ] File sharing permissions
+  - [ ] Search and filtering
+  - [ ] File preview thumbnails
+
+- [ ] **TODO** — Enhanced UI/UX (Phase 9.4)
+
+  - [ ] Dark mode toggle with theme persistence
+  - [ ] Responsive design for mobile/tablet
+  - [ ] Keyboard shortcuts system
+  - [ ] Command palette (Cmd+K)
+  - [ ] Accessibility improvements (WCAG AA)
+  - [ ] Internationalization (i18n) framework
+  - [ ] User preferences persistence
+
+- [ ] **TODO** — Advanced visualization (Phase 9.5)
+
+  - [ ] Camera position bookmarks
+  - [ ] Multiple viewport support
+  - [ ] Measurement tools (distance, angle)
+  - [ ] Cross-section view
+  - [ ] Animation recording/export
+  - [ ] Screenshot/export functionality
+
+- [ ] **TODO** — Performance optimization (Phase 9.6)
+  - [ ] Code splitting and lazy loading
+  - [ ] WebGL optimization
+  - [ ] Bundle size reduction
+  - [ ] Caching strategies
+  - [ ] Service worker for offline support
+  - [ ] Progressive Web App (PWA) features
+
+### Phase 10: Community & Open Source [TODO]
+
+**Goal:** Prepare for public release and community contributions.
+
+#### Tasks:
+
+- [ ] **TODO** — Documentation (Phase 10.1)
+
+  - [ ] API documentation (JSDoc → HTML)
+  - [ ] Architecture documentation
+  - [ ] Deployment guide
+  - [ ] User manual/tutorial
+  - [ ] Contributing guidelines (CONTRIBUTING.md)
+  - [ ] Code of conduct (CODE_OF_CONDUCT.md)
+
+- [ ] **TODO** — GitHub repository setup (Phase 10.2)
+
+  - [ ] Issue templates (bug, feature request)
+  - [ ] Pull request template
+  - [ ] Labels and milestones
+  - [ ] GitHub Discussions setup
+  - [ ] Wiki pages
+  - [ ] Automated issue triage
+
+- [ ] **TODO** — Quality improvements (Phase 10.3)
+
+  - [ ] Fix all ESLint warnings
+  - [ ] Push code coverage to 75%+
+  - [ ] Add E2E visual regression tests
+  - [ ] Performance benchmarking suite
+  - [ ] Security audit
+  - [ ] Dependency audit and updates
+
+- [ ] **TODO** — Public deployment (Phase 10.4)
+
+  - [ ] Deploy frontend to GitHub Pages/Netlify
+  - [ ] Deploy WebSocket server to cloud (AWS/GCP/Azure)
+  - [ ] Set up CDN for assets
+  - [ ] Custom domain configuration
+  - [ ] SSL certificate setup
+  - [ ] Production monitoring
+
+- [ ] **TODO** — Marketing & outreach (Phase 10.5)
+  - [ ] Create demo video
+  - [ ] Write blog post/announcement
+  - [ ] Submit to product directories
+  - [ ] Social media presence
+  - [ ] README badges (build status, coverage, etc.)
+  - [ ] Changelog automation (conventional commits)
+
 ---
 
 ## Status Legend

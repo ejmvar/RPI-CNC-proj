@@ -1,0 +1,46 @@
+# Node modules
+node_modules/
+npm-debug.log
+package-lock.json
+
+# Git
+.git/
+.gitignore
+.github/
+
+# Tests
+tests/
+coverage/
+*.test.js
+*.test.mjs
+
+# Documentation
+docs/
+*.md
+!README.md
+
+# Logs
+logs/
+LOG/
+*.log
+
+# Development files
+.env
+.env.local
+.env.*.local
+.vscode/
+.idea/
+
+# Build artifacts
+dist/
+build/
+*.tmp
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Docker files (don't include in image)
+docker-compose*.yml
+Dockerfile*
+.dockerignore

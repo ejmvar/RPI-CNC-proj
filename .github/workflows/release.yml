@@ -1,0 +1,64 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build Docker images
+        run: |
+          docker build -f Dockerfile.frontend -t cnc-simulator-frontend:${{ github.ref_name }} .
+          docker build -f Dockerfile.backend -t cnc-simulator-backend:${{ github.ref_name }} .
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          echo "## Changes" > CHANGELOG.txt
+          git log $(git describe --tags --abbrev=0 HEAD^)..HEAD --pretty=format:"- %s" >> CHANGELOG.txt
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          body_path: CHANGELOG.txt
+          draft: false
+          prerelease: false
+          files: |
+            docker-compose.yml
+            docker/README.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Docker Hub login
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Push to Docker Hub
+        run: |
+          docker tag cnc-simulator-frontend:${{ github.ref_name }} ${{ secrets.DOCKERHUB_USERNAME }}/cnc-simulator-frontend:${{ github.ref_name }}
+          docker tag cnc-simulator-backend:${{ github.ref_name }} ${{ secrets.DOCKERHUB_USERNAME }}/cnc-simulator-backend:${{ github.ref_name }}
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/cnc-simulator-frontend:${{ github.ref_name }}
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/cnc-simulator-backend:${{ github.ref_name }}

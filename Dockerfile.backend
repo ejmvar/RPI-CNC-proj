@@ -1,0 +1,32 @@
+# Multi-stage build for WebSocket Collaborative Server
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install only production dependencies
+RUN npm ci --only=production
+
+# Copy application files
+COPY modules/backend/ ./modules/backend/
+COPY modules/presentation/collaborative-client.mjs ./modules/presentation/collaborative-client.mjs
+COPY scripts/collab-server.js ./scripts/collab-server.js
+
+# Create non-root user for security
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nodejs -u 1001 && \
+    chown -R nodejs:nodejs /app
+
+USER nodejs
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
+    CMD node -e "const ws = require('ws'); const client = new ws('ws://localhost:8765'); client.on('open', () => { client.close(); process.exit(0); }); client.on('error', () => process.exit(1));" || exit 1
+
+# Expose WebSocket port
+EXPOSE 8765
+
+# Start collaborative server
+CMD ["node", "scripts/collab-server.js", "8765"]
