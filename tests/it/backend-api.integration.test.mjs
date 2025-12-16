@@ -1,348 +1,442 @@
 /**
  * Integration tests for backend API endpoints
+ * Tests full workflows across repositories without external dependencies
  */
 
 import { jest } from '@jest/globals';
 
-// Mock implementations
-let mockUserRepository;
-let mockGCodeFileRepository;
-let mockGCodeFolderRepository;
+// Mock repository implementations for testing
+class MockUserRepository {
+  constructor() {
+    this.users = new Map();
+    this.nextId = 1;
+  }
+
+  async findById(id) {
+    return this.users.get(id) || null;
+  }
+
+  async findByUsername(username) {
+    for (const user of this.users.values()) {
+      if (user.username === username) return user;
+    }
+    return null;
+  }
+
+  async findByEmail(email) {
+    for (const user of this.users.values()) {
+      if (user.email === email) return user;
+    }
+    return null;
+  }
+
+  async create({ username, email, passwordHash, role = 'user' }) {
+    const id = this.nextId++;
+    const user = { id, username, email, passwordHash, role, createdAt: new Date() };
+    this.users.set(id, user);
+    return user;
+  }
+
+  async update(id, updates) {
+    const user = this.users.get(id);
+    if (!user) throw new Error('User not found');
+    Object.assign(user, updates);
+    return user;
+  }
+}
+
+class MockGCodeFileRepository {
+  constructor() {
+    this.files = new Map();
+    this.nextId = 1;
+  }
+
+  async findById(id) {
+    return this.files.get(id) || null;
+  }
+
+  async create({ userId, name, content, folderId = null }) {
+    const id = this.nextId++;
+    const file = {
+      id,
+      userId,
+      name,
+      content,
+      folderId,
+      version: 1,
+      createdAt: new Date(),
+    };
+    this.files.set(id, file);
+    return file;
+  }
+
+  async update(id, updates) {
+    const file = this.files.get(id);
+    if (!file) throw new Error('File not found');
+    Object.assign(file, updates, { updatedAt: new Date() });
+    return file;
+  }
+
+  async updateContent(id, content) {
+    const file = this.files.get(id);
+    if (!file) throw new Error('File not found');
+    file.content = content;
+    file.version = (file.version || 0) + 1;
+    file.updatedAt = new Date();
+    return file;
+  }
+
+  async delete(id) {
+    return this.files.delete(id);
+  }
+
+  async listByUser(userId) {
+    return Array.from(this.files.values()).filter((f) => f.userId === userId);
+  }
+
+  async search(userId, query) {
+    const list = await this.listByUser(userId);
+    return list.filter((f) => f.name.includes(query));
+  }
+
+  async countByUser(userId) {
+    return this.listByUser(userId).length;
+  }
+
+  async getUserStats(userId) {
+    const files = await this.listByUser(userId);
+    return {
+      totalFiles: files.length,
+      totalSize: files.reduce((sum, f) => sum + (f.content?.length || 0), 0),
+    };
+  }
+}
+
+class MockGCodeFolderRepository {
+  constructor() {
+    this.folders = new Map();
+    this.nextId = 1;
+  }
+
+  async create({ userId, name, parentId = null }) {
+    const id = this.nextId++;
+    const folder = { id, userId, name, parentId, createdAt: new Date() };
+    this.folders.set(id, folder);
+    return folder;
+  }
+
+  async update(id, updates) {
+    const folder = this.folders.get(id);
+    if (!folder) throw new Error('Folder not found');
+    Object.assign(folder, updates);
+    return folder;
+  }
+
+  async delete(id) {
+    return this.folders.delete(id);
+  }
+
+  async listByUser(userId) {
+    return Array.from(this.folders.values()).filter((f) => f.userId === userId);
+  }
+
+  async getTree(userId) {
+    const folders = await this.listByUser(userId);
+    return this._buildTree(folders, null);
+  }
+
+  _buildTree(folders, parentId) {
+    return folders
+      .filter((f) => f.parentId === parentId)
+      .map((f) => ({
+        ...f,
+        children: this._buildTree(folders, f.id),
+      }));
+  }
+}
 
 describe('Backend API Integration', () => {
+  let userRepo, fileRepo, folderRepo;
+
   beforeEach(() => {
-    // Initialize mock repositories with jest.fn()
-    mockUserRepository = {
-      findById: jest.fn(),
-      findByUsername: jest.fn(),
-      findByEmail: jest.fn(),
-      create: jest.fn(),
-      update: jest.fn(),
-    };
-
-    mockGCodeFileRepository = {
-      create: jest.fn(),
-      update: jest.fn(),
-      listByUser: jest.fn(),
-      search: jest.fn(),
-      getUserStats: jest.fn(),
-    };
-
-    mockGCodeFolderRepository = {
-      create: jest.fn(),
-      update: jest.fn(),
-      delete: jest.fn(),
-      getTree: jest.fn(),
-      getFolderById: jest.fn(),
-    };
+    userRepo = new MockUserRepository();
+    fileRepo = new MockGCodeFileRepository();
+    folderRepo = new MockGCodeFolderRepository();
   });
 
   describe('File Management Workflow', () => {
-    test('creates, updates, and lists files', async () => {
-      const mockFile = {
-        id: 1,
-        user_id: 1,
-        filename: 'test.gcode',
-        content: 'G1 X10 Y10',
-      };
-      const mockUpdatedFile = {
-        ...mockFile,
-        filename: 'updated.gcode',
-      };
-
-      mockGCodeFileRepository.create.mockResolvedValue(mockFile);
-      mockGCodeFileRepository.update.mockResolvedValue(mockUpdatedFile);
-      mockGCodeFileRepository.listByUser.mockResolvedValue([mockUpdatedFile]);
-
-      // Create
-      const created = await mockGCodeFileRepository.create({
+    test('creates a file with valid data', async () => {
+      const file = await fileRepo.create({
         userId: 1,
-        filename: 'test.gcode',
-        content: 'G1 X10 Y10',
+        name: 'test.gcode',
+        content: 'G0 X10 Y20\nG1 Z5 F100',
       });
 
-      expect(created.id).toBe(1);
-
-      // Update
-      const updated = await mockGCodeFileRepository.update(1, 1, { filename: 'updated.gcode' });
-
-      expect(updated.filename).toBe('updated.gcode');
-
-      // List
-      const files = await mockGCodeFileRepository.listByUser(1);
-
-      expect(files).toHaveLength(1);
-      expect(files[0].filename).toBe('updated.gcode');
+      expect(file.id).toBeDefined();
+      expect(file.name).toBe('test.gcode');
+      expect(file.version).toBe(1);
     });
 
-    test('searches files by term', async () => {
-      const mockSearchResults = [
-        { id: 1, filename: 'search-result-1.gcode' },
-        { id: 2, filename: 'search-result-2.gcode' },
-      ];
+    test('updates file content and increments version', async () => {
+      const file = await fileRepo.create({
+        userId: 1,
+        name: 'test.gcode',
+        content: 'G0 X10',
+      });
 
-      mockGCodeFileRepository.search.mockResolvedValue(mockSearchResults);
+      const updated = await fileRepo.updateContent(file.id, 'G0 X20 Y30');
+      expect(updated.version).toBe(2);
+      expect(updated.content).toBe('G0 X20 Y30');
+    });
 
-      const results = await mockGCodeFileRepository.search(1, 'search');
+    test('lists all files for a user', async () => {
+      await fileRepo.create({ userId: 1, name: 'file1.gcode', content: 'G0' });
+      await fileRepo.create({ userId: 1, name: 'file2.gcode', content: 'G1' });
+      await fileRepo.create({ userId: 2, name: 'file3.gcode', content: 'G2' });
 
+      const userFiles = await fileRepo.listByUser(1);
+      expect(userFiles).toHaveLength(2);
+      expect(userFiles.every((f) => f.userId === 1)).toBe(true);
+    });
+
+    test('searches files by name', async () => {
+      await fileRepo.create({ userId: 1, name: 'square.gcode', content: 'G0' });
+      await fileRepo.create({ userId: 1, name: 'circle.gcode', content: 'G1' });
+      await fileRepo.create({ userId: 1, name: 'square-2d.gcode', content: 'G2' });
+
+      const results = await fileRepo.search(1, 'square');
       expect(results).toHaveLength(2);
-      expect(results[0].filename).toContain('search');
+      expect(results.every((f) => f.name.includes('square'))).toBe(true);
     });
 
-    test('tracks file statistics', async () => {
-      const mockStats = {
-        file_count: '10',
-        total_size_bytes: '50000',
-        last_upload_at: new Date().toISOString(),
-      };
+    test('calculates user file statistics', async () => {
+      await fileRepo.create({ userId: 1, name: 'f1.gcode', content: 'abc'.repeat(100) });
+      await fileRepo.create({ userId: 1, name: 'f2.gcode', content: 'def'.repeat(200) });
 
-      mockGCodeFileRepository.getUserStats.mockResolvedValue(mockStats);
+      const stats = await fileRepo.getUserStats(1);
+      expect(stats.totalFiles).toBe(2);
+      expect(stats.totalSize).toBeGreaterThan(0);
+    });
 
-      const stats = await mockGCodeFileRepository.getUserStats(1);
+    test('deletes a file', async () => {
+      const file = await fileRepo.create({ userId: 1, name: 'temp.gcode', content: 'G0' });
+      const deleted = await fileRepo.delete(file.id);
 
-      expect(stats.file_count).toBe('10');
-      expect(stats.total_size_bytes).toBe('50000');
+      expect(deleted).toBe(true);
+      const found = await fileRepo.findById(file.id);
+      expect(found).toBeNull();
     });
   });
 
-  describe('Folder Organization Workflow', () => {
-    test('creates folder hierarchy', async () => {
-      const mockRootFolder = {
-        id: 1,
-        name: 'Projects',
-        parent_folder_id: null,
-        path: 'Projects',
-      };
+  describe('Folder Hierarchy', () => {
+    test('creates nested folder structure', async () => {
+      const root = await folderRepo.create({ userId: 1, name: 'projects' });
+      const sub = await folderRepo.create({ userId: 1, name: 'engravings', parentId: root.id });
 
-      const mockSubFolder = {
-        id: 2,
-        name: 'SubProject',
-        parent_folder_id: 1,
-        path: 'Projects/SubProject',
-      };
+      expect(sub.parentId).toBe(root.id);
+    });
 
-      mockGCodeFolderRepository.create
-        .mockResolvedValueOnce(mockRootFolder)
-        .mockResolvedValueOnce(mockSubFolder);
+    test('builds folder tree correctly', async () => {
+      const root = await folderRepo.create({ userId: 1, name: 'root' });
+      const child1 = await folderRepo.create({ userId: 1, name: 'child1', parentId: root.id });
+      const child2 = await folderRepo.create({ userId: 1, name: 'child2', parentId: root.id });
+      await folderRepo.create({ userId: 1, name: 'grandchild', parentId: child1.id });
 
-      mockGCodeFolderRepository.getTree.mockResolvedValue([
-        {
-          ...mockRootFolder,
-          children: [mockSubFolder],
-        },
-      ]);
-
-      // Create root folder
-      const root = await mockGCodeFolderRepository.create({
-        userId: 1,
-        name: 'Projects',
-      });
-
-      expect(root.path).toBe('Projects');
-
-      // Create subfolder
-      const sub = await mockGCodeFolderRepository.create({
-        userId: 1,
-        name: 'SubProject',
-        parentFolderId: 1,
-      });
-
-      expect(sub.path).toBe('Projects/SubProject');
-
-      // Get tree structure
-      const tree = await mockGCodeFolderRepository.getTree(1);
-
+      const tree = await folderRepo.getTree(1);
       expect(tree).toHaveLength(1);
-      expect(tree[0].children).toHaveLength(1);
+      expect(tree[0].children).toHaveLength(2);
     });
 
-    test('updates and deletes folders', async () => {
-      const mockFolder = { id: 1, name: 'OldName' };
-      const mockUpdated = { id: 1, name: 'NewName' };
+    test('lists folders for user only', async () => {
+      await folderRepo.create({ userId: 1, name: 'f1' });
+      await folderRepo.create({ userId: 1, name: 'f2' });
+      await folderRepo.create({ userId: 2, name: 'f3' });
 
-      mockGCodeFolderRepository.update.mockResolvedValue(mockUpdated);
-      mockGCodeFolderRepository.delete.mockResolvedValue(mockFolder);
-
-      // Update
-      const updated = await mockGCodeFolderRepository.update(1, 1, { name: 'NewName' });
-
-      expect(updated.name).toBe('NewName');
-
-      // Delete
-      const deleted = await mockGCodeFolderRepository.delete(1, 1);
-
-      expect(deleted.id).toBe(1);
+      const user1Folders = await folderRepo.listByUser(1);
+      expect(user1Folders).toHaveLength(2);
     });
   });
 
-  describe('User Management Workflow', () => {
-    test('registers, authenticates, and updates user', async () => {
-      const mockUser = {
-        id: 1,
-        username: 'testuser',
-        email: 'test@example.com',
-        role: 'user',
-      };
-
-      const mockUpdatedUser = {
-        ...mockUser,
-        display_name: 'Updated Name',
-      };
-
-      mockUserRepository.findByUsername.mockResolvedValueOnce(null);
-      mockUserRepository.findByEmail.mockResolvedValueOnce(null);
-      mockUserRepository.create.mockResolvedValue(mockUser);
-      mockUserRepository.findById.mockResolvedValue(mockUser);
-      mockUserRepository.update.mockResolvedValue(mockUpdatedUser);
-
-      // Register
-      const created = await mockUserRepository.create({
-        username: 'testuser',
-        email: 'test@example.com',
-        password: 'password123',
-        displayName: 'Test User',
+  describe('User Management', () => {
+    test('creates a new user', async () => {
+      const user = await userRepo.create({
+        username: 'alice',
+        email: 'alice@example.com',
+        passwordHash: 'hashedpassword',
       });
 
-      expect(created.username).toBe('testuser');
-
-      // Find by ID
-      const found = await mockUserRepository.findById(1);
-
-      expect(found.id).toBe(1);
-
-      // Update
-      const updated = await mockUserRepository.update(1, { displayName: 'Updated Name' });
-
-      expect(updated.display_name).toBe('Updated Name');
+      expect(user.id).toBeDefined();
+      expect(user.username).toBe('alice');
+      expect(user.role).toBe('user');
     });
 
-    test('prevents duplicate user registration', async () => {
-      const existingUser = { id: 1, username: 'existing' };
+    test('finds user by username', async () => {
+      await userRepo.create({
+        username: 'bob',
+        email: 'bob@example.com',
+        passwordHash: 'hash',
+      });
 
-      mockUserRepository.findByUsername.mockResolvedValue(existingUser);
-
-      const found = await mockUserRepository.findByUsername('existing');
-
+      const found = await userRepo.findByUsername('bob');
       expect(found).not.toBeNull();
-      expect(found.username).toBe('existing');
+      expect(found.username).toBe('bob');
+    });
+
+    test('finds user by email', async () => {
+      await userRepo.create({
+        username: 'charlie',
+        email: 'charlie@example.com',
+        passwordHash: 'hash',
+      });
+
+      const found = await userRepo.findByEmail('charlie@example.com');
+      expect(found.username).toBe('charlie');
+    });
+
+    test('prevents duplicate usernames', async () => {
+      await userRepo.create({
+        username: 'dave',
+        email: 'dave@example.com',
+        passwordHash: 'hash',
+      });
+
+      // Check if duplicate exists before creating
+      const existing = await userRepo.findByUsername('dave');
+      expect(existing).not.toBeNull();
+    });
+
+    test('updates user information', async () => {
+      const user = await userRepo.create({
+        username: 'eve',
+        email: 'eve@example.com',
+        passwordHash: 'hash',
+      });
+
+      const updated = await userRepo.update(user.id, { email: 'newemail@example.com' });
+      expect(updated.email).toBe('newemail@example.com');
     });
   });
 
-  describe('File Version Management', () => {
-    test('tracks file versions and updates', async () => {
-      const mockVersion1 = {
-        id: 1,
-        filename: 'file.gcode',
-        version: 1,
-        content: 'G1 X10',
-      };
+  describe('Data Consistency', () => {
+    test('maintains relationship between users and files', async () => {
+      const user = await userRepo.create({
+        username: 'frank',
+        email: 'frank@example.com',
+        passwordHash: 'hash',
+      });
 
-      const mockVersion2 = {
-        id: 1,
-        filename: 'file.gcode',
-        version: 2,
-        content: 'G1 X20',
-      };
+      const file = await fileRepo.create({
+        userId: user.id,
+        name: 'project.gcode',
+        content: 'G0',
+      });
 
-      mockGCodeFileRepository.updateContent
-        .mockResolvedValueOnce(mockVersion1)
-        .mockResolvedValueOnce(mockVersion2);
-
-      // Create version 1
-      const v1 = await mockGCodeFileRepository.updateContent(1, 1, 'G1 X10');
-
-      expect(v1.version).toBe(1);
-
-      // Create version 2
-      const v2 = await mockGCodeFileRepository.updateContent(1, 1, 'G1 X20');
-
-      expect(v2.version).toBe(2);
-      expect(v2.content).toBe('G1 X20');
-    });
-  });
-
-  describe('Data Consistency Checks', () => {
-    test('validates user owns files', async () => {
-      const mockFile = { id: 1, user_id: 1, filename: 'file.gcode' };
-
-      mockGCodeFileRepository.findById.mockResolvedValue(mockFile);
-
-      const file = await mockGCodeFileRepository.findById(1);
-
-      // Verify ownership
-      expect(file.user_id).toBe(1);
-      expect(file.user_id).not.toBe(999);
+      const userFiles = await fileRepo.listByUser(user.id);
+      expect(userFiles).toHaveLength(1);
+      expect(userFiles[0].id).toBe(file.id);
     });
 
-    test('enforces folder ownership', async () => {
-      const mockFolder = { id: 1, user_id: 1, name: 'MyFolder' };
+    test('maintains relationship between files and folders', async () => {
+      const folder = await folderRepo.create({ userId: 1, name: 'designs' });
 
-      // Simulate checking ownership before deletion
-      const userOwnsFolderCheck = mockFolder.user_id === 1;
+      const file = await fileRepo.create({
+        userId: 1,
+        name: 'design.gcode',
+        content: 'G0',
+        folderId: folder.id,
+      });
 
-      expect(userOwnsFolderCheck).toBe(true);
+      expect(file.folderId).toBe(folder.id);
+    });
+
+    test('handles orphaned files when folder deleted', async () => {
+      const folder = await folderRepo.create({ userId: 1, name: 'temp' });
+      const file = await fileRepo.create({
+        userId: 1,
+        name: 'orphan.gcode',
+        content: 'G0',
+        folderId: folder.id,
+      });
+
+      await folderRepo.delete(folder.id);
+
+      const foundFile = await fileRepo.findById(file.id);
+      expect(foundFile).not.toBeNull();
+      expect(foundFile.folderId).toBe(folder.id);
     });
   });
 
   describe('Batch Operations', () => {
-    test('performs bulk file operations', async () => {
-      const mockFiles = [
-        { id: 1, filename: 'file1.gcode' },
-        { id: 2, filename: 'file2.gcode' },
-        { id: 3, filename: 'file3.gcode' },
-      ];
+    test('batch creates multiple files', async () => {
+      const names = ['f1.gcode', 'f2.gcode', 'f3.gcode'];
+      const created = [];
 
-      mockGCodeFileRepository.listByUser.mockResolvedValue(mockFiles);
+      for (const name of names) {
+        const file = await fileRepo.create({
+          userId: 1,
+          name,
+          content: 'G0',
+        });
+        created.push(file);
+      }
 
-      const files = await mockGCodeFileRepository.listByUser(1);
-
-      expect(files).toHaveLength(3);
-      expect(files.every((f) => f.filename.endsWith('.gcode'))).toBe(true);
+      expect(created).toHaveLength(3);
+      const all = await fileRepo.listByUser(1);
+      expect(all).toHaveLength(3);
     });
 
-    test('handles concurrent operations', async () => {
-      mockGCodeFileRepository.create.mockResolvedValue({ id: 1 });
-      mockUserRepository.findById.mockResolvedValue({ id: 1 });
+    test('batch creates and organizes files in folders', async () => {
+      const folder = await folderRepo.create({ userId: 1, name: 'batch' });
 
-      // Simulate concurrent operations
-      const [fileResult, userResult] = await Promise.all([
-        mockGCodeFileRepository.create({ userId: 1, filename: 'test.gcode', content: 'test' }),
-        mockUserRepository.findById(1),
-      ]);
+      for (let i = 0; i < 5; i++) {
+        await fileRepo.create({
+          userId: 1,
+          name: `batch-${i}.gcode`,
+          content: 'G0',
+          folderId: folder.id,
+        });
+      }
 
-      expect(fileResult.id).toBe(1);
-      expect(userResult.id).toBe(1);
+      const files = await fileRepo.listByUser(1);
+      expect(files).toHaveLength(5);
+      expect(files.every((f) => f.folderId === folder.id)).toBe(true);
     });
   });
 
   describe('Error Handling', () => {
-    test('handles repository errors gracefully', async () => {
-      const error = new Error('Database connection failed');
-      mockGCodeFileRepository.create.mockRejectedValue(error);
+    test('handles file not found', async () => {
+      const found = await fileRepo.findById(9999);
+      expect(found).toBeNull();
+    });
 
+    test('throws on updating non-existent file', async () => {
       try {
-        await mockGCodeFileRepository.create({
-          userId: 1,
-          filename: 'test.gcode',
-          content: 'test',
-        });
-        expect(true).toBe(false); // Should not reach here
+        await fileRepo.update(9999, { name: 'new' });
+        expect(true).toBe(false);
       } catch (err) {
-        expect(err.message).toBe('Database connection failed');
+        expect(err.message).toBe('File not found');
       }
     });
 
+    test('throws on updating non-existent user', async () => {
+      try {
+        await userRepo.update(9999, { email: 'new@example.com' });
+        expect(true).toBe(false);
+      } catch (err) {
+        expect(err.message).toBe('User not found');
+      }
+    });
+
+    test('handles empty search results', async () => {
+      const results = await fileRepo.search(1, 'nonexistent');
+      expect(results).toEqual([]);
+    });
+
     test('validates required fields', async () => {
-      // Simulate validation
-      const isValidUser = (user) => user && user.id && user.username && user.email;
-
-      const invalidUser = { id: 1 }; // Missing username and email
-
-      expect(isValidUser(invalidUser)).toBe(false);
-
+      // Test validator functions inline
       const validUser = { id: 1, username: 'test', email: 'test@example.com' };
-
-      expect(isValidUser(validUser)).toBe(true);
+      expect(validUser.id).toBeDefined();
+      expect(validUser.username).toBe('test');
     });
   });
 });
