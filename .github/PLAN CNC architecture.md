@@ -357,14 +357,15 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
 
 #### Tasks:
 
-- [ ] **TODO** — Documentation (Phase 10.1)
+- [x] **DONE** — Documentation (Phase 10.1)
 
-  - [ ] API documentation (JSDoc → HTML)
-  - [ ] Architecture documentation
-  - [ ] Deployment guide
-  - [ ] User manual/tutorial
-  - [ ] Contributing guidelines (CONTRIBUTING.md)
-  - [ ] Code of conduct (CODE_OF_CONDUCT.md)
+  - [x] API documentation (API.md - comprehensive REST + WebSocket)
+  - [x] Architecture documentation (ARCHITECTURE.md - system design)
+  - [x] Deployment guide (DEPLOYMENT.md - local, Docker, cloud)
+  - [x] User manual (USER-GUIDE.md - complete tutorial)
+  - [x] Contributing guidelines (CONTRIBUTING.md - dev setup, standards)
+  - [x] Code of conduct (CODE_OF_CONDUCT.md - community rules)
+  - [x] Performance guide (PERFORMANCE.md - optimization techniques)
 
 - [ ] **TODO** — GitHub repository setup (Phase 10.2)
 
