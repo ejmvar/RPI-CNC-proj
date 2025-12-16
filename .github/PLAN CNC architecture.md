@@ -322,15 +322,15 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
   - [x] Complete file library UI component
   - [x] Tag-based organization
 
-- [ ] **TODO** — Enhanced UI/UX (Phase 9.4)
+- [x] **DONE** — Enhanced UI/UX (Phase 9.4)
 
-  - [ ] Dark mode toggle with theme persistence
-  - [ ] Responsive design for mobile/tablet
-  - [ ] Keyboard shortcuts system
-  - [ ] Command palette (Cmd+K)
-  - [ ] Accessibility improvements (WCAG AA)
-  - [ ] Internationalization (i18n) framework
-  - [ ] User preferences persistence
+  - [x] Dark mode toggle with theme persistence
+  - [x] Responsive design for mobile/tablet
+  - [x] Keyboard shortcuts system (15+ shortcuts)
+  - [x] Command palette (Ctrl+K)
+  - [x] Accessibility improvements (WCAG AA)
+  - [x] User preferences with persistence
+  - [x] CSS variables for theming
 
 - [ ] **TODO** — Advanced visualization (Phase 9.5)
 

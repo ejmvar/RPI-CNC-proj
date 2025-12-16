@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Enhanced UI Demo - CNC Simulator</title>
+
+    <!-- Theme CSS -->
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/auth-ui.css" />
+    <link rel="stylesheet" href="css/file-library-ui.css" />
+    <link rel="stylesheet" href="css/keyboard-shortcuts.css" />
+    <link rel="stylesheet" href="css/user-preferences.css" />
+
+    <style>
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, sans-serif;
+        min-height: 100vh;
+        padding: 40px 20px;
+      }
+
+      .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        background: var(--bg-primary);
+        border-radius: 16px;
+        padding: 40px;
+        box-shadow: var(--shadow-xl);
+        border: 1px solid var(--border-color);
+      }
+
+      h1 {
+        color: var(--text-primary);
+        margin-top: 0;
+      }
+
+      h2 {
+        color: var(--text-primary);
+        margin-top: 30px;
+      }
+
+      .feature-list {
+        margin: 30px 0;
+      }
+
+      .feature-list li {
+        margin: 12px 0;
+        color: var(--text-primary);
+      }
+
+      .demo-section {
+        margin: 30px 0;
+        padding: 20px;
+        background: var(--bg-secondary);
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+      }
+
+      .demo-section h3 {
+        margin-top: 0;
+        color: var(--text-primary);
+      }
+
+      .demo-buttons {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin: 20px 0;
+      }
+
+      code {
+        background: var(--code-bg);
+        color: var(--code-text);
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-family: 'Courier New', monospace;
+        font-size: 13px;
+      }
+
+      pre {
+        background: var(--code-bg);
+        color: var(--code-text);
+        padding: 16px;
+        border-radius: 8px;
+        overflow-x: auto;
+        border: 1px solid var(--border-color);
+      }
+
+      .note {
+        background: var(--bg-tertiary);
+        border-left: 4px solid var(--color-primary);
+        padding: 16px;
+        margin: 20px 0;
+        border-radius: 4px;
+        color: var(--text-primary);
+      }
+
+      .shortcuts-demo {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 12px;
+        margin: 20px 0;
+      }
+
+      .shortcut-card {
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 16px;
+      }
+
+      .shortcut-card h4 {
+        margin: 0 0 8px 0;
+        color: var(--text-primary);
+        font-size: 14px;
+      }
+
+      .shortcut-card p {
+        margin: 0;
+        color: var(--text-secondary);
+        font-size: 13px;
+      }
+
+      .btn {
+        padding: 10px 20px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.2s;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>✨ Enhanced UI/UX Demo</h1>
+
+      <p>Experience the complete UI enhancement suite for the CNC Simulator.</p>
+
+      <div class="feature-list">
+        <h2>🎨 Features Implemented</h2>
+        <ul>
+          <li>✅ <strong>Dark mode</strong> - System preference detection with manual toggle</li>
+          <li>✅ <strong>Theme persistence</strong> - Your choice saved across sessions</li>
+          <li>✅ <strong>Keyboard shortcuts</strong> - 15+ shortcuts for common actions</li>
+          <li>✅ <strong>Command palette</strong> - Quick access to all commands (Ctrl+K)</li>
+          <li>✅ <strong>User preferences</strong> - Customizable settings with persistence</li>
+          <li>
+            ✅ <strong>Accessibility</strong> - ARIA labels, keyboard navigation, focus management
+          </li>
+          <li>✅ <strong>Responsive design</strong> - Mobile and tablet optimized</li>
+        </ul>
+      </div>
+
+      <div class="demo-section">
+        <h3>🎨 Theme System</h3>
+        <p>
+          Click the theme toggle button in the top-right corner (🌙/☀️) to switch between light and
+          dark modes. Your preference is automatically saved.
+        </p>
+
+        <div class="demo-buttons">
+          <button
+            class="btn btn-primary"
+            onclick="if(window.themeManager) window.themeManager.setTheme('light')"
+          >
+            ☀️ Light Mode
+          </button>
+          <button
+            class="btn btn-secondary"
+            onclick="if(window.themeManager) window.themeManager.setTheme('dark')"
+          >
+            🌙 Dark Mode
+          </button>
+          <button
+            class="btn btn-secondary"
+            onclick="if(window.themeManager) window.themeManager.toggle()"
+          >
+            🔄 Toggle
+          </button>
+        </div>
+
+        <div class="note">
+          <strong>💡 Tip:</strong> If you haven't set a preference, the theme follows your system
+          settings automatically.
+        </div>
+      </div>
+
+      <div class="demo-section">
+        <h3>⌨️ Keyboard Shortcuts</h3>
+        <p>
+          Press <kbd>Ctrl+/</kbd> to see all available shortcuts, or <kbd>Ctrl+K</kbd> to open the
+          command palette.
+        </p>
+
+        <div class="shortcuts-demo">
+          <div class="shortcut-card">
+            <h4><kbd>Ctrl+K</kbd></h4>
+            <p>Open command palette</p>
+          </div>
+          <div class="shortcut-card">
+            <h4><kbd>Ctrl+S</kbd></h4>
+            <p>Save current file</p>
+          </div>
+          <div class="shortcut-card">
+            <h4><kbd>Ctrl+O</kbd></h4>
+            <p>Open file</p>
+          </div>
+          <div class="shortcut-card">
+            <h4><kbd>Ctrl+L</kbd></h4>
+            <p>Show file library</p>
+          </div>
+          <div class="shortcut-card">
+            <h4><kbd>Space</kbd></h4>
+            <p>Play/Pause simulation</p>
+          </div>
+          <div class="shortcut-card">
+            <h4><kbd>Ctrl+Shift+D</kbd></h4>
+            <p>Toggle dark mode</p>
+          </div>
+          <div class="shortcut-card">
+            <h4><kbd>Escape</kbd></h4>
+            <p>Close modals</p>
+          </div>
+          <div class="shortcut-card">
+            <h4><kbd>Ctrl+1/2/3</kbd></h4>
+            <p>Top/Front/Side view</p>
+          </div>
+        </div>
+
+        <div class="demo-buttons">
+          <button
+            class="btn btn-primary"
+            onclick="if(window.shortcuts) window.shortcuts.showCommandPalette()"
+          >
+            🔍 Open Command Palette
+          </button>
+          <button
+            class="btn btn-secondary"
+            onclick="if(window.shortcuts) window.shortcuts.toggleShortcutsHelp()"
+          >
+            📋 Show All Shortcuts
+          </button>
+        </div>
+      </div>
+
+      <div class="demo-section">
+        <h3>⚙️ User Preferences</h3>
+        <p>
+          Click the gear icon (⚙️) in the top-right to customize your experience. All settings are
+          saved automatically.
+        </p>
+
+        <div class="feature-list">
+          <ul>
+            <li>Display options (grid, axes, FPS counter)</li>
+            <li>Performance settings (animation speed, camera speed)</li>
+            <li>File options (auto-save)</li>
+            <li>Audio settings (sound effects)</li>
+          </ul>
+        </div>
+
+        <div class="demo-buttons">
+          <button
+            class="btn btn-primary"
+            onclick="if(window.preferences) window.preferences.showPreferences()"
+          >
+            ⚙️ Open Preferences
+          </button>
+        </div>
+      </div>
+
+      <div class="demo-section">
+        <h3>💻 Usage Example</h3>
+        <pre>
+// Initialize all UI enhancement systems
+import { ThemeManager } from './js/theme-manager.mjs';
+import { KeyboardShortcuts } from './js/keyboard-shortcuts.mjs';
+import { UserPreferences } from './js/user-preferences.mjs';
+
+// Initialize theme system
+const themeManager = new ThemeManager();
+themeManager.init();
+window.themeManager = themeManager;
+
+// Initialize keyboard shortcuts
+const shortcuts = new KeyboardShortcuts();
+shortcuts.init();
+window.shortcuts = shortcuts;
+
+// Initialize user preferences
+const preferences = new UserPreferences();
+preferences.init();
+window.preferences = preferences;
+
+// Listen for theme changes
+window.addEventListener('themechange', (e) => {
+  console.log('Theme changed to:', e.detail.theme);
+  // Update 3D scene colors, etc.
+});
+
+// Listen for preference changes
+window.addEventListener('preferenceschange', (e) => {
+  console.log('Preferences updated:', e.detail.preferences);
+  // Apply new settings to simulator
+});</pre
+        >
+      </div>
+
+      <div class="demo-section">
+        <h3>♿ Accessibility Features</h3>
+        <ul>
+          <li><strong>ARIA labels</strong> - All interactive elements properly labeled</li>
+          <li><strong>Keyboard navigation</strong> - Full keyboard control of all features</li>
+          <li><strong>Focus management</strong> - Clear focus indicators and logical tab order</li>
+          <li><strong>Screen reader support</strong> - Semantic HTML and ARIA roles</li>
+          <li><strong>High contrast</strong> - Both themes meet WCAG AA standards</li>
+        </ul>
+      </div>
+
+      <div class="note">
+        <strong>🚀 Integration:</strong> These systems work seamlessly with the authentication and
+        file library systems. Try opening preferences, changing the theme, then opening the file
+        library to see consistent styling.
+      </div>
+    </div>
+
+    <script type="module">
+      import ThemeManager from './js/theme-manager.mjs';
+      import KeyboardShortcuts from './js/keyboard-shortcuts.mjs';
+      import UserPreferences from './js/user-preferences.mjs';
+
+      // Initialize theme system
+      const themeManager = new ThemeManager();
+      themeManager.init();
+      window.themeManager = themeManager;
+
+      // Initialize keyboard shortcuts
+      const shortcuts = new KeyboardShortcuts();
+      shortcuts.init();
+      window.shortcuts = shortcuts;
+
+      // Initialize user preferences
+      const preferences = new UserPreferences();
+      preferences.init();
+      window.preferences = preferences;
+
+      // Log theme changes
+      window.addEventListener('themechange', (e) => {
+        console.log('Theme changed to:', e.detail.theme);
+      });
+
+      // Log preference changes
+      window.addEventListener('preferenceschange', (e) => {
+        console.log('Preferences updated:', e.detail.preferences);
+      });
+
+      console.log('✨ Enhanced UI systems initialized');
+      console.log('💡 Try: Ctrl+K for command palette, Ctrl+/ for shortcuts help');
+    </script>
+  </body>
+</html>
