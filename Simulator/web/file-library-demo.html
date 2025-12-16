@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>File Library Demo - CNC Simulator</title>
+    <link rel="stylesheet" href="css/auth-ui.css" />
+    <link rel="stylesheet" href="css/file-library-ui.css" />
+    <style>
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 40px 20px;
+      }
+
+      .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 16px;
+        padding: 40px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      }
+
+      h1 {
+        color: #1f2937;
+        margin-top: 0;
+      }
+
+      .feature-list {
+        margin: 30px 0;
+      }
+
+      .feature-list li {
+        margin: 12px 0;
+        color: #374151;
+      }
+
+      .demo-section {
+        margin: 30px 0;
+        padding: 20px;
+        background: #f9fafb;
+        border-radius: 8px;
+      }
+
+      .demo-section h2 {
+        margin-top: 0;
+        color: #1f2937;
+      }
+
+      code {
+        background: #1f2937;
+        color: #d1d5db;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-family: 'Courier New', monospace;
+        font-size: 13px;
+      }
+
+      pre {
+        background: #1f2937;
+        color: #d1d5db;
+        padding: 16px;
+        border-radius: 8px;
+        overflow-x: auto;
+      }
+
+      .note {
+        background: #fef3c7;
+        border-left: 4px solid #f59e0b;
+        padding: 16px;
+        margin: 20px 0;
+        border-radius: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>📁 G-Code File Library Demo</h1>
+
+      <p>This demo showcases the complete file management system for the CNC Simulator.</p>
+
+      <div class="feature-list">
+        <h2>✨ Features</h2>
+        <ul>
+          <li>✅ <strong>Create, edit, and delete files</strong> - Full CRUD operations</li>
+          <li>✅ <strong>Folder organization</strong> - Hierarchical project structure</li>
+          <li>✅ <strong>File versioning</strong> - Track changes over time</li>
+          <li>✅ <strong>Search and filter</strong> - Find files quickly</li>
+          <li>✅ <strong>File statistics</strong> - Track storage usage</li>
+          <li>✅ <strong>Download files</strong> - Export G-Code for offline use</li>
+          <li>✅ <strong>Tag-based organization</strong> - Categorize your files</li>
+          <li>✅ <strong>Public/private files</strong> - Control sharing</li>
+        </ul>
+      </div>
+
+      <div class="demo-section">
+        <h2>🔌 API Endpoints</h2>
+        <ul>
+          <li><code>GET /api/files</code> - List user's files</li>
+          <li><code>GET /api/files/search</code> - Search files</li>
+          <li><code>GET /api/files/stats</code> - Get statistics</li>
+          <li><code>GET /api/files/:id</code> - Get file details</li>
+          <li><code>POST /api/files</code> - Create new file</li>
+          <li><code>PUT /api/files/:id</code> - Update file metadata</li>
+          <li><code>PUT /api/files/:id/content</code> - Update content (new version)</li>
+          <li><code>GET /api/files/:id/versions</code> - Get version history</li>
+          <li><code>DELETE /api/files/:id</code> - Delete file (soft)</li>
+          <li><code>POST /api/files/:id/duplicate</code> - Duplicate file</li>
+        </ul>
+
+        <h3>Folder Endpoints</h3>
+        <ul>
+          <li><code>GET /api/folders</code> - List folders</li>
+          <li><code>GET /api/folders/tree</code> - Get folder tree</li>
+          <li><code>GET /api/folders/:id</code> - Get folder details</li>
+          <li><code>POST /api/folders</code> - Create folder</li>
+          <li><code>PUT /api/folders/:id</code> - Update folder</li>
+          <li><code>DELETE /api/folders/:id</code> - Delete folder</li>
+        </ul>
+      </div>
+
+      <div class="demo-section">
+        <h2>💻 Usage Example</h2>
+        <pre>
+// Initialize file library
+import { AuthUI } from './js/auth-ui.mjs';
+import { FileLibraryUI } from './js/file-library-ui.mjs';
+
+// Create auth system
+const auth = new AuthUI();
+auth.init();
+
+// Create file library
+const fileLibrary = new FileLibraryUI(auth);
+fileLibrary.init();
+
+// File library will show automatically when user logs in
+// Or manually show: fileLibrary.show();</pre
+        >
+      </div>
+
+      <div class="demo-section">
+        <h2>🐳 Docker Setup</h2>
+        <pre>
+# Start all services (backend with database)
+docker-compose up -d
+
+# Initialize database schema
+docker-compose exec backend node modules/backend/database/migrations/migrate.mjs init
+
+# Check logs
+docker-compose logs -f backend
+
+# Access:
+# - Frontend: http://localhost:8080
+# - Backend API: http://localhost:8765
+# - Health: http://localhost:8765/health</pre
+        >
+      </div>
+
+      <div class="note">
+        <strong>📝 Note:</strong> Make sure you're logged in before accessing the file library. The
+        authentication system is required to manage your personal files.
+      </div>
+
+      <div style="margin-top: 40px; text-align: center">
+        <button
+          id="btn-try-demo"
+          class="btn btn-primary"
+          style="font-size: 16px; padding: 12px 24px"
+        >
+          🚀 Try File Library
+        </button>
+      </div>
+    </div>
+
+    <script type="module">
+      import { AuthUI } from './js/auth-ui.mjs';
+      import { FileLibraryUI } from './js/file-library-ui.mjs';
+
+      // Initialize authentication
+      const auth = new AuthUI();
+      auth.init();
+
+      // Initialize file library
+      const fileLibrary = new FileLibraryUI(auth);
+      fileLibrary.init();
+
+      // Make it available globally for demo
+      window.fileLibrary = fileLibrary;
+
+      // Demo button
+      document.getElementById('btn-try-demo').addEventListener('click', () => {
+        if (!auth.isAuthenticated()) {
+          alert('Please log in first using the button in the top-right corner');
+        } else {
+          fileLibrary.show();
+        }
+      });
+    </script>
+  </body>
+</html>

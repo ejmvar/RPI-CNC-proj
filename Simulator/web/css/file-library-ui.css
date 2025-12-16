@@ -1,0 +1,303 @@
+/**
+ * File Library UI Styles
+ */
+
+/* Library Button */
+.btn-library {
+  position: fixed;
+  top: 60px;
+  right: 20px;
+  z-index: 999;
+  background: #6366f1;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+}
+
+.btn-library:hover {
+  background: #4f46e5;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+}
+
+/* Large Modal */
+.modal-large {
+  max-width: 900px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+/* Toolbar */
+.library-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.toolbar-left,
+.toolbar-right {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+.search-input {
+  width: 250px;
+  padding: 6px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+/* Breadcrumb */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 12px;
+  background: #f9fafb;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.breadcrumb-item {
+  cursor: pointer;
+  color: #6366f1;
+  transition: color 0.2s;
+}
+
+.breadcrumb-item:hover {
+  color: #4f46e5;
+  text-decoration: underline;
+}
+
+.breadcrumb-item.active {
+  color: #6b7280;
+  cursor: default;
+}
+
+.breadcrumb-item.active:hover {
+  text-decoration: none;
+}
+
+.breadcrumb-separator {
+  color: #9ca3af;
+}
+
+/* File List Container */
+.file-list-container {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  min-height: 300px;
+  max-height: 400px;
+  overflow-y: auto;
+  background: white;
+}
+
+/* Folder List */
+.folder-list {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.folder-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #f3f4f6;
+  transition: background 0.2s;
+}
+
+.folder-item:hover {
+  background: #f9fafb;
+}
+
+.folder-icon {
+  font-size: 20px;
+  margin-right: 12px;
+}
+
+.folder-name {
+  flex: 1;
+  font-weight: 500;
+  color: #374151;
+}
+
+.folder-actions {
+  display: flex;
+  gap: 4px;
+}
+
+/* File List */
+.file-list {
+  padding: 8px 0;
+}
+
+.file-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #f3f4f6;
+  transition: background 0.2s;
+}
+
+.file-item:hover {
+  background: #f9fafb;
+}
+
+.file-item:last-child {
+  border-bottom: none;
+}
+
+.file-icon {
+  font-size: 20px;
+  margin-right: 12px;
+}
+
+.file-info {
+  flex: 1;
+}
+
+.file-name {
+  font-weight: 500;
+  color: #111827;
+  margin-bottom: 4px;
+}
+
+.file-meta {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.file-actions {
+  display: flex;
+  gap: 4px;
+}
+
+/* Icon Buttons */
+.btn-icon {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.btn-icon:hover {
+  background: #e5e7eb;
+}
+
+/* Empty State */
+.empty-message {
+  text-align: center;
+  color: #9ca3af;
+  padding: 40px 20px;
+  font-size: 14px;
+}
+
+/* File Stats */
+.file-stats {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 16px;
+  padding: 12px;
+  background: #f9fafb;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* File Details Modal */
+.file-details-meta {
+  background: #f9fafb;
+  padding: 16px;
+  border-radius: 8px;
+  margin: 16px 0;
+}
+
+.file-details-meta p {
+  margin: 8px 0;
+  color: #374151;
+}
+
+.code-preview {
+  background: #1f2937;
+  color: #d1d5db;
+  padding: 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* Form Textarea */
+#new-file-content {
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  resize: vertical;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .modal-large {
+    max-width: 95%;
+    width: 95%;
+  }
+
+  .library-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .toolbar-left,
+  .toolbar-right {
+    flex-direction: column;
+  }
+
+  .search-input {
+    width: 100%;
+  }
+
+  .btn-library {
+    top: 50px;
+    right: 10px;
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+
+  .file-item,
+  .folder-item {
+    flex-wrap: wrap;
+  }
+
+  .file-actions,
+  .folder-actions {
+    width: 100%;
+    justify-content: flex-end;
+    margin-top: 8px;
+  }
+}

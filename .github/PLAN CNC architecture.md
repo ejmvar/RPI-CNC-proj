@@ -311,14 +311,16 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
   - [x] Session management (token-based)
   - [x] Profile management UI
 
-- [ ] **TODO** — G-Code file library (Phase 9.3)
+- [x] **DONE** — G-Code file library (Phase 9.3)
 
-  - [ ] File upload/download API
-  - [ ] File versioning system
-  - [ ] Folder/project organization
-  - [ ] File sharing permissions
-  - [ ] Search and filtering
-  - [ ] File preview thumbnails
+  - [x] File CRUD API (create, read, update, delete)
+  - [x] File versioning with content updates
+  - [x] Folder organization with tree structure
+  - [x] File search and filtering
+  - [x] File statistics tracking
+  - [x] Download and duplicate functionality
+  - [x] Complete file library UI component
+  - [x] Tag-based organization
 
 - [ ] **TODO** — Enhanced UI/UX (Phase 9.4)
 

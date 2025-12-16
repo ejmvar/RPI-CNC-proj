@@ -31,6 +31,8 @@ import {
 } from '../modules/backend/monitoring/health.mjs';
 import { initDatabase, testConnection } from '../modules/backend/database/connection.mjs';
 import authRoutes from '../modules/backend/routes/auth.mjs';
+import fileRoutes from '../modules/backend/routes/files.mjs';
+import folderRoutes from '../modules/backend/routes/folders.mjs';
 
 // Validate environment
 try {
@@ -79,6 +81,8 @@ if (process.env.DB_HOST) {
 
 // API Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/files', fileRoutes);
+app.use('/api/folders', folderRoutes);
 
 // Health checks
 app.get('/health', healthCheckHandler);
