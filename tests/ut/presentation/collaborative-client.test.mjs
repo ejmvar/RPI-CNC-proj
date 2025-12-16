@@ -2,8 +2,6 @@
  * Unit tests for collaborative-client.mjs
  */
 
-/* global WebSocket */
-
 import { CollaborativeClient } from '../../../modules/presentation/collaborative-client.mjs';
 
 // Mock WebSocket

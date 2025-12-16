@@ -2,7 +2,8 @@
  * User Repository - Data access layer for users
  */
 
-import { query, transaction } from '../connection.mjs';
+import { query } from '../connection.mjs';
+// import { transaction } from '../connection.mjs'; // Reserved for future transactional operations
 import { hashPassword } from '../../security/auth.mjs';
 
 export class UserRepository {

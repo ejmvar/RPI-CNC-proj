@@ -3,76 +3,76 @@
 # Frontend changes
 'area: frontend':
   - changed-files:
-    - any-glob-to-any-file: 
-      - 'Simulator/web/**/*'
-      - '*.html'
-      - '*.css'
+      - any-glob-to-any-file:
+          - 'Simulator/web/**/*'
+          - '*.html'
+          - '*.css'
 
 # Backend changes
 'area: backend':
   - changed-files:
-    - any-glob-to-any-file:
-      - 'modules/backend/**/*'
-      - 'scripts/production-server.js'
+      - any-glob-to-any-file:
+          - 'modules/backend/**/*'
+          - 'scripts/production-server.js'
 
 # Database changes
 'area: database':
   - changed-files:
-    - any-glob-to-any-file:
-      - 'modules/backend/database/**/*'
-      - '**/migrations/**/*'
+      - any-glob-to-any-file:
+          - 'modules/backend/database/**/*'
+          - '**/migrations/**/*'
 
 # G-Code processing
 'area: gcode':
   - changed-files:
-    - any-glob-to-any-file:
-      - 'modules/gcode/**/*'
+      - any-glob-to-any-file:
+          - 'modules/gcode/**/*'
 
 # Visualization/3D
 'area: visualization':
   - changed-files:
-    - any-glob-to-any-file:
-      - 'modules/presentation/**/*'
-      - '**/three-*.mjs'
+      - any-glob-to-any-file:
+          - 'modules/presentation/**/*'
+          - '**/three-*.mjs'
 
 # Tests
 'type: tests':
   - changed-files:
-    - any-glob-to-any-file:
-      - 'tests/**/*'
-      - '**/*.test.js'
-      - '**/*.test.mjs'
+      - any-glob-to-any-file:
+          - 'tests/**/*'
+          - '**/*.test.js'
+          - '**/*.test.mjs'
 
 # Documentation
 'type: documentation':
   - changed-files:
-    - any-glob-to-any-file:
-      - 'docs/**/*'
-      - '*.md'
-      - 'CONTRIBUTING.md'
-      - 'CODE_OF_CONDUCT.md'
+      - any-glob-to-any-file:
+          - 'docs/**/*'
+          - '*.md'
+          - 'CONTRIBUTING.md'
+          - 'CODE_OF_CONDUCT.md'
 
 # CI/CD
 'type: ci-cd':
   - changed-files:
-    - any-glob-to-any-file:
-      - '.github/**/*'
-      - 'docker-compose.yml'
-      - 'Dockerfile'
+      - any-glob-to-any-file:
+          - '.github/**/*'
+          - 'docker-compose.yml'
+          - 'Dockerfile'
 
 # Dependencies
 'type: dependencies':
   - changed-files:
-    - any-glob-to-any-file:
-      - 'package.json'
-      - 'package-lock.json'
+      - any-glob-to-any-file:
+          - 'package.json'
+          - 'package-lock.json'
 
 # Configuration
 'type: configuration':
   - changed-files:
-    - any-glob-to-any-file:
-      - '*.config.js'
-      - '*.config.mjs'
-      - '.eslintrc.*'
-      - '.prettierrc.*'
-      - 'modules-config.yml'
+      - any-glob-to-any-file:
+          - '*.config.js'
+          - '*.config.mjs'
+          - '.eslintrc.*'
+          - '.prettierrc.*'
+          - 'modules-config.yml'

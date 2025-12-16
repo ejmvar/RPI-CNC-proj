@@ -360,7 +360,7 @@ export class CollaborativeServer {
   /**
    * Handle client leaving
    */
-  handleLeave(ws, payload) {
+  handleLeave(ws /* , payload */) {
     this.handleDisconnect(ws);
   }
 
@@ -399,11 +399,11 @@ export class CollaborativeServer {
     if (session._eventsSetup) return;
     session._eventsSetup = true;
 
-    session.on('operation-applied', ({ userId, operation }) => {
+    session.on('operation-applied', ({ userId /* , operation */ }) => {
       console.log(`Operation applied in ${session.sessionId} by ${userId}`);
     });
 
-    session.on('cursor-moved', ({ userId, cursor }) => {
+    session.on('cursor-moved', (/* { userId, cursor } */) => {
       // Already broadcast in handleCursor
     });
   }

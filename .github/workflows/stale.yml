@@ -15,7 +15,7 @@ jobs:
       - uses: actions/stale@v9
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          
+
           # Stale issue settings
           days-before-stale: 60
           days-before-close: 14
@@ -23,23 +23,23 @@ jobs:
           stale-issue-message: |
             This issue has been automatically marked as stale because it has not had recent activity.
             It will be closed in 14 days if no further activity occurs.
-            
+
             If you believe this issue is still relevant, please:
             - Comment with an update on the status
             - Remove the 'stale' label
             - Provide additional context or information
-            
+
             Thank you for your contributions!
           close-issue-message: |
             This issue has been automatically closed due to inactivity.
-            
+
             If you believe this issue should be reopened, please create a new issue with:
             - A reference to this closed issue
             - Updated context or information
             - Current reproduction steps (if applicable)
-            
+
             Thank you!
-          
+
           # Stale PR settings
           days-before-pr-stale: 30
           days-before-pr-close: 7
@@ -47,29 +47,29 @@ jobs:
           stale-pr-message: |
             This pull request has been automatically marked as stale because it has not had recent activity.
             It will be closed in 7 days if no further activity occurs.
-            
+
             To keep this PR active:
             - Rebase on the latest main branch
             - Address any review comments
             - Comment with an update on the status
             - Remove the 'stale' label
-            
+
             Thank you for your contribution!
           close-pr-message: |
             This pull request has been automatically closed due to inactivity.
-            
+
             If you'd like to continue work on this PR:
             1. Reopen the PR
             2. Rebase on the latest main branch
             3. Address any pending review comments
             4. Comment with an update
-            
+
             Thank you!
-          
+
           # Exempt labels
           exempt-issue-labels: 'priority: critical,priority: high,pinned,security'
           exempt-pr-labels: 'priority: critical,priority: high,status: in-progress'
-          
+
           # Other settings
           operations-per-run: 100
           remove-stale-when-updated: true

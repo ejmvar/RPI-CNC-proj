@@ -1,5 +1,5 @@
-title: "[Show & Tell] "
-labels: ["show-and-tell"]
+title: '[Show & Tell] '
+labels: ['show-and-tell']
 
 body:
   - type: markdown

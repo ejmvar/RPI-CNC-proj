@@ -231,12 +231,12 @@ describe('CollaborativeServer', () => {
 
   test('creates session on first client join', () => {
     let sendCalled = false;
-    let sentData = null;
+    // let sentData = null; // Reserved for future message validation
 
     const mockWs = {
-      send: (data) => {
+      send: (/* data */) => {
         sendCalled = true;
-        sentData = data;
+        // sentData = data;
       },
       readyState: 1,
     };

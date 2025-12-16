@@ -201,7 +201,7 @@ function checkWorkpieceCollision(pos, config) {
   const wpXMax = config.workpieceX + config.workpieceWidth / 2;
   const wpYMin = config.workpieceY - config.workpieceDepth / 2;
   const wpYMax = config.workpieceY + config.workpieceDepth / 2;
-  const wpZMin = config.workpieceZ - config.workpieceHeight;
+  // const wpZMin = config.workpieceZ - config.workpieceHeight; // Reserved for future boundary checks
   const wpZMax = config.workpieceZ;
 
   // If tool is below workpiece surface, it's cutting (not a collision)

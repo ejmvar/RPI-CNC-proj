@@ -90,7 +90,7 @@ export class GCodeFileRepository {
         throw new Error('File not found');
       }
 
-      const currentFile = currentResult.rows[0];
+      // const currentFile = currentResult.rows[0]; // Reserved for future version comparison
       const sizeBytes = Buffer.byteLength(newContent, 'utf8');
       const checksum = this._calculateChecksum(newContent);
 

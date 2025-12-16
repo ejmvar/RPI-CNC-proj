@@ -2,7 +2,8 @@
  * G-Code Folder Repository - Data access layer for folders
  */
 
-import { query, transaction } from '../connection.mjs';
+import { query } from '../connection.mjs';
+// import { transaction } from '../connection.mjs'; // Reserved for future transactional operations
 
 export class GCodeFolderRepository {
   /**
