@@ -417,12 +417,205 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
     - [x] Logging and monitoring hooks
 
 - [ ] **TODO** — Marketing & outreach (Phase 10.5)
-  - [ ] Create demo video
-  - [ ] Write blog post/announcement
+  - [ ] Create demo video/screenshots
+  - [ ] Write announcement blog post
+  - [ ] Add more badges to README (build status from actual CI)
+  - [ ] Set up changelog automation (conventional commits)
+  - [ ] Prepare for public launch
   - [ ] Submit to product directories
   - [ ] Social media presence
-  - [ ] README badges (build status, coverage, etc.)
-  - [ ] Changelog automation (conventional commits)
+  - [ ] Create interactive demo page
+
+### Phase 11: Test Coverage Expansion [TODO]
+
+**Goal:** Increase test coverage from 30% to 40%+ for better code quality.
+
+#### Tasks:
+
+- [ ] **TODO** — Backend module testing (Phase 11.1)
+
+  - [ ] Add tests for database repositories (GCodeFileRepository, GCodeFolderRepository, UserRepository)
+  - [ ] Add tests for database migrations
+  - [ ] Add tests for authentication and authorization
+  - [ ] Add tests for security middleware
+  - [ ] Add tests for monitoring and health checks
+  - [ ] Add tests for WebSocket server edge cases
+
+- [ ] **TODO** — Presentation module testing (Phase 11.2)
+
+  - [ ] Add tests for touch controls module
+  - [ ] Add tests for renderer-2d module
+  - [ ] Add tests for viewport manager
+  - [ ] Add tests for theme manager
+  - [ ] Add tests for user preferences
+  - [ ] Add tests for keyboard shortcuts
+
+- [ ] **TODO** — Integration testing (Phase 11.3)
+
+  - [ ] Add end-to-end workflow tests
+  - [ ] Add API integration tests
+  - [ ] Add WebSocket communication tests
+  - [ ] Add file upload/download tests
+  - [ ] Add collaborative editing tests
+
+- [ ] **TODO** — Branch coverage improvement (Phase 11.4)
+  - [ ] Improve branch coverage in G-Code parser
+  - [ ] Improve branch coverage in collision detector
+  - [ ] Improve branch coverage in mesh compensation
+  - [ ] Target: 50% branch coverage overall
+
+### Phase 12: Advanced Examples & Templates [TODO]
+
+**Goal:** Create comprehensive example library with real-world projects.
+
+#### Tasks:
+
+- [ ] **TODO** — Advanced G-Code examples (Phase 12.1)
+
+  - [ ] PCB drilling patterns
+  - [ ] Text engraving examples
+  - [ ] Parametric toolpath generation
+  - [ ] Advanced arc interpolation demos
+  - [ ] Multi-pass strategies
+  - [ ] Climb vs conventional milling examples
+
+- [ ] **TODO** — Real-world project templates (Phase 12.2)
+
+  - [ ] Simple enclosure box project
+  - [ ] Name plate engraving project
+  - [ ] PCB isolation routing project
+  - [ ] 3D relief carving project
+  - [ ] Gear cutting project
+
+- [ ] **TODO** — Tutorial series (Phase 12.3)
+
+  - [ ] Beginner: "Your First Cut" tutorial
+  - [ ] Intermediate: "Multi-Tool Workflow" tutorial
+  - [ ] Advanced: "Parametric Design to G-Code" tutorial
+  - [ ] Video tutorials or animated guides
+
+- [ ] **TODO** — CAM workflow documentation (Phase 12.4)
+  - [ ] Fusion 360 to simulator workflow
+  - [ ] FreeCAD Path to simulator workflow
+  - [ ] KiCad PCB to simulator workflow
+  - [ ] Manual G-Code writing guide
+
+### Phase 13: Performance Improvements [TODO]
+
+**Goal:** Optimize for large files and improve rendering performance.
+
+#### Tasks:
+
+- [ ] **TODO** — Three.js optimization (Phase 13.1)
+
+  - [ ] Implement LOD (Level of Detail) for complex toolpaths
+  - [ ] Add geometry instancing for repeated elements
+  - [ ] Optimize material usage and shader compilation
+  - [ ] Implement frustum culling for large scenes
+  - [ ] Add object pooling for dynamic geometry
+
+- [ ] **TODO** — WebWorker implementation (Phase 13.2)
+
+  - [ ] Move G-Code parsing to WebWorker
+  - [ ] Move mesh compensation calculation to WebWorker
+  - [ ] Move collision detection to WebWorker
+  - [ ] Implement progress reporting for long operations
+
+- [ ] **TODO** — Virtual scrolling (Phase 13.3)
+
+  - [ ] Implement virtual scrolling for large G-Code files
+  - [ ] Add windowing for toolpath visualization
+  - [ ] Optimize command list rendering
+
+- [ ] **TODO** — Progressive loading (Phase 13.4)
+
+  - [ ] Implement streaming G-Code parser
+  - [ ] Add progressive toolpath rendering
+  - [ ] Show partial results while processing
+  - [ ] Add cancellation support for long operations
+
+- [ ] **TODO** — Performance benchmarking (Phase 13.5)
+  - [ ] Create performance test suite
+  - [ ] Benchmark parser throughput improvements
+  - [ ] Benchmark rendering FPS with large files
+  - [ ] Memory usage profiling and optimization
+
+### Phase 14: New Features & Enhancements [TODO]
+
+**Goal:** Add requested features and improve user experience.
+
+#### Tasks:
+
+- [ ] **TODO** — Editor improvements (Phase 14.1)
+
+  - [ ] Add G-Code syntax highlighting (Monaco Editor or CodeMirror)
+  - [ ] Implement line numbers and gutter
+  - [ ] Add code folding for sections
+  - [ ] Implement autocomplete for G-Code commands
+  - [ ] Add error highlighting and inline diagnostics
+
+- [ ] **TODO** — Undo/Redo system (Phase 14.2)
+
+  - [ ] Implement command pattern for undo/redo
+  - [ ] Add undo/redo for G-Code editing
+  - [ ] Add undo/redo for mesh adjustments
+  - [ ] Add undo/redo for tool library changes
+  - [ ] Keyboard shortcuts (Ctrl+Z, Ctrl+Y)
+
+- [ ] **TODO** — Simulation enhancements (Phase 14.3)
+
+  - [ ] Add simulation replay with variable speed
+  - [ ] Implement bookmark system for interesting positions
+  - [ ] Add time-based simulation (not just command-based)
+  - [ ] Show current feed rate and spindle speed
+  - [ ] Add simulation statistics dashboard
+
+- [ ] **TODO** — Toolpath comparison (Phase 14.4)
+
+  - [ ] Side-by-side toolpath comparison view
+  - [ ] Diff view for before/after mesh compensation
+  - [ ] Show differences in tool changes
+  - [ ] Export comparison report
+
+- [ ] **TODO** — Advanced visualization (Phase 14.5)
+  - [ ] Add material removal simulation (3D cutaway view)
+  - [ ] Show tool engagement angle
+  - [ ] Visualize chip load per tooth
+  - [ ] Add heat map for feed rate variations
+  - [ ] Show rapid vs cutting move statistics
+
+### Phase 15: Platform & Integration [TODO]
+
+**Goal:** Expand platform support and integrate with other tools.
+
+#### Tasks:
+
+- [ ] **TODO** — Desktop application (Phase 15.1)
+
+  - [ ] Create Electron wrapper
+  - [ ] Add native file system access
+  - [ ] Add native serial port support for direct CNC control
+  - [ ] Package for Windows/Mac/Linux
+
+- [ ] **TODO** — Mobile optimization (Phase 15.2)
+
+  - [ ] Optimize touch interface for tablets
+  - [ ] Add mobile-specific gestures
+  - [ ] Responsive layout improvements
+  - [ ] Progressive Web App enhancements
+
+- [ ] **TODO** — External tool integration (Phase 15.3)
+
+  - [ ] Add REST API for external CAM software
+  - [ ] Create plugins for FreeCAD
+  - [ ] Create plugins for Fusion 360
+  - [ ] Integrate with KiCad for PCB milling
+
+- [ ] **TODO** — Hardware integration (Phase 15.4)
+  - [ ] Direct GRBL connection via WebSerial
+  - [ ] Real-time position feedback
+  - [ ] Jog controls for connected machines
+  - [ ] Machine configuration profiles
 
 ---
 

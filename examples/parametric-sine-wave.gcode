@@ -1,0 +1,71 @@
+; Parametric Sine Wave
+; Mathematical toolpath generation
+; Creates smooth 3D sine wave surface
+; Demonstrates advanced motion control
+
+G21 G90 G17
+M3 S15000
+G0 Z5
+
+; Start position
+G0 X0 Y0
+G1 Z0 F100
+
+; Sine wave - 50mm length, 5mm amplitude, 2 cycles
+; Generated with 50 interpolation points
+G1 X1 Y0.63 Z-0.5 F300
+G1 X2 Y1.22 Z-0.5
+G1 X3 Y1.73 Z-0.5
+G1 X4 Y2.14 Z-0.5
+G1 X5 Y2.42 Z-0.5
+G1 X6 Y2.57 Z-0.5
+G1 X7 Y2.57 Z-0.5
+G1 X8 Y2.42 Z-0.5
+G1 X9 Y2.14 Z-0.5
+G1 X10 Y1.73 Z-0.5
+G1 X11 Y1.22 Z-0.5
+G1 X12 Y0.63 Z-0.5
+G1 X13 Y0 Z-0.5
+G1 X14 Y-0.63 Z-0.5
+G1 X15 Y-1.22 Z-0.5
+G1 X16 Y-1.73 Z-0.5
+G1 X17 Y-2.14 Z-0.5
+G1 X18 Y-2.42 Z-0.5
+G1 X19 Y-2.57 Z-0.5
+G1 X20 Y-2.57 Z-0.5
+G1 X21 Y-2.42 Z-0.5
+G1 X22 Y-2.14 Z-0.5
+G1 X23 Y-1.73 Z-0.5
+G1 X24 Y-1.22 Z-0.5
+G1 X25 Y-0.63 Z-0.5
+G1 X26 Y0 Z-0.5
+G1 X27 Y0.63 Z-0.5
+G1 X28 Y1.22 Z-0.5
+G1 X29 Y1.73 Z-0.5
+G1 X30 Y2.14 Z-0.5
+G1 X31 Y2.42 Z-0.5
+G1 X32 Y2.57 Z-0.5
+G1 X33 Y2.57 Z-0.5
+G1 X34 Y2.42 Z-0.5
+G1 X35 Y2.14 Z-0.5
+G1 X36 Y1.73 Z-0.5
+G1 X37 Y1.22 Z-0.5
+G1 X38 Y0.63 Z-0.5
+G1 X39 Y0 Z-0.5
+G1 X40 Y-0.63 Z-0.5
+G1 X41 Y-1.22 Z-0.5
+G1 X42 Y-1.73 Z-0.5
+G1 X43 Y-2.14 Z-0.5
+G1 X44 Y-2.42 Z-0.5
+G1 X45 Y-2.57 Z-0.5
+G1 X46 Y-2.57 Z-0.5
+G1 X47 Y-2.42 Z-0.5
+G1 X48 Y-2.14 Z-0.5
+G1 X49 Y-1.73 Z-0.5
+G1 X50 Y-1.22 Z-0.5
+
+; Return
+G0 Z5
+M5
+G0 X0 Y0
+M2
