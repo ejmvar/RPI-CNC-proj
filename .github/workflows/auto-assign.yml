@@ -1,0 +1,83 @@
+name: Assign Issues
+
+on:
+  issues:
+    types: [opened, labeled]
+
+jobs:
+  assign:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Auto-assign by area
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const labels = issue.labels.map(l => l.name);
+            
+            // Define team assignments by area
+            const assignments = {
+              'area: frontend': ['@frontend-team'],
+              'area: backend': ['@backend-team'],
+              'area: database': ['@database-team'],
+              'area: gcode': ['@gcode-team'],
+              'area: visualization': ['@visualization-team']
+            };
+            
+            // Find matching assignments
+            for (const [label, assignees] of Object.entries(assignments)) {
+              if (labels.includes(label)) {
+                await github.rest.issues.addAssignees({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  assignees: assignees
+                });
+                
+                // Add comment
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  body: `🤖 Auto-assigned to ${assignees.join(', ')} based on the \`${label}\` label.`
+                });
+                
+                break;
+              }
+            }
+
+      - name: Welcome first-time contributors
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            
+            // Check if this is the user's first issue
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              creator: issue.user.login,
+              state: 'all'
+            });
+            
+            if (issues.length === 1) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `👋 Welcome @${issue.user.login}! Thank you for opening your first issue.
+                
+                Please make sure you've provided:
+                - [ ] A clear description of the issue
+                - [ ] Steps to reproduce (if applicable)
+                - [ ] Expected vs actual behavior
+                - [ ] Environment details (browser, OS, version)
+                
+                Our team will review this soon. In the meantime, feel free to check out:
+                - 📖 [Documentation](../docs/)
+                - 💬 [Discussions](https://github.com/${context.repo.owner}/${context.repo.repo}/discussions)
+                - 🤝 [Contributing Guide](../CONTRIBUTING.md)`
+              });
+            }

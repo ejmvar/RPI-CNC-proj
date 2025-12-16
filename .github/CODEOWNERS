@@ -1,0 +1,42 @@
+# Global code owners
+* @project-maintainers
+
+# Frontend code
+/Simulator/web/ @frontend-team
+/Simulator/web/*.html @frontend-team
+/Simulator/web/css/ @frontend-team
+/Simulator/web/js/ @frontend-team
+
+# Backend code
+/modules/backend/ @backend-team
+/scripts/production-server.js @backend-team
+
+# Database
+/modules/backend/database/ @database-team
+
+# G-Code processing
+/modules/gcode/ @gcode-team
+
+# Visualization and 3D
+/modules/presentation/ @visualization-team
+
+# Documentation
+/docs/ @docs-team
+*.md @docs-team
+
+# Tests
+/tests/ @qa-team
+
+# CI/CD and infrastructure
+/.github/ @devops-team
+/docker-compose.yml @devops-team
+/Dockerfile @devops-team
+
+# Security-sensitive files
+/modules/backend/auth/ @security-team
+/modules/backend/session/ @security-team
+
+# Configuration files
+/modules/modules-config.yml @maintainers
+/package.json @maintainers
+/.eslintrc.* @maintainers

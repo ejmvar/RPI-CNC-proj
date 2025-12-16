@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 GitHub Discussions
+    url: https://github.com/your-org/RPI-CNC-proj/discussions
+    about: Ask questions, share ideas, and discuss with the community
+  - name: 📖 Documentation
+    url: https://github.com/your-org/RPI-CNC-proj/tree/main/docs
+    about: Read the documentation for help and guides
+  - name: 🔒 Security Issue
+    url: mailto:security@your-domain.com
+    about: Report security vulnerabilities privately via email (DO NOT create public issues)

@@ -1,0 +1,160 @@
+# GitHub Labels Configuration
+# Use with: gh label sync -f .github/labels.yml
+
+# Type labels
+- name: 'type: bug'
+  color: 'd73a4a'
+  description: 'Something isn''t working'
+
+- name: 'type: feature'
+  color: 'a2eeef'
+  description: 'New feature or request'
+
+- name: 'type: enhancement'
+  color: '84b6eb'
+  description: 'Improvement to existing feature'
+
+- name: 'type: documentation'
+  color: '0075ca'
+  description: 'Documentation improvements'
+
+- name: 'type: tests'
+  color: '00ff00'
+  description: 'Test-related changes'
+
+- name: 'type: ci-cd'
+  color: 'fef2c0'
+  description: 'CI/CD pipeline changes'
+
+- name: 'type: refactoring'
+  color: 'fbca04'
+  description: 'Code refactoring'
+
+- name: 'type: performance'
+  color: 'ff6b6b'
+  description: 'Performance improvements'
+
+- name: 'type: security'
+  color: 'ee0701'
+  description: 'Security-related changes'
+
+# Priority labels
+- name: 'priority: critical'
+  color: 'b60205'
+  description: 'Critical priority - must be fixed ASAP'
+
+- name: 'priority: high'
+  color: 'd93f0b'
+  description: 'High priority'
+
+- name: 'priority: medium'
+  color: 'fbca04'
+  description: 'Medium priority'
+
+- name: 'priority: low'
+  color: '0e8a16'
+  description: 'Low priority'
+
+# Status labels
+- name: 'status: needs-triage'
+  color: 'ededed'
+  description: 'Needs initial triage'
+
+- name: 'status: blocked'
+  color: 'd73a4a'
+  description: 'Blocked by another issue or PR'
+
+- name: 'status: in-progress'
+  color: 'c2e0c6'
+  description: 'Work is in progress'
+
+- name: 'status: needs-review'
+  color: 'fbca04'
+  description: 'Needs code review'
+
+- name: 'status: needs-testing'
+  color: 'f9d0c4'
+  description: 'Needs testing before merge'
+
+- name: 'status: ready-to-merge'
+  color: '0e8a16'
+  description: 'Ready to be merged'
+
+# Area labels
+- name: 'area: frontend'
+  color: '5319e7'
+  description: 'Frontend/UI changes'
+
+- name: 'area: backend'
+  color: '1d76db'
+  description: 'Backend/API changes'
+
+- name: 'area: database'
+  color: '0052cc'
+  description: 'Database-related changes'
+
+- name: 'area: gcode'
+  color: 'c5def5'
+  description: 'G-Code parsing and transformation'
+
+- name: 'area: visualization'
+  color: 'bfdadc'
+  description: '3D visualization and Three.js'
+
+- name: 'area: collaboration'
+  color: 'e99695'
+  description: 'Real-time collaboration features'
+
+- name: 'area: auth'
+  color: 'f9d0c4'
+  description: 'Authentication and authorization'
+
+# Difficulty labels
+- name: 'difficulty: easy'
+  color: '7057ff'
+  description: 'Good for beginners'
+
+- name: 'difficulty: medium'
+  color: '008672'
+  description: 'Moderate difficulty'
+
+- name: 'difficulty: hard'
+  color: 'e99695'
+  description: 'Requires significant effort'
+
+# Special labels
+- name: 'good first issue'
+  color: '7057ff'
+  description: 'Good for newcomers'
+
+- name: 'help wanted'
+  color: '008672'
+  description: 'Extra attention is needed'
+
+- name: 'breaking change'
+  color: 'b60205'
+  description: 'Breaking change in API or behavior'
+
+- name: 'duplicate'
+  color: 'cfd3d7'
+  description: 'This issue or PR already exists'
+
+- name: 'wontfix'
+  color: 'ffffff'
+  description: 'This will not be worked on'
+
+- name: 'invalid'
+  color: 'e4e669'
+  description: 'Invalid issue or PR'
+
+- name: 'question'
+  color: 'd876e3'
+  description: 'Further information is requested'
+
+- name: 'dependencies'
+  color: '0366d6'
+  description: 'Dependency updates'
+
+- name: 'sponsored'
+  color: 'ea4aaa'
+  description: 'Sponsored development'

@@ -1,0 +1,31 @@
+title: "[Idea] "
+labels: ["idea"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Share your ideas for improving the CNC Simulator!
+
+  - type: textarea
+    id: idea
+    attributes:
+      label: Your Idea
+      description: Describe your idea in detail
+      placeholder: I think it would be great if...
+    validations:
+      required: true
+
+  - type: textarea
+    id: benefits
+    attributes:
+      label: Benefits
+      description: How would this benefit users?
+      placeholder: This would help users to...
+
+  - type: textarea
+    id: examples
+    attributes:
+      label: Examples
+      description: Are there examples of this idea in other software?
+      placeholder: Similar to how Fusion 360 does...

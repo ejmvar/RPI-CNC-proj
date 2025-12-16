@@ -1,0 +1,41 @@
+title: "[Show & Tell] "
+labels: ["show-and-tell"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Share your projects, workflows, or cool things you've created with the CNC Simulator!
+
+  - type: textarea
+    id: project
+    attributes:
+      label: What did you create?
+      description: Tell us about your project
+      placeholder: I used the simulator to...
+    validations:
+      required: true
+
+  - type: textarea
+    id: media
+    attributes:
+      label: Screenshots / Videos
+      description: Share images or videos of your work
+      placeholder: Drag and drop images or paste video links
+
+  - type: textarea
+    id: details
+    attributes:
+      label: Technical Details
+      description: Share any interesting technical aspects
+      placeholder: |
+        - Machine used: ...
+        - Material: ...
+        - Special techniques: ...
+
+  - type: textarea
+    id: tips
+    attributes:
+      label: Tips for Others
+      description: Any tips or lessons learned?
+      placeholder: One thing I learned was...
