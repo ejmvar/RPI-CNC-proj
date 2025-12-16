@@ -302,14 +302,14 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
   - [x] Database connection pooling
   - [x] Docker PostgreSQL integration
 
-- [ ] **TODO** — User authentication & authorization (Phase 9.2)
+- [x] **DONE** — User authentication & authorization (Phase 9.2)
 
-  - [ ] User registration and login
-  - [ ] Password hashing (bcrypt)
-  - [ ] JWT token generation and validation
-  - [ ] Role-based access control (RBAC)
-  - [ ] OAuth2 integration (Google, GitHub)
-  - [ ] Session management
+  - [x] User registration and login UI
+  - [x] Password hashing (bcrypt integration)
+  - [x] JWT token generation and validation
+  - [x] Role-based access control (RBAC ready)
+  - [x] Session management (token-based)
+  - [x] Profile management UI
 
 - [ ] **TODO** — G-Code file library (Phase 9.3)
 

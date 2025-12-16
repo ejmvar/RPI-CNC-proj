@@ -29,6 +29,8 @@ import {
   livenessHandler,
   readinessHandler,
 } from '../modules/backend/monitoring/health.mjs';
+import { initDatabase, testConnection } from '../modules/backend/database/connection.mjs';
+import authRoutes from '../modules/backend/routes/auth.mjs';
 
 // Validate environment
 try {
@@ -54,6 +56,29 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
   : ['http://localhost:8080'];
 configureCORS(app, allowedOrigins);
 configureRateLimiting(app);
+
+// Initialize database
+if (process.env.DB_HOST) {
+  try {
+    initDatabase();
+    logger.info('Database initialized');
+
+    // Test connection
+    testConnection().then((success) => {
+      if (success) {
+        logger.info('Database connection verified');
+      } else {
+        logger.warn('Database connection test failed, but continuing...');
+      }
+    });
+  } catch (error) {
+    logger.error('Database initialization failed', { error: error.message });
+    logger.warn('Continuing without database support');
+  }
+}
+
+// API Routes
+app.use('/api/auth', authRoutes);
 
 // Health checks
 app.get('/health', healthCheckHandler);

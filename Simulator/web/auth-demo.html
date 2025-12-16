@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CNC Simulator - Authentication Demo</title>
+    <link rel="stylesheet" href="css/auth-ui.css" />
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
+          Cantarell, sans-serif;
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+      }
+
+      .demo-container {
+        max-width: 1200px;
+        margin: 80px auto 40px;
+        padding: 40px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      }
+
+      h1 {
+        color: #1f2937;
+        margin-top: 0;
+      }
+
+      .feature-list {
+        list-style: none;
+        padding: 0;
+      }
+
+      .feature-list li {
+        padding: 12px 0;
+        border-bottom: 1px solid #e5e7eb;
+        color: #4b5563;
+      }
+
+      .feature-list li:last-child {
+        border-bottom: none;
+      }
+
+      .feature-list li::before {
+        content: '✓';
+        color: #10b981;
+        font-weight: bold;
+        margin-right: 10px;
+      }
+
+      .api-info {
+        background: #f9fafb;
+        padding: 20px;
+        border-radius: 8px;
+        margin-top: 30px;
+      }
+
+      .api-info h2 {
+        margin-top: 0;
+        color: #374151;
+      }
+
+      .api-endpoint {
+        font-family: 'Courier New', monospace;
+        background: #1f2937;
+        color: #10b981;
+        padding: 8px 12px;
+        border-radius: 4px;
+        display: inline-block;
+        margin: 5px 0;
+      }
+
+      .code-block {
+        background: #1f2937;
+        color: #e5e7eb;
+        padding: 15px;
+        border-radius: 6px;
+        overflow-x: auto;
+        margin: 15px 0;
+      }
+
+      .code-block code {
+        font-family: 'Courier New', monospace;
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Auth UI will be injected here -->
+
+    <div class="demo-container">
+      <h1>🔐 Authentication System Demo</h1>
+
+      <p>
+        Welcome to the CNC Simulator authentication demo. This page demonstrates the complete user
+        authentication system with registration, login, profile management, and password changes.
+      </p>
+
+      <h2>Features</h2>
+      <ul class="feature-list">
+        <li>User registration with email validation</li>
+        <li>Secure login with JWT tokens</li>
+        <li>Profile management (update email and display name)</li>
+        <li>Password change functionality</li>
+        <li>Persistent sessions (localStorage)</li>
+        <li>Automatic token verification</li>
+        <li>Clean modal-based UI</li>
+        <li>Responsive design</li>
+      </ul>
+
+      <div class="api-info">
+        <h2>API Endpoints</h2>
+        <p>
+          <strong>POST</strong> <span class="api-endpoint">/api/auth/register</span> - Register new
+          user
+        </p>
+        <p>
+          <strong>POST</strong> <span class="api-endpoint">/api/auth/login</span> - Login with
+          credentials
+        </p>
+        <p>
+          <strong>GET</strong> <span class="api-endpoint">/api/auth/me</span> - Get current user
+          profile
+        </p>
+        <p>
+          <strong>PUT</strong> <span class="api-endpoint">/api/auth/profile</span> - Update profile
+        </p>
+        <p>
+          <strong>PUT</strong> <span class="api-endpoint">/api/auth/password</span> - Change
+          password
+        </p>
+        <p><strong>POST</strong> <span class="api-endpoint">/api/auth/logout</span> - Logout</p>
+      </div>
+
+      <div class="api-info">
+        <h2>Usage Example</h2>
+        <div class="code-block">
+          <code>
+            // Initialize authentication UI<br />
+            const auth = new AuthUI();<br />
+            auth.init();<br />
+            <br />
+            // Listen for auth state changes<br />
+            auth.onAuthChange = (user) => {<br />
+            &nbsp;&nbsp;if (user) {<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;console.log('User logged in:', user.username);<br />
+            &nbsp;&nbsp;} else {<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;console.log('User logged out');<br />
+            &nbsp;&nbsp;}<br />
+            };<br />
+            <br />
+            // Check authentication status<br />
+            if (auth.isAuthenticated()) {<br />
+            &nbsp;&nbsp;const user = auth.getCurrentUser();<br />
+            &nbsp;&nbsp;console.log('Current user:', user);<br />
+            }
+          </code>
+        </div>
+      </div>
+
+      <div class="api-info">
+        <h2>Try It Out</h2>
+        <p>
+          Click the <strong>Register</strong> button in the top-right corner to create an account,
+          then log in to test the authentication system.
+        </p>
+        <p><strong>Note:</strong> Make sure the backend server is running with database support:</p>
+        <div class="code-block">
+          <code>
+            # Start with Docker Compose (recommended)<br />
+            docker-compose up -d<br />
+            <br />
+            # Or start manually<br />
+            node scripts/production-server.js
+          </code>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      import { AuthUI } from './js/auth-ui.mjs';
+
+      // Initialize authentication
+      const auth = new AuthUI();
+      auth.init();
+
+      // Listen for auth changes
+      auth.onAuthChange = (user) => {
+        console.log('Auth state changed:', user ? `Logged in as ${user.username}` : 'Logged out');
+      };
+
+      // Make auth available globally for debugging
+      window.auth = auth;
+    </script>
+  </body>
+</html>
