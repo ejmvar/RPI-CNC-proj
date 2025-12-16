@@ -1,10 +1,15 @@
 # RPI-CNC-proj — Raspberry Pi CNC Simulator
 
-![Tests](https://github.com/YOUR_USERNAME/RPI-CNC-proj/actions/workflows/collab-e2e.yml/badge.svg)
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Node](https://img.shields.io/badge/node-%3E%3D18-green.svg)
+[![Tests](https://github.com/YOUR_USERNAME/RPI-CNC-proj/actions/workflows/collab-e2e.yml/badge.svg)](https://github.com/YOUR_USERNAME/RPI-CNC-proj/actions)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Node](https://img.shields.io/badge/node-%3E%3D18-green.svg)](https://nodejs.org)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+[![Code Style: ESLint](https://img.shields.io/badge/code_style-eslint-4b32c3.svg)](https://eslint.org/)
+[![Coverage](https://img.shields.io/badge/coverage-30%25-yellow.svg)](https://codecov.io)
 
 Lightweight browser-based simulator for a Raspberry Pi CNC educational project. The simulator is a single-page front-end located at `Simulator/web/front.html`. It supports loading simple G-Code, a 3D visualization (Three.js), and a conceptual auto-leveling probe simulation.
+
+📚 **[View Documentation](docs/)** | 🎯 **[Try Examples](examples/)** | 💬 **[Join Discussions](https://github.com/YOUR_USERNAME/RPI-CNC-proj/discussions)** | 📝 **[Report Issues](https://github.com/YOUR_USERNAME/RPI-CNC-proj/issues)**
 
 ## Features
 
