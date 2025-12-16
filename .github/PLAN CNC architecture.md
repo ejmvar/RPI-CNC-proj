@@ -293,14 +293,14 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
 
 #### Tasks:
 
-- [ ] **TODO** — Database integration (Phase 9.1)
+- [x] **DONE** — Database integration (Phase 9.1)
 
-  - [ ] Set up PostgreSQL/MySQL for persistent storage
-  - [ ] Create database schema for users, sessions, files
-  - [ ] Implement ORM (Prisma/TypeORM)
-  - [ ] Add migration system
-  - [ ] Database seeding scripts
-  - [ ] Backup and restore utilities
+  - [x] Set up PostgreSQL for persistent storage
+  - [x] Create database schema for users, sessions, files
+  - [x] Implement data access layer (repositories)
+  - [x] Add migration system
+  - [x] Database connection pooling
+  - [x] Docker PostgreSQL integration
 
 - [ ] **TODO** — User authentication & authorization (Phase 9.2)
 
