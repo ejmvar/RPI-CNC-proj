@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CNC Simulator - Interactive Example Gallery</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      }
+      .demo-card {
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+      .demo-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+      }
+      .feature-badge {
+        display: inline-block;
+        padding: 2px 8px;
+        font-size: 0.75rem;
+        border-radius: 9999px;
+        margin: 2px;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen p-4 md:p-8">
+    <div class="max-w-7xl mx-auto">
+      <!-- Header -->
+      <div class="text-center mb-12">
+        <h1 class="text-5xl font-bold text-white mb-4">🔧 Interactive CNC Examples</h1>
+        <p class="text-xl text-purple-100 mb-6">9 Ready-to-Run G-Code Examples</p>
+        <a
+          href="front.html"
+          class="inline-block bg-white text-purple-600 font-bold py-3 px-8 rounded-full hover:shadow-lg transition-all"
+        >
+          Launch Full Simulator →
+        </a>
+      </div>
+
+      <!-- Example Gallery -->
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <!-- Example 1 -->
+        <div
+          class="demo-card bg-white rounded-lg shadow-lg p-6"
+          onclick="loadExample('basic-square.gcode')"
+        >
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl font-bold">Basic Square</h3>
+            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm"
+              >⭐ Beginner</span
+            >
+          </div>
+          <p class="text-gray-600 mb-4">50mm square - perfect first test</p>
+          <div class="flex flex-wrap gap-1">
+            <span class="feature-badge bg-gray-200 text-gray-700">G0/G1</span>
+            <span class="feature-badge bg-gray-200 text-gray-700">Spindle</span>
+          </div>
+        </div>
+
+        <!-- Example 2 -->
+        <div
+          class="demo-card bg-white rounded-lg shadow-lg p-6"
+          onclick="loadExample('circle-test.gcode')"
+        >
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl font-bold">Circle Test</h3>
+            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm"
+              >⭐ Beginner</span
+            >
+          </div>
+          <p class="text-gray-600 mb-4">Arc interpolation demo</p>
+          <div class="flex flex-wrap gap-1">
+            <span class="feature-badge bg-gray-200 text-gray-700">G2/G3</span>
+            <span class="feature-badge bg-gray-200 text-gray-700">Arcs</span>
+          </div>
+        </div>
+
+        <!-- Example 3 -->
+        <div
+          class="demo-card bg-white rounded-lg shadow-lg p-6"
+          onclick="loadExample('auto-leveling-demo.gcode')"
+        >
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl font-bold">Auto-Leveling</h3>
+            <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm"
+              >⭐⭐ Intermediate</span
+            >
+          </div>
+          <p class="text-gray-600 mb-4">Mesh compensation demo</p>
+          <div class="flex flex-wrap gap-1">
+            <span class="feature-badge bg-gray-200 text-gray-700">Mesh</span>
+            <span class="feature-badge bg-gray-200 text-gray-700">Grid</span>
+          </div>
+        </div>
+
+        <!-- Example 4 -->
+        <div
+          class="demo-card bg-white rounded-lg shadow-lg p-6"
+          onclick="loadExample('multi-tool-demo.gcode')"
+        >
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl font-bold">Multi-Tool</h3>
+            <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm"
+              >⭐⭐ Intermediate</span
+            >
+          </div>
+          <p class="text-gray-600 mb-4">3-tool workflow with offsets</p>
+          <div class="flex flex-wrap gap-1">
+            <span class="feature-badge bg-gray-200 text-gray-700">T1/T2/T3</span>
+            <span class="feature-badge bg-gray-200 text-gray-700">G43</span>
+          </div>
+        </div>
+
+        <!-- Example 5 -->
+        <div
+          class="demo-card bg-white rounded-lg shadow-lg p-6"
+          onclick="loadExample('complex-pocket.gcode')"
+        >
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl font-bold">Complex Pocket</h3>
+            <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm"
+              >⭐⭐⭐ Advanced</span
+            >
+          </div>
+          <p class="text-gray-600 mb-4">Spiral milling strategy</p>
+          <div class="flex flex-wrap gap-1">
+            <span class="feature-badge bg-gray-200 text-gray-700">Spiral</span>
+            <span class="feature-badge bg-gray-200 text-gray-700">Multi-Pass</span>
+          </div>
+        </div>
+
+        <!-- Example 6 -->
+        <div
+          class="demo-card bg-white rounded-lg shadow-lg p-6"
+          onclick="loadExample('3d-print-multi-material.gcode')"
+        >
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl font-bold">3D Print Multi-Material</h3>
+            <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm"
+              >⭐⭐⭐ Advanced</span
+            >
+          </div>
+          <p class="text-gray-600 mb-4">Dual material FDM</p>
+          <div class="flex flex-wrap gap-1">
+            <span class="feature-badge bg-gray-200 text-gray-700">PLA+PVA</span>
+            <span class="feature-badge bg-gray-200 text-gray-700">E-Axis</span>
+          </div>
+        </div>
+
+        <!-- NEW Example 7 -->
+        <div
+          class="demo-card bg-white rounded-lg shadow-lg p-6"
+          onclick="loadExample('pcb-drilling.gcode')"
+        >
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl font-bold">PCB Drilling</h3>
+            <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm"
+              >⭐⭐ Intermediate</span
+            >
+          </div>
+          <p class="text-gray-600 mb-4">Precision drilling pattern</p>
+          <div class="flex flex-wrap gap-1">
+            <span class="feature-badge bg-gray-200 text-gray-700">0.8mm Drill</span>
+            <span class="feature-badge bg-gray-200 text-gray-700">Grid</span>
+          </div>
+        </div>
+
+        <!-- NEW Example 8 -->
+        <div
+          class="demo-card bg-white rounded-lg shadow-lg p-6"
+          onclick="loadExample('text-engraving.gcode')"
+        >
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl font-bold">Text Engraving</h3>
+            <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm"
+              >⭐⭐ Intermediate</span
+            >
+          </div>
+          <p class="text-gray-600 mb-4">Single-line font demo</p>
+          <div class="flex flex-wrap gap-1">
+            <span class="feature-badge bg-gray-200 text-gray-700">V-Bit</span>
+            <span class="feature-badge bg-gray-200 text-gray-700">Text</span>
+          </div>
+        </div>
+
+        <!-- NEW Example 9 -->
+        <div
+          class="demo-card bg-white rounded-lg shadow-lg p-6"
+          onclick="loadExample('parametric-sine-wave.gcode')"
+        >
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl font-bold">Parametric Sine Wave</h3>
+            <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm"
+              >⭐⭐⭐ Advanced</span
+            >
+          </div>
+          <p class="text-gray-600 mb-4">Mathematical 3D surface</p>
+          <div class="flex flex-wrap gap-1">
+            <span class="feature-badge bg-gray-200 text-gray-700">Math</span>
+            <span class="feature-badge bg-gray-200 text-gray-700">50 Points</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Features -->
+      <div class="bg-white rounded-lg shadow-2xl p-8 mb-8">
+        <h2 class="text-3xl font-bold mb-6 text-center">✨ Features</h2>
+        <div class="grid md:grid-cols-4 gap-6">
+          <div class="text-center">
+            <div class="text-4xl mb-2">🎯</div>
+            <h3 class="font-bold">3D Visualization</h3>
+          </div>
+          <div class="text-center">
+            <div class="text-4xl mb-2">🗺️</div>
+            <h3 class="font-bold">Auto-Leveling</h3>
+          </div>
+          <div class="text-center">
+            <div class="text-4xl mb-2">🔧</div>
+            <h3 class="font-bold">Multi-Tool</h3>
+          </div>
+          <div class="text-center">
+            <div class="text-4xl mb-2">⚡</div>
+            <h3 class="font-bold">Real-Time</h3>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="text-center text-white">
+        <p>Open Source • MIT License • Built with Three.js</p>
+      </div>
+    </div>
+
+    <script>
+      function loadExample(filename) {
+        window.location.href = `front.html?example=${filename}`;
+      }
+    </script>
+  </body>
+</html>

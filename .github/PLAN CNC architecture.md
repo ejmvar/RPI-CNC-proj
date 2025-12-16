@@ -426,20 +426,23 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
   - [ ] Social media presence
   - [ ] Create interactive demo page
 
-### Phase 11: Test Coverage Expansion [TODO]
+### Phase 11: Test Coverage Expansion [WIP]
 
 **Goal:** Increase test coverage from 30% to 40%+ for better code quality.
 
+**Progress (Dec 16, 2024):** 960 tests passing, ~35% line coverage (+94 tests, +4.65% coverage)
+
 #### Tasks:
 
-- [ ] **TODO** — Backend module testing (Phase 11.1)
+- [ ] **WIP** — Backend module testing (Phase 11.1)
 
-  - [ ] Add tests for database repositories (GCodeFileRepository, GCodeFolderRepository, UserRepository)
-  - [ ] Add tests for database migrations
-  - [ ] Add tests for authentication and authorization
-  - [ ] Add tests for security middleware
-  - [ ] Add tests for monitoring and health checks
-  - [ ] Add tests for WebSocket server edge cases
+  - [x] **DONE** — Add tests for database repositories (60 tests: UserRepository, GCodeFileRepository, GCodeFolderRepository)
+  - [x] **DONE** — Add tests for authentication and authorization (20 tests: password hashing, JWT, middleware)
+  - [x] **DONE** — Add tests for security middleware (14 tests: sanitization, validation)
+  - [ ] **TODO** — Add tests for database migrations
+  - [ ] **TODO** — Add tests for monitoring and health checks
+  - [ ] **TODO** — Add tests for WebSocket server edge cases
+  - [ ] **TODO** — Add tests for backend routes (files, folders, auth)
 
 - [ ] **TODO** — Presentation module testing (Phase 11.2)
 
