@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Advanced Visualization Demo - CNC Simulator</title>
+
+    <!-- Theme and base CSS -->
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/visualization.css" />
+
+    <!-- Three.js -->
+    <script src="static/three.min.js"></script>
+
+    <style>
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, sans-serif;
+        overflow: hidden;
+      }
+
+      #canvas-container {
+        width: 100vw;
+        height: 100vh;
+        position: relative;
+      }
+
+      .info-panel {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 20px;
+        max-width: 350px;
+        box-shadow: var(--shadow-lg);
+        z-index: 1000;
+      }
+
+      .info-panel h1 {
+        margin: 0 0 10px 0;
+        font-size: 20px;
+        color: var(--text-primary);
+      }
+
+      .info-panel p {
+        margin: 8px 0;
+        font-size: 14px;
+        color: var(--text-secondary);
+        line-height: 1.5;
+      }
+
+      .feature-list {
+        margin: 16px 0 0 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .feature-list li {
+        padding: 6px 0;
+        font-size: 13px;
+        color: var(--text-primary);
+      }
+
+      .close-info {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        color: var(--text-secondary);
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        transition: background 0.2s;
+      }
+
+      .close-info:hover {
+        background: var(--bg-tertiary);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="canvas-container"></div>
+
+    <div class="info-panel" id="info-panel">
+      <button
+        class="close-info"
+        onclick="document.getElementById('info-panel').style.display='none'"
+      >
+        ×
+      </button>
+      <h1>🎨 Advanced Visualization</h1>
+      <p>Interactive 3D visualization with professional tools</p>
+
+      <ul class="feature-list">
+        <li>📷 <strong>Camera Bookmarks</strong> - Save and restore views (bottom-left)</li>
+        <li>📏 <strong>Measurements</strong> - Measure distances and angles (bottom-right)</li>
+        <li>🖼️ <strong>Viewports</strong> - Single/Split/Quad view modes (top-right)</li>
+        <li>📸 <strong>Screenshots</strong> - Capture and export (top-right)</li>
+        <li>🎯 <strong>Predefined Views</strong> - Quick camera angles</li>
+        <li>✨ <strong>Smooth Animations</strong> - Animated camera transitions</li>
+      </ul>
+
+      <p style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-color)">
+        <strong>Try it:</strong> Click the view buttons, save camera positions, or use measurement
+        tools!
+      </p>
+    </div>
+
+    <script type="module">
+      import CameraBookmarks from './js/camera-bookmarks.mjs';
+      import MeasurementTools from './js/measurement-tools.mjs';
+      import ViewportManager from './js/viewport-manager.mjs';
+      import ScreenshotExporter from './js/screenshot-exporter.mjs';
+
+      // Setup Three.js scene
+      const container = document.getElementById('canvas-container');
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x111827);
+
+      const camera = new THREE.PerspectiveCamera(
+        75,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000
+      );
+      camera.position.set(50, 50, 50);
+      camera.lookAt(0, 0, 0);
+
+      const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(window.devicePixelRatio);
+      container.appendChild(renderer.domElement);
+
+      // Add lights
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+      scene.add(ambientLight);
+
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+      directionalLight.position.set(50, 50, 50);
+      scene.add(directionalLight);
+
+      // Add grid
+      const gridHelper = new THREE.GridHelper(100, 20, 0x444444, 0x222222);
+      scene.add(gridHelper);
+
+      // Add axes
+      const axesHelper = new THREE.AxesHelper(50);
+      scene.add(axesHelper);
+
+      // Add some demo geometry
+      const geometry = new THREE.BoxGeometry(20, 20, 20);
+      const material = new THREE.MeshPhongMaterial({
+        color: 0x6366f1,
+        transparent: true,
+        opacity: 0.8,
+      });
+      const cube = new THREE.Mesh(geometry, material);
+      cube.position.set(0, 10, 0);
+      scene.add(cube);
+
+      // Add wireframe
+      const wireframe = new THREE.WireframeGeometry(geometry);
+      const line = new THREE.LineSegments(wireframe);
+      line.material.color.setHex(0xffffff);
+      line.position.copy(cube.position);
+      scene.add(line);
+
+      // Simple controls (basic orbit)
+      let isDragging = false;
+      let previousMousePosition = { x: 0, y: 0 };
+
+      renderer.domElement.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        previousMousePosition = { x: e.clientX, y: e.clientY };
+      });
+
+      renderer.domElement.addEventListener('mousemove', (e) => {
+        if (!isDragging || measurementTools.isActive) return;
+
+        const deltaX = e.clientX - previousMousePosition.x;
+        const deltaY = e.clientY - previousMousePosition.y;
+
+        const rotationSpeed = 0.005;
+        camera.position.applyAxisAngle(new THREE.Vector3(0, 1, 0), -deltaX * rotationSpeed);
+
+        previousMousePosition = { x: e.clientX, y: e.clientY };
+      });
+
+      renderer.domElement.addEventListener('mouseup', () => {
+        isDragging = false;
+      });
+
+      // Zoom with mouse wheel
+      renderer.domElement.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        const zoomSpeed = 0.1;
+        const direction = camera.position.clone().normalize();
+        const distance = e.deltaY * zoomSpeed;
+        camera.position.add(direction.multiplyScalar(-distance));
+      });
+
+      // Handle clicks for measurements
+      renderer.domElement.addEventListener('click', (e) => {
+        if (!measurementTools.isActive) return;
+
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2(
+          (e.clientX / window.innerWidth) * 2 - 1,
+          -(e.clientY / window.innerHeight) * 2 + 1
+        );
+
+        raycaster.setFromCamera(mouse, camera);
+        const intersects = raycaster.intersectObjects(scene.children, true);
+
+        if (intersects.length > 0) {
+          measurementTools.handleClick(intersects[0]);
+        }
+      });
+
+      // Initialize visualization systems
+      const cameraBookmarks = new CameraBookmarks(camera, null);
+      cameraBookmarks.init();
+      window.cameraBookmarks = cameraBookmarks;
+
+      const measurementTools = new MeasurementTools(scene, camera, renderer);
+      measurementTools.init();
+      window.measurementTools = measurementTools;
+
+      const viewportManager = new ViewportManager(container);
+      viewportManager.init();
+      window.viewportManager = viewportManager;
+
+      const screenshotExporter = new ScreenshotExporter(renderer, scene, camera);
+      screenshotExporter.init();
+      window.screenshotExporter = screenshotExporter;
+
+      // Listen for keyboard shortcuts from camera bookmarks
+      window.addEventListener('shortcut-view', (e) => {
+        cameraBookmarks.setPredefinedView(e.detail.view);
+      });
+
+      // Handle viewport changes
+      window.addEventListener('viewportchange', (e) => {
+        console.log('Viewport changed:', e.detail.mode);
+        // In a full implementation, would setup multiple cameras here
+      });
+
+      // Animation loop
+      function animate() {
+        requestAnimationFrame(animate);
+
+        // Rotate cube slowly
+        cube.rotation.x += 0.005;
+        cube.rotation.y += 0.005;
+        line.rotation.copy(cube.rotation);
+
+        // Always look at origin
+        camera.lookAt(0, 0, 0);
+
+        // Render with viewport manager
+        if (viewportManager.mode === 'single') {
+          renderer.render(scene, camera);
+        } else {
+          viewportManager.render(renderer, scene, camera);
+        }
+      }
+
+      animate();
+
+      // Handle window resize
+      window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+
+      console.log('🎨 Advanced visualization demo ready');
+      console.log('📷 Try saving camera bookmarks and using measurement tools!');
+    </script>
+  </body>
+</html>

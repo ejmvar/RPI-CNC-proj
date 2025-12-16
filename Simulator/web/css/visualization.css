@@ -1,0 +1,404 @@
+/**
+ * Advanced Visualization Components Styles
+ */
+
+/* Camera Bookmarks Panel */
+.camera-bookmarks-panel {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  width: 280px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+  z-index: 900;
+  transition: transform 0.3s ease;
+}
+
+.camera-bookmarks-panel.collapsed {
+  transform: translateY(calc(100% - 44px));
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  border-radius: 12px 12px 0 0;
+  cursor: pointer;
+}
+
+.panel-header h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.btn-collapse {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.btn-collapse:hover {
+  background: var(--bg-tertiary);
+}
+
+.panel-content {
+  padding: 12px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* Predefined Views */
+.predefined-views {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.view-btn {
+  padding: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.view-btn:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--color-primary);
+}
+
+/* Bookmarks Actions */
+.bookmarks-actions {
+  margin-bottom: 12px;
+}
+
+.bookmarks-actions .btn {
+  width: 100%;
+}
+
+/* Bookmarks List */
+.bookmarks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.bookmark-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.bookmark-item:hover {
+  background: var(--bg-tertiary);
+}
+
+.bookmark-name {
+  flex: 1;
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.bookmark-actions {
+  display: flex;
+  gap: 4px;
+}
+
+/* Measurement Tools Panel */
+.measurement-tools-panel {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 280px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+  z-index: 900;
+  transition: transform 0.3s ease;
+}
+
+.measurement-tools-panel.collapsed {
+  transform: translateY(calc(100% - 44px));
+}
+
+.tool-buttons {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.measurement-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--color-warning);
+  color: var(--text-inverse);
+  border-radius: 6px;
+  margin-bottom: 12px;
+  font-size: 13px;
+}
+
+.measurement-status.hidden {
+  display: none;
+}
+
+.measurements-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.measurement-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+}
+
+.measurement-icon {
+  font-size: 16px;
+}
+
+.measurement-value {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Viewport Controls */
+.viewport-controls {
+  position: fixed;
+  top: 120px;
+  right: 20px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 8px;
+  box-shadow: var(--shadow-md);
+  z-index: 1000;
+}
+
+.viewport-modes {
+  display: flex;
+  gap: 4px;
+}
+
+.viewport-mode-btn {
+  width: 40px;
+  height: 40px;
+  background: var(--bg-secondary);
+  border: 2px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  color: var(--text-secondary);
+}
+
+.viewport-mode-btn:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.viewport-mode-btn.active {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: white;
+}
+
+/* Screenshot Controls */
+.screenshot-controls {
+  position: fixed;
+  top: 170px;
+  right: 20px;
+  z-index: 1000;
+}
+
+.btn-icon-lg {
+  width: 50px;
+  height: 50px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  box-shadow: var(--shadow-md);
+}
+
+.btn-icon-lg:hover {
+  background: var(--bg-secondary);
+  transform: scale(1.1);
+  box-shadow: var(--shadow-lg);
+}
+
+.screenshot-menu {
+  position: absolute;
+  top: 60px;
+  right: 0;
+  width: 220px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.screenshot-menu.hidden {
+  opacity: 0;
+  transform: translateY(-10px);
+  pointer-events: none;
+}
+
+.screenshot-menu .menu-item {
+  width: 100%;
+  padding: 12px 16px;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--border-color);
+  text-align: left;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text-primary);
+  transition: background 0.2s;
+}
+
+.screenshot-menu .menu-item:last-child {
+  border-bottom: none;
+}
+
+.screenshot-menu .menu-item:hover {
+  background: var(--bg-secondary);
+}
+
+/* Screenshot Notification */
+.screenshot-notification {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-100px);
+  background: var(--color-success);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  box-shadow: var(--shadow-lg);
+  z-index: 10001;
+  opacity: 0;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.screenshot-notification.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+.screenshot-notification.error {
+  background: var(--color-danger);
+}
+
+/* Empty State */
+.empty-message {
+  text-align: center;
+  color: var(--text-tertiary);
+  font-size: 13px;
+  padding: 20px;
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .camera-bookmarks-panel,
+  .measurement-tools-panel {
+    width: calc(100% - 40px);
+    left: 20px;
+    right: 20px;
+    bottom: 10px;
+  }
+
+  .viewport-controls {
+    top: 100px;
+    right: 10px;
+  }
+
+  .screenshot-controls {
+    top: 150px;
+    right: 10px;
+  }
+
+  .viewport-mode-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .btn-icon-lg {
+    width: 44px;
+    height: 44px;
+    font-size: 20px;
+  }
+}
+
+/* Scrollbar Styling */
+.panel-content::-webkit-scrollbar,
+.measurements-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.panel-content::-webkit-scrollbar-track,
+.measurements-list::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+  border-radius: 3px;
+}
+
+.panel-content::-webkit-scrollbar-thumb,
+.measurements-list::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 3px;
+}
+
+.panel-content::-webkit-scrollbar-thumb:hover,
+.measurements-list::-webkit-scrollbar-thumb:hover {
+  background: var(--border-color-hover);
+}

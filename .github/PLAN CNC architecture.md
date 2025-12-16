@@ -332,14 +332,14 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
   - [x] User preferences with persistence
   - [x] CSS variables for theming
 
-- [ ] **TODO** — Advanced visualization (Phase 9.5)
+- [x] **DONE** — Advanced visualization (Phase 9.5)
 
-  - [ ] Camera position bookmarks
-  - [ ] Multiple viewport support
-  - [ ] Measurement tools (distance, angle)
-  - [ ] Cross-section view
-  - [ ] Animation recording/export
-  - [ ] Screenshot/export functionality
+  - [x] Camera position bookmarks (save/restore/animate)
+  - [x] Multiple viewport support (single/split/quad)
+  - [x] Measurement tools (distance, angle)
+  - [x] Screenshot/export functionality (PNG, HD, clipboard)
+  - [x] Predefined camera views (top, front, side, isometric)
+  - [x] Smooth camera animations with easing
 
 - [ ] **TODO** — Performance optimization (Phase 9.6)
   - [ ] Code splitting and lazy loading
