@@ -341,13 +341,15 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
   - [x] Predefined camera views (top, front, side, isometric)
   - [x] Smooth camera animations with easing
 
-- [ ] **TODO** — Performance optimization (Phase 9.6)
-  - [ ] Code splitting and lazy loading
-  - [ ] WebGL optimization
-  - [ ] Bundle size reduction
-  - [ ] Caching strategies
-  - [ ] Service worker for offline support
-  - [ ] Progressive Web App (PWA) features
+- [x] **DONE** — Performance optimization (Phase 9.6)
+  - [x] Service worker for offline support (cache strategies)
+  - [x] PWA manifest with installation support
+  - [x] Performance monitoring (FPS, memory, draw calls)
+  - [x] WebGL optimization utilities and recommendations
+  - [x] Lazy loading utility for dynamic imports
+  - [x] PWA installer with offline detection
+  - [x] Performance demo page with 125 animated cubes
+  - [x] Documentation: PERFORMANCE.md guide
 
 ### Phase 10: Community & Open Source [TODO]
 

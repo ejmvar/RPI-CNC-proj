@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#6366f1" />
+    <meta name="description" content="Performance optimization demo for CNC Simulator" />
+    <link rel="manifest" href="/manifest.json" />
+    <title>Performance Demo - CNC Simulator</title>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/performance.css" />
+    <style>
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+      }
+      #demo-container {
+        width: 100%;
+        height: 100vh;
+        position: relative;
+      }
+      #canvas {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+      .info-panel {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 16px;
+        max-width: 300px;
+        box-shadow: var(--shadow-lg);
+      }
+      .info-panel h3 {
+        margin: 0 0 12px 0;
+        font-size: 16px;
+        color: var(--text-primary);
+      }
+      .info-panel ul {
+        margin: 0;
+        padding-left: 20px;
+        font-size: 13px;
+        line-height: 1.6;
+        color: var(--text-secondary);
+      }
+      .controls {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        display: flex;
+        gap: 8px;
+      }
+      .btn {
+        padding: 8px 16px;
+        background: var(--color-primary);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 500;
+        transition: background 0.2s;
+      }
+      .btn:hover {
+        background: var(--color-primary-hover);
+      }
+      .btn-secondary {
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+      }
+      .btn-secondary:hover {
+        background: var(--bg-tertiary);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Info Panel -->
+    <div class="info-panel">
+      <h3>⚡ Performance Demo</h3>
+      <ul>
+        <li>Service Worker for offline support</li>
+        <li>PWA with install capability</li>
+        <li>Real-time FPS monitoring</li>
+        <li>WebGL optimization tips</li>
+        <li>Memory usage tracking</li>
+        <li>Draw call reporting</li>
+      </ul>
+      <p style="margin-top: 12px; font-size: 12px; color: var(--text-tertiary)">
+        Check browser console for detailed metrics
+      </p>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+      <button id="btn-toggle-perf" class="btn">Show Stats</button>
+      <button id="btn-log-report" class="btn btn-secondary">Log Report</button>
+      <button id="btn-export-metrics" class="btn btn-secondary">Export</button>
+    </div>
+
+    <!-- 3D Canvas -->
+    <div id="demo-container">
+      <canvas id="canvas"></canvas>
+    </div>
+
+    <!-- Three.js -->
+    <script src="static/three.min.js"></script>
+
+    <!-- Modules -->
+    <script type="module">
+      import PerformanceMonitor from './js/performance-monitor.mjs';
+      import { WebGLOptimizer } from './js/webgl-optimizer.mjs';
+      import PWAInstaller from './js/pwa-installer.mjs';
+
+      // Initialize PWA
+      const pwaInstaller = new PWAInstaller();
+      pwaInstaller.init();
+
+      // Three.js scene setup
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x111827);
+
+      const camera = new THREE.PerspectiveCamera(
+        75,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000
+      );
+      camera.position.set(50, 50, 50);
+      camera.lookAt(0, 0, 0);
+
+      const renderer = new THREE.WebGLRenderer({
+        canvas: document.getElementById('canvas'),
+        antialias: true,
+        preserveDrawingBuffer: true,
+      });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+      // Lighting
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+      scene.add(ambientLight);
+
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+      directionalLight.position.set(10, 20, 10);
+      scene.add(directionalLight);
+
+      // Grid and axes
+      const gridHelper = new THREE.GridHelper(100, 20, 0x444444, 0x222222);
+      scene.add(gridHelper);
+
+      const axesHelper = new THREE.AxesHelper(50);
+      scene.add(axesHelper);
+
+      // Create demo objects (many cubes for stress test)
+      const geometry = new THREE.BoxGeometry(5, 5, 5);
+      const material = new THREE.MeshStandardMaterial({
+        color: 0x6366f1,
+        metalness: 0.3,
+        roughness: 0.7,
+      });
+
+      const cubes = [];
+      const gridSize = 5;
+      const spacing = 12;
+
+      for (let x = 0; x < gridSize; x++) {
+        for (let y = 0; y < gridSize; y++) {
+          for (let z = 0; z < gridSize; z++) {
+            const cube = new THREE.Mesh(geometry, material.clone());
+            cube.position.set(
+              (x - gridSize / 2) * spacing,
+              (y - gridSize / 2) * spacing,
+              (z - gridSize / 2) * spacing
+            );
+            cube.rotation.set(
+              Math.random() * Math.PI,
+              Math.random() * Math.PI,
+              Math.random() * Math.PI
+            );
+            scene.add(cube);
+            cubes.push(cube);
+          }
+        }
+      }
+
+      console.log(`Created ${cubes.length} cubes`);
+
+      // Initialize optimizer
+      const optimizer = new WebGLOptimizer(renderer, scene);
+      optimizer.applyOptimizations();
+
+      // Initialize performance monitor
+      const perfMonitor = new PerformanceMonitor();
+      perfMonitor.init({
+        showOverlay: false, // Start hidden
+        sampleSize: 60,
+        updateInterval: 500,
+      });
+
+      // Controls
+      let isPerfVisible = false;
+
+      document.getElementById('btn-toggle-perf').addEventListener('click', () => {
+        isPerfVisible = !isPerfVisible;
+        const element = document.getElementById('performance-monitor');
+        if (element) {
+          element.style.display = isPerfVisible ? 'block' : 'none';
+        }
+        document.getElementById('btn-toggle-perf').textContent = isPerfVisible
+          ? 'Hide Stats'
+          : 'Show Stats';
+      });
+
+      document.getElementById('btn-log-report').addEventListener('click', () => {
+        perfMonitor.logMetrics();
+        optimizer.logReport();
+      });
+
+      document.getElementById('btn-export-metrics').addEventListener('click', () => {
+        perfMonitor.exportMetrics();
+      });
+
+      // Mouse controls
+      let mouseX = 0;
+      let mouseY = 0;
+
+      document.addEventListener('mousemove', (e) => {
+        mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+        mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+      });
+
+      // Animation loop
+      let time = 0;
+      function animate() {
+        requestAnimationFrame(animate);
+
+        time += 0.01;
+
+        // Rotate cubes
+        cubes.forEach((cube, i) => {
+          cube.rotation.x += 0.001 * (i % 3);
+          cube.rotation.y += 0.002 * (i % 3);
+
+          // Pulse scale
+          const scale = 1 + Math.sin(time + i * 0.1) * 0.1;
+          cube.scale.setScalar(scale);
+        });
+
+        // Camera follows mouse
+        camera.position.x += (mouseX * 20 - camera.position.x) * 0.05;
+        camera.position.y += (-mouseY * 20 - camera.position.y) * 0.05;
+        camera.lookAt(0, 0, 0);
+
+        // Update performance monitor
+        perfMonitor.update(renderer);
+
+        // Render
+        renderer.render(scene, camera);
+      }
+
+      animate();
+
+      // Handle window resize
+      window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+
+      // Log initial report
+      setTimeout(() => {
+        optimizer.logReport();
+      }, 2000);
+    </script>
+  </body>
+</html>
