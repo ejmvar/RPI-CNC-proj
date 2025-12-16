@@ -4,7 +4,6 @@
 
 import logger from '../../../modules/backend/logging/logger.mjs';
 import { describe, test, expect, jest, beforeEach, afterEach } from '@jest/globals';
-import fs from 'fs';
 
 describe('Logger Module', () => {
   let consoleSpy;
