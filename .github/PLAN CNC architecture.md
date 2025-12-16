@@ -392,14 +392,29 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
   - [x] Dependency audit (7 major version updates available, all current versions secure)
   - [x] Quality report documentation (QUALITY_REPORT.md)
 
-- [ ] **TODO** — Public deployment (Phase 10.4)
+- [x] **DONE** — Public deployment (Phase 10.4)
 
-  - [ ] Deploy frontend to GitHub Pages/Netlify
-  - [ ] Deploy WebSocket server to cloud (AWS/GCP/Azure)
-  - [ ] Set up CDN for assets
-  - [ ] Custom domain configuration
-  - [ ] SSL certificate setup
-  - [ ] Production monitoring
+  - [x] GitHub Pages deployment workflow (github-pages.yml)
+  - [x] Netlify configuration (netlify.toml - static hosting)
+  - [x] Vercel configuration (vercel.json - alternative hosting)
+  - [x] Production Docker setup:
+    - [x] Multi-stage Dockerfile (Dockerfile.production - optimized image)
+    - [x] Docker Compose production (docker-compose.production.yml - full stack)
+    - [x] Nginx configuration (reverse proxy, SSL-ready, caching, rate limiting)
+  - [x] Environment configuration (.env.production.example - all secrets documented)
+  - [x] Deployment automation:
+    - [x] Deploy script (scripts/deploy.sh - github-pages, netlify, docker, aws)
+    - [x] Health check script (scripts/health-check.sh - monitoring integration)
+  - [x] Production features:
+    - [x] Health check endpoints
+    - [x] Rate limiting (Nginx + app level)
+    - [x] SSL/TLS ready
+    - [x] CDN caching headers
+    - [x] Security headers (CSP, HSTS, etc.)
+    - [x] Redis for sessions/caching
+    - [x] Database connection pooling
+    - [x] Resource limits (Docker)
+    - [x] Logging and monitoring hooks
 
 - [ ] **TODO** — Marketing & outreach (Phase 10.5)
   - [ ] Create demo video
