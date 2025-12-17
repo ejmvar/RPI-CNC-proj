@@ -241,7 +241,7 @@ export class ChipLoadCalculator {
   /**
    * Calculate chip load for a segment
    */
-  calculateChipLoad(feedRate, spindleSpeed, distance) {
+  calculateChipLoad(feedRate, spindleSpeed) {
     if (spindleSpeed <= 0 || feedRate <= 0) return 0;
 
     // Chip load = Feed rate / (Spindle speed * Number of teeth)
