@@ -1166,6 +1166,65 @@ Planned modules:
 **Test Summary:**
 
 - 5 comprehensive test suites (ES6 modules, .mjs format)
+- Phase 21 complete and validated (see above)
+
+---
+
+### Phase 22: Cloud Deployment & Distributed Inference [WIP]
+
+**Goal:** Prepare cloud deployment workflows, distributed model training, remote inference, and multi-tenant support for production.
+
+**Status:** 0/5 COMPLETE (WIP - Preparing now)
+
+Planned modules:
+
+- [ ] **TODO** — Distributed Training Manager (`modules/cloud/distributed-training.mjs`, ~420 lines)
+
+  - Distributed training orchestration (multi-node), model versioning, checkpointing
+  - Job scheduling, priority, and resource allocation (GPU/CPU targeting)
+  - Integration hooks for telemetry and monitoring
+  - 30+ unit tests planned
+
+- [ ] **TODO** — Remote Inference Manager (`modules/cloud/remote-inference-manager.mjs`, ~380 lines)
+
+  - Low-latency inference endpoints (REST/gRPC), batching and autoscaling
+  - Query routing, model routing by tenant, cold/hot model loading
+  - Request logging and performance metrics
+  - 35+ unit tests planned
+
+- [ ] **TODO** — Model Registry & Artifact Store (`modules/cloud/model-registry.mjs`, ~300 lines)
+
+  - Model metadata, storage, checksum verification, promotion (staging→prod)
+  - Model validation pipeline and signature verification
+  - Simple CLI for model upload/download
+  - 20+ unit tests planned
+
+- [ ] **TODO** — Multi-Tenant Manager (`modules/cloud/multi-tenant-manager.mjs`, ~340 lines)
+
+  - Tenant isolation, RBAC for model access, quota management, telemetry segregation
+  - Billing & usage report stubs for later integration
+  - 25+ unit tests planned
+
+- [ ] **TODO** — Deployment Orchestrator (`modules/cloud/deployment-orchestrator.mjs`, ~360 lines)
+  - Staging & prod deploy pipelines, rollback, canary releases, health checks
+  - CI/CD hooks and simple deploy simulation for local testing
+  - 30+ unit tests planned
+
+**Roadmap / Milestones:**
+
+- Phase 22.1: Plan & scaffolding (this task)
+- Phase 22.2: Implement core model registry and remote inference (MVP)
+- Phase 22.3: Add distributed training & multi-tenant features
+- Phase 22.4: Integration tests + staging deployment
+- Phase 22.5: Production readiness & documentation
+
+**Test Summary & Expectations:**
+
+- Start with unit test skeletons and aim for 100% pass on new tests
+- Add integration test candidates for model upload and inference
+
+---
+
 - 51 unit tests implemented, 51/51 passing ✅
 - All modules feature event-driven architecture with comprehensive documentation
 - Production-ready hardware integration implemented and validated
