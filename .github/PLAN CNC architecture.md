@@ -799,18 +799,44 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
 
 **Ready for Phase 15: Platform & Integration**
 
-### Phase 15: Platform & Integration [TODO]
+### Phase 15: Platform & Integration [WIP: 1/4 COMPLETE]
 
 **Goal:** Expand platform support and integrate with other tools.
 
+**Progress:**
+
+- Phase 15.1: Desktop Application ✅ DONE (45 tests)
+- Phase 15.2: Mobile Optimization ⏳ TODO
+- Phase 15.3: External Tool Integration ⏳ TODO
+- Phase 15.4: Hardware Integration ⏳ TODO
+
+**Cumulative Test Count:** 1603 → 1648 (+45 tests)
+
 #### Tasks:
 
-- [ ] **TODO** — Desktop application (Phase 15.1)
+- [x] **DONE** — Desktop application (Phase 15.1)
 
-  - [ ] Create Electron wrapper
-  - [ ] Add native file system access
-  - [ ] Add native serial port support for direct CNC control
-  - [ ] Package for Windows/Mac/Linux
+  - [x] Create Electron wrapper (ElectronApp class)
+  - [x] Add native file system access (FileSystemAPI class)
+  - [x] Add native serial port support for direct CNC control (SerialPortAPI class)
+  - [x] Application configuration management (AppConfig class)
+  - **Module:** modules/desktop/
+  - **Classes:**
+    - AppConfig (configuration management with cross-platform paths)
+    - FileSystemAPI (read, write, watch, copy, delete, directory operations)
+    - SerialPortAPI (port listing, connection, data transfer, event handling)
+    - ElectronApp (window management, IPC, menu, messaging)
+  - **Test Results:** 45 new tests in tests/ut/desktop/desktop.test.mjs
+  - **Features:**
+    - Multi-window management with state tracking
+    - Cross-platform user data paths (Windows/macOS/Linux)
+    - Configuration persistence (theme, fonts, settings, serial baudrate)
+    - Native file operations with error handling
+    - Serial port enumeration and communication
+    - IPC channels for renderer-main communication
+    - Application menu with standard shortcuts (File, Edit, View, Help)
+    - Event system for window and port events
+  - **Status:** All tests passing (45/45)
 
 - [ ] **TODO** — Mobile optimization (Phase 15.2)
 
