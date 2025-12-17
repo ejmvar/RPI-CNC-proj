@@ -799,7 +799,7 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
 
 **Ready for Phase 15: Platform & Integration**
 
-### Phase 15: Platform & Integration [WIP: 3/4 COMPLETE]
+### Phase 15: Platform & Integration [DONE: 4/4 COMPLETE]
 
 **Goal:** Expand platform support and integrate with other tools.
 
@@ -808,9 +808,9 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
 - Phase 15.1: Desktop Application ✅ DONE (45 tests)
 - Phase 15.2: Mobile Optimization ✅ DONE (39 tests)
 - Phase 15.3: External Tool Integration ✅ DONE (46 tests)
-- Phase 15.4: Hardware Integration ⏳ TODO
+- Phase 15.4: Hardware Integration ✅ DONE (47 tests)
 
-**Cumulative Test Count:** 1687 → 1733 (+46 tests)
+**Cumulative Test Count:** 1733 → 1780 (+47 tests)
 
 #### Tasks:
 
@@ -889,10 +889,90 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
   - **Status:** All tests passing (46/46)
 
 - [ ] **TODO** — Hardware integration (Phase 15.4)
-  - [ ] Direct GRBL connection via WebSerial
-  - [ ] Real-time position feedback
-  - [ ] Jog controls for connected machines
-  - [ ] Machine configuration profiles
+  - [x] Direct GRBL connection via WebSerial
+  - [x] Real-time position feedback
+  - [x] Jog controls for connected machines
+  - [x] Machine configuration profiles
+  - **Module:** modules/hardware/
+  - **Classes:**
+    - WebSerialAPI (WebSerial port communication)
+    - PositionFeedback (Real-time tracking with history)
+    - JogControls (Manual movement with increments)
+    - MachineProfiles (Configuration and tool management)
+  - **Test Results:** 47 new tests in tests/ut/hardware/hardware.test.mjs
+  - **Features:**
+    - WebSerial port enumeration and connection
+    - GRBL status report parsing (machine/work coordinates)
+    - Real-time position feedback with 1000-entry history
+    - Position statistics and movement analysis
+    - Single-step incremental jog (0.1mm - 10mm increments)
+    - Continuous jog for manual control
+    - Feed rate control (normal/rapid modes)
+    - Keyboard event handling for directional input
+    - Machine profile CRUD operations
+    - Tool offset storage per profile
+    - Work area bounds validation
+    - Profile import/export (JSON serialization)
+    - Active profile switching
+  - **Status:** All tests passing (47/47)
+
+---
+
+**Phase 15 Summary:**
+
+Total new modules: 13 (Desktop 4, Mobile 4, External Tools 4, Hardware 4)
+Total tests added: 177 (Desktop 45, Mobile 39, External Tools 46, Hardware 47)
+Total test count: 1780 passing tests (1399 → 1780, +381 in phases 14-15)
+
+**Platform Coverage:**
+
+- ✅ Desktop (Electron): Application window management, native file I/O, serial communication
+- ✅ Mobile (Web): Touch handling, responsive design, progressive web app support
+- ✅ External Tools: REST API, FreeCAD integration, Fusion 360 integration, KiCad integration
+- ✅ Hardware: WebSerial GRBL control, position feedback, manual jog, machine profiles
+
+---
+
+## Next Phases (Planned but not started)
+
+### Phase 16: Advanced Simulation & Analysis [NOT STARTED]
+
+**Goal:** Deepen simulation capabilities and add advanced analytics.
+
+Suggested tasks:
+
+- [ ] Multi-tool collision detection
+- [ ] Thermal analysis (spindle load, cutting temp)
+- [ ] Chip load optimization
+- [ ] Vibration analysis
+- [ ] Tool wear prediction
+- [ ] Cost estimation (material, spindle time)
+
+### Phase 17: Cloud Integration & Collaboration [NOT STARTED]
+
+**Goal:** Cloud storage, sharing, and real-time collaboration.
+
+Suggested tasks:
+
+- [ ] Cloud storage (AWS S3, Google Cloud)
+- [ ] Project sharing and permissions
+- [ ] Real-time collaborative editing
+- [ ] Job scheduling and queue management
+- [ ] Machine fleet management
+- [ ] Remote operation capability
+
+### Phase 18: AI & Machine Learning [NOT STARTED]
+
+**Goal:** Intelligence and optimization via ML.
+
+Suggested tasks:
+
+- [ ] G-Code optimization via ML models
+- [ ] Automatic tool selection
+- [ ] Feed/speed recommendations
+- [ ] Failure prediction
+- [ ] Anomaly detection (vibration, sounds)
+- [ ] Natural language job description parsing
 
 ---
 
