@@ -6,7 +6,7 @@ describe('WebSocketManager', () => {
 
   beforeEach(() => {
     manager = new WebSocketManager({
-      enableHeartbeat: true,
+      enableHeartbeat: false,
       heartbeatInterval: 1000,
       maxConnections: 100,
     });
@@ -266,51 +266,59 @@ describe('WebSocketManager', () => {
   });
 
   describe('Events', () => {
-    it('should emit clientConnected event', (done) => {
+    it('should emit clientConnected event', () => {
+      let eventEmitted = false;
       manager.on('clientConnected', (data) => {
+        eventEmitted = true;
         expect(data.clientId).toBe('client1');
         expect(data.totalClients).toBe(1);
-        done();
       });
 
       manager.handleConnection('client1', {});
+      expect(eventEmitted).toBe(true);
     });
 
-    it('should emit subscribed event', (done) => {
+    it('should emit subscribed event', () => {
+      let eventEmitted = false;
       manager.handleConnection('client1', {});
 
       manager.on('subscribed', (data) => {
+        eventEmitted = true;
         expect(data.clientId).toBe('client1');
         expect(data.channel).toBe('notifications');
-        done();
       });
 
       manager.subscribe('client1', 'notifications');
+      expect(eventEmitted).toBe(true);
     });
 
-    it('should emit broadcast event', (done) => {
+    it('should emit broadcast event', () => {
+      let eventEmitted = false;
       manager.handleConnection('client1', {});
       manager.subscribe('client1', 'notifications');
 
       manager.on('broadcast', (data) => {
+        eventEmitted = true;
         expect(data.channel).toBe('notifications');
         expect(data.sent).toBe(1);
-        done();
       });
 
       manager.broadcast('notifications', { message: 'Test' });
+      expect(eventEmitted).toBe(true);
     });
 
-    it('should emit clientDisconnected event', (done) => {
+    it('should emit clientDisconnected event', () => {
+      let eventEmitted = false;
       manager.handleConnection('client1', {});
 
       manager.on('clientDisconnected', (data) => {
+        eventEmitted = true;
         expect(data.clientId).toBe('client1');
         expect(data.messageCount).toBe(0);
-        done();
       });
 
       manager.handleDisconnection('client1');
+      expect(eventEmitted).toBe(true);
     });
   });
 

@@ -266,6 +266,7 @@ export class APIGateway {
         path: route.path,
         version: route.version,
         requiresAuth: route.requiresAuth,
+        rateLimit: route.rateLimit,
         tags: route.tags,
       });
     }

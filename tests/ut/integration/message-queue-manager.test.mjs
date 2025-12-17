@@ -140,16 +140,17 @@ describe('MessageQueueManager', () => {
       expect(msg2.attempts).toBe(1);
     });
 
-    it('should remove expired messages', (done) => {
+    it('should remove expired messages', () => {
       manager.createQueue('test-queue');
       manager.enqueue('test-queue', { data: 'test' }, { ttl: 50 });
 
-      // Wait for TTL to expire
-      setTimeout(() => {
-        const msg = manager.dequeue('test-queue');
-        expect(msg).toBeNull();
-        done();
-      }, 100);
+      // Simulate TTL expiration
+      const queue = manager.queues.get('test-queue');
+      const msg = queue.messages[0];
+      msg.createdAt = Date.now() - 100; // Make it expired
+
+      const dequeued = manager.dequeue('test-queue');
+      expect(dequeued).toBeNull();
     });
   });
 
@@ -332,34 +333,40 @@ describe('MessageQueueManager', () => {
   });
 
   describe('Events', () => {
-    it('should emit queueCreated event', (done) => {
+    it('should emit queueCreated event', () => {
+      let eventEmitted = false;
       manager.on('queueCreated', (data) => {
+        eventEmitted = true;
         expect(data.queueName).toBe('test-queue');
-        done();
       });
 
       manager.createQueue('test-queue');
+      expect(eventEmitted).toBe(true);
     });
 
-    it('should emit messageEnqueued event', (done) => {
+    it('should emit messageEnqueued event', () => {
       manager.createQueue('test-queue');
+      let eventEmitted = false;
 
       manager.on('messageEnqueued', (data) => {
+        eventEmitted = true;
         expect(data.queueName).toBe('test-queue');
         expect(data.priority).toBe('HIGH');
-        done();
       });
 
       manager.enqueue('test-queue', { data: 'test' }, { priority: 'HIGH' });
+      expect(eventEmitted).toBe(true);
     });
 
-    it('should emit movedToDeadLetterQueue event', (done) => {
+    it('should emit movedToDeadLetterQueue event', () => {
+      let eventEmitted = false;
       manager.on('movedToDeadLetterQueue', (data) => {
+        eventEmitted = true;
         expect(data.reason).toBe('FAILED');
-        done();
       });
 
       manager._moveToDeadLetter({ id: 'msg1' }, 'FAILED');
+      expect(eventEmitted).toBe(true);
     });
   });
 

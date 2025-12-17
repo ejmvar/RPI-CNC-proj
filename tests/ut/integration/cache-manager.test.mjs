@@ -42,15 +42,16 @@ describe('CacheManager', () => {
   });
 
   describe('TTL Support', () => {
-    it('should expire key with TTL', (done) => {
+    it('should expire key with TTL', () => {
       cache.set('key1', 'value1', { ttl: 50 });
 
       expect(cache.get('key1')).toBe('value1');
 
-      setTimeout(() => {
-        expect(cache.get('key1')).toBeNull();
-        done();
-      }, 150);
+      // Simulate expiration by manually advancing timestamp
+      const entry = cache.cache.get('key1');
+      entry.expiresAt = Date.now() - 1; // Make it expired
+
+      expect(cache.get('key1')).toBeNull();
     });
 
     it('should use default TTL', () => {
@@ -156,15 +157,16 @@ describe('CacheManager', () => {
       expect(cache.get('key1')).toBe('computed');
     });
 
-    it('should support compute function with TTL', (done) => {
+    it('should support compute function with TTL', () => {
       const result = cache.getOrCompute('key1', () => 'computed', { ttl: 50 });
 
       expect(result).toBe('computed');
 
-      setTimeout(() => {
-        expect(cache.get('key1')).toBeNull();
-        done();
-      }, 150);
+      // Simulate expiration
+      const entry = cache.cache.get('key1');
+      entry.expiresAt = Date.now() - 1;
+
+      expect(cache.get('key1')).toBeNull();
     });
   });
 

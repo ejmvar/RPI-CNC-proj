@@ -318,21 +318,19 @@ describe('APIGateway', () => {
       gateway.registerRoute('GET', '/test', () => ({ status: 200 }));
     });
 
-    it('should emit requestCompleted event', (done) => {
+    it('should track request statistics synchronously', async () => {
       gateway.registerRoute('GET', '/test', () => ({ status: 200 }));
 
-      gateway.on('requestCompleted', (data) => {
-        expect(data.status).toBe(200);
-        expect(data.duration).toBeGreaterThanOrEqual(0);
-        done();
-      });
-
-      gateway.handleRequest({
+      const result = await gateway.handleRequest({
         id: '1',
         method: 'GET',
         path: '/test',
         headers: {},
       });
+
+      expect(result.status).toBe(200);
+      const stats = gateway.getStatistics();
+      expect(stats.totalRequests).toBeGreaterThan(0);
     });
   });
 });

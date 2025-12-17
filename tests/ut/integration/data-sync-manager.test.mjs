@@ -302,51 +302,59 @@ describe('DataSynchronizationManager', () => {
   });
 
   describe('Events', () => {
-    it('should emit dataChanged event', (done) => {
+    it('should emit dataChanged event', () => {
+      let eventEmitted = false;
       manager.on('dataChanged', (data) => {
+        eventEmitted = true;
         expect(data.key).toBe('key1');
         expect(data.operation).toBe('set');
-        done();
       });
 
       manager.set('key1', 'value1');
+      expect(eventEmitted).toBe(true);
     });
 
-    it('should emit syncCompleted event', (done) => {
+    it('should emit syncCompleted event', () => {
+      let eventEmitted = false;
       manager.on('syncCompleted', (result) => {
+        eventEmitted = true;
         expect(result).toBeDefined();
         expect(result.synced).toBeGreaterThanOrEqual(0);
-        done();
       });
 
       manager.syncWithRemote({});
+      expect(eventEmitted).toBe(true);
     });
 
-    it('should emit conflictResolved event', (done) => {
+    it('should emit conflictResolved event', () => {
+      let eventEmitted = false;
       manager.conflicts.push({
         key: 'key1',
         resolved: false,
       });
 
       manager.on('conflictResolved', (data) => {
+        eventEmitted = true;
         expect(data.key).toBe('key1');
         expect(data.strategy).toBe('manual');
-        done();
       });
 
       manager.resolveConflictManually('key1', 'resolved');
+      expect(eventEmitted).toBe(true);
     });
 
-    it('should emit rolledBack event', (done) => {
+    it('should emit rolledBack event', () => {
+      let eventEmitted = false;
       manager.set('key1', 'v1');
       manager.set('key1', 'v2');
 
       manager.on('rolledBack', (data) => {
+        eventEmitted = true;
         expect(data.key).toBe('key1');
-        done();
       });
 
       manager.rollback('key1', 0);
+      expect(eventEmitted).toBe(true);
     });
   });
 
