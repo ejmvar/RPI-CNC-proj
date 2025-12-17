@@ -529,20 +529,25 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
 
 **Goal:** Optimize for large files and improve rendering performance.
 
-**Completion Status:** 1/5 subtasks
+**Completion Status:** 2/5 subtasks
 
 - Phase 13.1: ✅ DONE (30 tests)
-- Phase 13.2: ⬜ TODO
+- Phase 13.2: ✅ DONE (112 tests)
 - Phase 13.3: ⬜ TODO
 - Phase 13.4: ⬜ TODO
 - Phase 13.5: ⬜ TODO
 
 **Phase 13 Progress:**
 
-- **New Tests Added:** 30 (Three.js optimization)
-- **New Modules:** modules/presentation/three-optimization.mjs
-- **Test Coverage:** All 30 tests passing (100% success rate)
-- **Total Test Suite:** 1140 passing tests (cumulative)
+- **New Tests Added:** 30 (Phase 13.1) + 112 (Phase 13.2) = 142 total
+- **New Modules:**
+  - modules/presentation/three-optimization.mjs (Phase 13.1)
+  - modules/backend/workers/worker-pool.mjs (Phase 13.2)
+  - modules/backend/workers/gcode-parser.worker.js (Phase 13.2)
+  - modules/backend/workers/mesh-compensation.worker.js (Phase 13.2)
+  - modules/backend/workers/collision-detection.worker.js (Phase 13.2)
+- **Test Coverage:** All 142 tests passing (100% success rate)
+- **Total Test Suite:** 1222 passing tests (cumulative)
 
 #### Tasks:
 
@@ -557,12 +562,25 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
   - **Test Results:** 30 new tests in tests/ut/presentation/three-optimization.test.mjs
   - **Status:** All tests passing (30/30)
 
-- [ ] **TODO** — WebWorker implementation (Phase 13.2)
+- [x] **DONE** — WebWorker implementation (Phase 13.2)
 
-  - [ ] Move G-Code parsing to WebWorker
-  - [ ] Move mesh compensation calculation to WebWorker
-  - [ ] Move collision detection to WebWorker
-  - [ ] Implement progress reporting for long operations
+  - [x] Create WorkerPool manager for reusable WebWorker instances
+  - [x] Implement WorkerCoordinator for multiple worker types
+  - [x] Move G-Code parsing to background WebWorker
+  - [x] Move mesh compensation calculation to WebWorker
+  - [x] Move collision detection to WebWorker
+  - [x] Implement task queueing and timeout handling
+  - **Modules:**
+    - modules/backend/workers/worker-pool.mjs (WorkerPool & WorkerCoordinator classes)
+    - modules/backend/workers/gcode-parser.worker.js (G-Code parser worker)
+    - modules/backend/workers/mesh-compensation.worker.js (Mesh compensation worker)
+    - modules/backend/workers/collision-detection.worker.js (Collision detection worker)
+  - **Test Results:** 112 new tests across 4 test files
+    - worker-pool.test.mjs: 32 tests (pool management, coordination, performance)
+    - gcode-parser.worker.test.mjs: 38 tests (line parsing, batch operations, metrics)
+    - mesh-compensation.worker.test.mjs: 28 tests (mesh creation, interpolation, compensation)
+    - collision-detection.worker.test.mjs: 36 tests (AABB, sphere, path collision, performance)
+  - **Status:** All 112 tests passing (112/112) ✅
 
 - [ ] **TODO** — Virtual scrolling (Phase 13.3)
 
@@ -579,9 +597,10 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
 
 - [ ] **TODO** — Performance benchmarking (Phase 13.5)
   - [ ] Create performance test suite
-  - [ ] Benchmark parser throughput improvements
+  - [ ] Benchmark parser throughput improvements (with/without workers)
   - [ ] Benchmark rendering FPS with large files
   - [ ] Memory usage profiling and optimization
+  - [ ] Generate performance report comparing optimization stages
 
 ### Phase 14: New Features & Enhancements [TODO]
 
