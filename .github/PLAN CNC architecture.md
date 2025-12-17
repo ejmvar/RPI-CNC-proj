@@ -799,7 +799,7 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
 
 **Ready for Phase 15: Platform & Integration**
 
-### Phase 15: Platform & Integration [WIP: 2/4 COMPLETE]
+### Phase 15: Platform & Integration [WIP: 3/4 COMPLETE]
 
 **Goal:** Expand platform support and integrate with other tools.
 
@@ -807,10 +807,10 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
 
 - Phase 15.1: Desktop Application ✅ DONE (45 tests)
 - Phase 15.2: Mobile Optimization ✅ DONE (39 tests)
-- Phase 15.3: External Tool Integration ⏳ TODO
+- Phase 15.3: External Tool Integration ✅ DONE (46 tests)
 - Phase 15.4: Hardware Integration ⏳ TODO
 
-**Cumulative Test Count:** 1648 → 1687 (+39 tests)
+**Cumulative Test Count:** 1687 → 1733 (+46 tests)
 
 #### Tasks:
 
@@ -865,10 +865,28 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
 
 - [ ] **TODO** — External tool integration (Phase 15.3)
 
-  - [ ] Add REST API for external CAM software
-  - [ ] Create plugins for FreeCAD
-  - [ ] Create plugins for Fusion 360
-  - [ ] Integrate with KiCad for PCB milling
+  - [x] Add REST API for external CAM software
+  - [x] Create plugins for FreeCAD
+  - [x] Create plugins for Fusion 360
+  - [x] Integrate with KiCad for PCB milling
+  - **Module:** modules/external/
+  - **Classes:**
+    - RESTAPIServer (HTTP API with WebSocket support)
+    - FreeCADPlugin (CAM workbench integration)
+    - Fusion360Integration (Autodesk Fusion 360 integration)
+    - KiCadIntegration (PCB design and milling)
+  - **Test Results:** 46 new tests in tests/ut/external/external.test.mjs
+  - **Features:**
+    - REST API with G-Code upload/validate/optimize
+    - Simulation state export/import
+    - Tool library management (CRUD operations)
+    - WebSocket broadcasting for real-time updates
+    - FreeCAD job import/export with automatic sync
+    - Fusion 360 CAM operation integration
+    - KiCad PCB design support with Excellon drill file parsing
+    - Gerber layer import with automatic type detection
+    - Milling strategy generation for PCB manufacturing
+  - **Status:** All tests passing (46/46)
 
 - [ ] **TODO** — Hardware integration (Phase 15.4)
   - [ ] Direct GRBL connection via WebSerial
