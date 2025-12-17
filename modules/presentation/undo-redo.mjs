@@ -501,7 +501,7 @@ export class ToolLibraryCommand extends Command {
  * Keyboard Shortcuts Manager
  */
 export class KeyboardShortcutsManager {
-  constructor(historyManager, options = {}) {
+  constructor(historyManager) {
     this.historyManager = historyManager;
     this.shortcuts = new Map();
     this.setupDefaultShortcuts();
