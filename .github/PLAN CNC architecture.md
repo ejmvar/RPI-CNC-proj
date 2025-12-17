@@ -630,9 +630,19 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
   - Full modular architecture established
   - Ready for Phase 14: New Features & Enhancements
 
-### Phase 14: New Features & Enhancements [IN PROGRESS]
+### Phase 14: New Features & Enhancements [WIP: 2/5 COMPLETE]
 
 **Goal:** Add requested features and improve user experience.
+
+**Progress:**
+
+- Phase 14.1: Editor Improvements ✅ DONE (45 tests)
+- Phase 14.2: Undo/Redo System ✅ DONE (48 tests)
+- Phase 14.3: Simulation Enhancements ⏳ TODO
+- Phase 14.4: Toolpath Comparison ⏳ TODO
+- Phase 14.5: Advanced Visualization ⏳ TODO
+
+**Cumulative Test Count:** 1399 → 1446 (+47 tests)
 
 #### Tasks:
 
@@ -655,13 +665,29 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
     - Command detection (G-codes, M-codes, parameters)
   - **Status:** All tests passing (45/45)
 
-- [ ] **TODO** — Undo/Redo system (Phase 14.2)
+- [x] **DONE** — Undo/Redo system (Phase 14.2)
 
-  - [ ] Implement command pattern for undo/redo
-  - [ ] Add undo/redo for G-Code editing
-  - [ ] Add undo/redo for mesh adjustments
-  - [ ] Add undo/redo for tool library changes
-  - [ ] Keyboard shortcuts (Ctrl+Z, Ctrl+Y)
+  - [x] Implement command pattern for undo/redo
+  - [x] Add undo/redo for G-Code editing
+  - [x] Add undo/redo for mesh adjustments
+  - [x] Add undo/redo for tool library changes
+  - [x] Keyboard shortcuts (Ctrl+Z, Ctrl+Y)
+  - **Module:** modules/presentation/undo-redo.mjs
+  - **Classes:**
+    - Command (base class with execute/undo interface)
+    - HistoryManager (dual-stack undo/redo with transaction support)
+    - CompoundCommand (groups multiple commands)
+    - GCodeEditCommand, GCodeInsertCommand, GCodeDeleteCommand
+    - MeshCompensationCommand, ToolLibraryCommand
+    - KeyboardShortcutsManager (Ctrl+Z/Y shortcuts)
+  - **Test Results:** 48 new tests in tests/ut/presentation/undo-redo.test.mjs
+  - **Features:**
+    - Command pattern implementation
+    - Dual-stack history management (max 1000 items)
+    - Transaction support with compound commands
+    - Event notifications (commandExecuted, commandUndone, etc.)
+    - Keyboard shortcuts for undo/redo
+  - **Status:** All tests passing (48/48)
 
 - [ ] **TODO** — Simulation enhancements (Phase 14.3)
 
