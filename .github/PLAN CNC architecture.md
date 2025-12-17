@@ -630,19 +630,30 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
   - Full modular architecture established
   - Ready for Phase 14: New Features & Enhancements
 
-### Phase 14: New Features & Enhancements [TODO]
+### Phase 14: New Features & Enhancements [IN PROGRESS]
 
 **Goal:** Add requested features and improve user experience.
 
 #### Tasks:
 
-- [ ] **TODO** — Editor improvements (Phase 14.1)
+- [x] **DONE** — Editor improvements (Phase 14.1)
 
-  - [ ] Add G-Code syntax highlighting (Monaco Editor or CodeMirror)
-  - [ ] Implement line numbers and gutter
-  - [ ] Add code folding for sections
-  - [ ] Implement autocomplete for G-Code commands
-  - [ ] Add error highlighting and inline diagnostics
+  - [x] Add G-Code syntax highlighting (Monaco Editor integration)
+  - [x] Implement line numbers and gutter
+  - [x] Add code folding for sections
+  - [x] Implement autocomplete for G-Code commands (50+ suggestions)
+  - [x] Add error highlighting and inline diagnostics
+  - **Module:** modules/presentation/monaco-editor.mjs
+  - **Classes:**
+    - MonacoEditorWrapper (configuration, content management, themes)
+    - GCodeLanguageProvider (validation, formatting, command detection)
+  - **Test Results:** 45 new tests in tests/ut/presentation/monaco-editor.test.mjs
+  - **Features:**
+    - 50+ G-Code autocomplete suggestions (G0-G99, M0-M999, parameters)
+    - Real-time validation with diagnostics
+    - G-Code formatting and normalization
+    - Command detection (G-codes, M-codes, parameters)
+  - **Status:** All tests passing (45/45)
 
 - [ ] **TODO** — Undo/Redo system (Phase 14.2)
 
