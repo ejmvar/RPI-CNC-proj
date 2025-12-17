@@ -630,7 +630,7 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
   - Full modular architecture established
   - Ready for Phase 14: New Features & Enhancements
 
-### Phase 14: New Features & Enhancements [WIP: 2/5 COMPLETE]
+### Phase 14: New Features & Enhancements [WIP: 3/5 COMPLETE]
 
 **Goal:** Add requested features and improve user experience.
 
@@ -638,11 +638,11 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
 
 - Phase 14.1: Editor Improvements ✅ DONE (45 tests)
 - Phase 14.2: Undo/Redo System ✅ DONE (48 tests)
-- Phase 14.3: Simulation Enhancements ⏳ TODO
+- Phase 14.3: Simulation Enhancements ✅ DONE (64 tests)
 - Phase 14.4: Toolpath Comparison ⏳ TODO
 - Phase 14.5: Advanced Visualization ⏳ TODO
 
-**Cumulative Test Count:** 1399 → 1446 (+47 tests)
+**Cumulative Test Count:** 1399 → 1510 (+111 tests)
 
 #### Tasks:
 
@@ -689,13 +689,31 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
     - Keyboard shortcuts for undo/redo
   - **Status:** All tests passing (48/48)
 
-- [ ] **TODO** — Simulation enhancements (Phase 14.3)
+- [x] **DONE** — Simulation enhancements (Phase 14.3)
 
-  - [ ] Add simulation replay with variable speed
-  - [ ] Implement bookmark system for interesting positions
-  - [ ] Add time-based simulation (not just command-based)
-  - [ ] Show current feed rate and spindle speed
-  - [ ] Add simulation statistics dashboard
+  - [x] Add simulation replay with variable speed
+  - [x] Implement bookmark system for interesting positions
+  - [x] Add time-based simulation (not just command-based)
+  - [x] Show current feed rate and spindle speed
+  - [x] Add simulation statistics dashboard
+  - **Module:** modules/simulation/simulation-controller.mjs
+  - **Classes:**
+    - Bookmark (save positions with metadata)
+    - SimulationStatistics (track metrics: distance, time, feed rate, spindle speed)
+    - SimulationState (preserve simulation state snapshots)
+    - SimulationController (playback control, bookmarks, snapshots)
+    - TimeBasedSimulationRunner (requestAnimationFrame-based execution)
+  - **Test Results:** 64 new tests in tests/ut/simulation/simulation-controller.test.mjs
+  - **Features:**
+    - Variable-speed playback (0.1x - 10x)
+    - Bookmark system (add, remove, jump to, list)
+    - State snapshots at command indices
+    - Time-based simulation with requestAnimationFrame
+    - Feed rate and spindle speed tracking
+    - Comprehensive statistics (distance, time, tool changes, spindle cycles)
+    - Event system for all operations
+    - Progress calculation and state queries
+  - **Status:** All tests passing (64/64)
 
 - [ ] **TODO** — Toolpath comparison (Phase 14.4)
 
