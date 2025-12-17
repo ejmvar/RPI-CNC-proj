@@ -469,20 +469,22 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
   - [x] **DONE** — Improved modules/simulation/collision.mjs from 0% → 100% overall coverage
   - [x] **DONE** — Branch coverage improved from 42.15% → 42.91% (+0.76%)
 
-### Phase 12: Advanced Examples & Templates [TODO]
+### Phase 12: Advanced Examples & Templates [IN PROGRESS]
 
 **Goal:** Create comprehensive example library with real-world projects.
 
 #### Tasks:
 
-- [ ] **TODO** — Advanced G-Code examples (Phase 12.1)
+- [x] **DONE** — Advanced G-Code examples (Phase 12.1)
 
-  - [ ] PCB drilling patterns
-  - [ ] Text engraving examples
-  - [ ] Parametric toolpath generation
-  - [ ] Advanced arc interpolation demos
-  - [ ] Multi-pass strategies
-  - [ ] Climb vs conventional milling examples
+  - [x] PCB drilling patterns (pcb-drilling-advanced.gcode)
+  - [x] Text engraving examples (text-engraving-advanced.gcode)
+  - [x] Parametric toolpath generation (parametric-spiral-advanced.gcode)
+  - [x] Advanced arc interpolation demos (spiral G2/G3 arcs)
+  - [x] Multi-pass strategies (depth-based drilling)
+  - [x] Climb vs conventional milling examples (G2 vs G3)
+  - **Test Results:** 24 new tests in tests/ut/examples/advanced-patterns.test.mjs
+  - **Status:** All tests passing (24/24)
 
 - [ ] **TODO** — Real-world project templates (Phase 12.2)
 
