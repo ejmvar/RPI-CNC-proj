@@ -2,6 +2,7 @@ module.exports = {
   testEnvironment: 'node',
   testMatch: ['**/*.test.js', '**/*.test.mjs'],
   transform: {},
+  injectGlobals: true,
   collectCoverageFrom: [
     'modules/**/*.{js,mjs}',
     'Simulator/web/js/*.{js,mjs}',
