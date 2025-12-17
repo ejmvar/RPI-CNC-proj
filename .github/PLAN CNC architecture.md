@@ -1100,6 +1100,76 @@ Completed modules:
 - [x] **DONE** — Prettier formatting applied to all files
 - [x] **DONE** — Committed to git (commit: d4ada93)
 
+### Phase 21: Hardware Integration & Real-Time Sensor Data [WIP]
+
+**Goal:** Real sensor data collection, hardware communication, and live machine metrics integration.
+
+**Status:** 0/5 COMPLETE (WIP - Starting now)
+
+Planned modules:
+
+- [ ] **TODO** — Sensor Data Collector (`modules/hardware/sensor-data-collector.mjs`, ~340 lines)
+
+  - Multi-sensor input support (accelerometer, temperature, pressure, displacement)
+  - Data buffering with configurable window size (default: 300 samples)
+  - Calibration management for each sensor
+  - Real-time streaming with subscription pattern
+  - Signal filtering (low-pass, moving average)
+  - Outlier detection and rejection
+  - 40+ unit tests planned
+
+- [ ] **TODO** — Hardware Device Manager (`modules/hardware/device-manager.mjs`, ~380 lines)
+
+  - Device discovery and auto-enumeration
+  - Serial port, USB, Ethernet, CAN bus support
+  - Connection lifecycle management (connect, reconnect, disconnect)
+  - Protocol adapters (GRBL, Mach3, LinuxCNC, custom)
+  - Device state tracking and health monitoring
+  - Configuration persistence per device
+  - 45+ unit tests planned
+
+- [ ] **TODO** — Tool Wear Measurement System (`modules/hardware/tool-wear-measurement.mjs`, ~360 lines)
+
+  - Optical/acoustic tool breakage detection
+  - Edge detection and flank wear measurement
+  - Runout monitoring (TIR - Total Indicated Runout)
+  - VBc (crater wear) and VBb (flank wear) calculation
+  - Wear rate trending and prediction
+  - Tool life management with automatic alerts
+  - Material and tool geometry database
+  - 45+ unit tests planned
+
+- [ ] **TODO** — Live Machine Metrics Aggregator (`modules/hardware/machine-metrics-aggregator.mjs`, ~350 lines)
+
+  - Spindle speed/load/current measurement
+  - Feed rate and actual vs. commanded comparison
+  - Thermal monitoring (spindle, motor, cutting zone)
+  - Axis vibration and acceleration measurement
+  - Power consumption tracking
+  - Cycle time and throughput calculation
+  - Real-time dashboard integration
+  - 40+ unit tests planned
+
+- [ ] **TODO** — Hardware Fault Detection & Recovery (`modules/hardware/fault-detection-recovery.mjs`, ~370 lines)
+
+  - Real-time alarm classification and logging
+  - Fault prediction using sensor anomalies
+  - Automatic recovery sequences
+  - Safe stop procedures
+  - Emergency halt coordination
+  - Root cause analysis from sensor patterns
+  - Maintenance recommendations
+  - 45+ unit tests planned
+
+**Test Summary:**
+
+- 5 comprehensive test suites (ES6 modules, .mjs format)
+- 215+ unit tests planned (all must pass)
+- All modules feature event-driven architecture with comprehensive documentation
+- Production-ready hardware integration expected
+
+**Summary (Expected):** Phase 21 will deliver comprehensive hardware integration enabling real-time sensor data collection, tool wear measurement, live machine metrics, and fault detection with automatic recovery. All 5 modules will feature consistent event-driven architecture, complete hardware communication protocols, and 215+ tests. System will be production-ready for live CNC operation.
+
 ---
 
 ## Status Legend
