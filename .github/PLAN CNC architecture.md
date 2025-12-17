@@ -630,7 +630,7 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
   - Full modular architecture established
   - Ready for Phase 14: New Features & Enhancements
 
-### Phase 14: New Features & Enhancements [WIP: 3/5 COMPLETE]
+### Phase 14: New Features & Enhancements [WIP: 4/5 COMPLETE]
 
 **Goal:** Add requested features and improve user experience.
 
@@ -639,10 +639,10 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
 - Phase 14.1: Editor Improvements ✅ DONE (45 tests)
 - Phase 14.2: Undo/Redo System ✅ DONE (48 tests)
 - Phase 14.3: Simulation Enhancements ✅ DONE (64 tests)
-- Phase 14.4: Toolpath Comparison ⏳ TODO
+- Phase 14.4: Toolpath Comparison ✅ DONE (49 tests)
 - Phase 14.5: Advanced Visualization ⏳ TODO
 
-**Cumulative Test Count:** 1399 → 1510 (+111 tests)
+**Cumulative Test Count:** 1399 → 1557 (+158 tests)
 
 #### Tasks:
 
@@ -715,12 +715,32 @@ Keep config for enabling/disabling tools (to add/include, also if they offer sim
     - Progress calculation and state queries
   - **Status:** All tests passing (64/64)
 
-- [ ] **TODO** — Toolpath comparison (Phase 14.4)
+- [x] **DONE** — Toolpath comparison (Phase 14.4)
 
-  - [ ] Side-by-side toolpath comparison view
-  - [ ] Diff view for before/after mesh compensation
-  - [ ] Show differences in tool changes
-  - [ ] Export comparison report
+  - [x] Side-by-side toolpath comparison view
+  - [x] Diff view for before/after mesh compensation
+  - [x] Show differences in tool changes
+  - [x] Export comparison report
+  - **Module:** modules/presentation/toolpath-comparison.mjs
+  - **Classes:**
+    - ToolChangeRecord (track tool changes with metadata)
+    - SegmentDiff (segment-by-segment analysis)
+    - ToolpathDiff (complete toolpath comparison)
+    - ToolpathComparator (multi-comparison management)
+    - VisualizationHints (rendering support with colors and styles)
+  - **Test Results:** 49 new tests in tests/ut/presentation/toolpath-comparison.test.mjs
+  - **Features:**
+    - Segment-by-segment difference detection
+    - Modification type classification (position, feed, spindle, combinations)
+    - Tool change tracking and recording
+    - Distance/time/feed metrics calculation
+    - Tolerance-based similarity analysis
+    - Mesh compensation impact analysis
+    - Axis-specific compensation tracking
+    - Report generation (JSON, CSV)
+    - Visualization hints with color mapping and styles
+    - Event-driven architecture for UI integration
+  - **Status:** All tests passing (49/49)
 
 - [ ] **TODO** — Advanced visualization (Phase 14.5)
   - [ ] Add material removal simulation (3D cutaway view)
