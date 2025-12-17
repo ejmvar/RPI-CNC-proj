@@ -6,9 +6,6 @@
  * Supports: G-Code parsing, mesh compensation, collision detection
  */
 
-// eslint-disable-next-line no-undef
-const WorkerClass = typeof Worker !== 'undefined' ? Worker : null;
-
 export class WorkerPool {
   constructor(workerScript, poolSize = 4) {
     this.workerScript = workerScript;
@@ -31,10 +28,12 @@ export class WorkerPool {
    */
   getWorker(index) {
     if (!this.workers[index]) {
-      if (!WorkerClass) {
+      // eslint-disable-next-line no-undef
+      if (typeof Worker === 'undefined') {
         throw new Error('Worker is not available in this environment');
       }
-      this.workers[index] = new WorkerClass(this.workerScript);
+      // eslint-disable-next-line no-undef
+      this.workers[index] = new Worker(this.workerScript);
     }
     return this.workers[index];
   }
