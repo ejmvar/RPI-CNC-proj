@@ -954,6 +954,27 @@ Completed tasks:
 
 **Summary:** Phase 16 successfully delivers a comprehensive advanced simulation and analysis system with vibration analysis, cost estimation, and toolpath optimization modules. 256 unit tests validate all functionality. System is production-ready.
 
+### Phase 16.5: Enhanced Analysis Modules [IN PROGRESS]
+
+**Goal:** Add 10 advanced analysis modules for deeper CNC operation insights.
+
+**Status:** 4/10 COMPLETE (220 tests passing)
+
+Enhancement tasks:
+
+- [x] **DONE** — Material Removal Rate (MRR) Calculator (`modules/simulation/mrr-calculator.mjs`, 38 tests ✅)
+- [x] **DONE** — Surface Finish Predictor (`modules/simulation/surface-finish-predictor.mjs`, 66 tests ✅)
+- [x] **DONE** — Cycle Time Predictor (`modules/simulation/cycle-time-predictor.mjs`, 60 tests ✅)
+- [x] **DONE** — Critical Speed Analyzer (`modules/simulation/critical-speed-analyzer.mjs`, 56 tests ✅)
+- [ ] Precision & Tolerance Analyzer (`modules/simulation/tolerance-analyzer.mjs`, 40-50 tests)
+- [ ] Power Draw Analyzer (`modules/simulation/power-draw-analyzer.mjs`, 25-30 tests)
+- [ ] Runout & TIR Simulator (`modules/simulation/runout-simulator.mjs`, 30-35 tests)
+- [ ] Deflection Compensation Advisor (`modules/simulation/deflection-advisor.mjs`, 25-30 tests)
+- [ ] Chip Evacuation Analyzer (`modules/simulation/chip-evacuation-analyzer.mjs`, 25-30 tests)
+- [ ] Feed Hold & Acceleration Analyzer (`modules/simulation/motion-analyzer.mjs`, 35-45 tests)
+
+**Summary:** Building on Phase 16 foundation with 10 specialized analysis modules targeting specific CNC engineering challenges (250+ additional tests planned).
+
 ### Phase 17: Cloud Integration & Collaboration [NOT STARTED]
 
 **Goal:** Cloud storage, sharing, and real-time collaboration.
