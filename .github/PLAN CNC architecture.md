@@ -1082,6 +1082,38 @@ Completed modules:
 - [x] **DONE** — Prettier formatting applied to all files
 - [x] **DONE** — Committed to git (commit: 32c730b)
 
+### Phase 20: Advanced Monitoring & Real-Time Analytics [IN PROGRESS]
+
+**Goal:** Enterprise-grade observability, performance monitoring, and real-time analytics for CNC operations.
+
+**Modules to create:**
+
+1. **Performance Monitor** — Real-time metrics tracking (CPU, memory, I/O, spindle load, feed rate stability)
+
+   - Features: Time-series metrics, threshold alerts, performance baseline comparisons
+   - Tests: 30+ unit tests covering metrics collection, aggregation, alerting
+
+2. **Real-Time Dashboard Manager** — Live updates for operations dashboard with WebSocket integration
+
+   - Features: Metric subscriptions, client connections, view state management, metric filtering
+   - Tests: 35+ unit tests covering updates, subscriptions, state management
+
+3. **Predictive Maintenance Engine** — ML-based early warning system for tool wear and equipment health
+
+   - Features: Wear prediction models, health scoring, maintenance recommendations
+   - Tests: 40+ unit tests covering predictions, scoring, recommendations
+
+4. **Event Stream Processor** — High-throughput event aggregation and real-time analysis
+
+   - Features: Event windowing, pattern detection, anomaly flagging, event replay
+   - Tests: 35+ unit tests covering processing, patterns, windowing
+
+5. **Audit & Compliance Logger** — Immutable operation logs for compliance and debugging
+   - Features: Append-only event store, access logs, operation history, compliance reporting
+   - Tests: 30+ unit tests covering logging, retrieval, compliance queries
+
+**Estimated deliverables:** 2,500+ lines production code, 1,700+ lines tests, 170+ tests, 90%+ pass rate
+
 ---
 
 ## Status Legend
