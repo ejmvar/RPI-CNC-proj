@@ -60,14 +60,64 @@ export class RemoteInferenceManager extends EventEmitter {
 
     if (descriptor.type === 'mq') {
       // descriptor: { type: 'mq', sendFn: async (inputs) => outputs }
-      if (typeof descriptor.sendFn !== 'function') throw new Error('MQRunnerRequiresSendFn');
-      const runnerFn = async (inputs) => {
-        return descriptor.sendFn(inputs);
-      };
-      this._runners.set(key, runnerFn);
-      if (!this._remoteDescriptors) this._remoteDescriptors = new Map();
-      this._remoteDescriptors.set(key, descriptor);
-      return true;
+      // or descriptor: { type: 'mq', amqpUrl, requestQueue }
+      if (typeof descriptor.sendFn === 'function') {
+        const runnerFn = async (inputs) => descriptor.sendFn(inputs);
+        this._runners.set(key, runnerFn);
+        if (!this._remoteDescriptors) this._remoteDescriptors = new Map();
+        this._remoteDescriptors.set(key, descriptor);
+        return true;
+      }
+
+      if (descriptor.amqpUrl && descriptor.requestQueue) {
+        const runnerFn = async (inputs) => {
+          // allow injection of amqplib implementation for testing via descriptor.amqplibImpl
+          const amqplib =
+            descriptor.amqplibImpl || (await import('amqplib').then((m) => m.default || m));
+          // RPC style: send message with correlationId and wait for response on reply queue
+          const conn = await amqplib.connect(descriptor.amqpUrl);
+          const ch = await conn.createChannel();
+          const q = await ch.assertQueue('', { exclusive: true });
+          const correlationId = `${Date.now()}-${Math.random()}`;
+
+          return await new Promise((resolve, reject) => {
+            ch.consume(
+              q.queue,
+              (msg) => {
+                if (!msg) return;
+                if (msg.properties.correlationId !== correlationId) return;
+                try {
+                  const body = JSON.parse(msg.content.toString());
+                  ch.close().catch(() => {});
+                  conn.close().catch(() => {});
+                  if (Array.isArray(body.outputs)) return resolve(body.outputs);
+                  return resolve([body]);
+                } catch (err) {
+                  ch.close().catch(() => {});
+                  conn.close().catch(() => {});
+                  return reject(err);
+                }
+              },
+              { noAck: true }
+            )
+              .then(() => {
+                const payload = Buffer.from(JSON.stringify({ inputs }));
+                ch.sendToQueue(descriptor.requestQueue, payload, {
+                  correlationId,
+                  replyTo: q.queue,
+                });
+              })
+              .catch(reject);
+          });
+        };
+
+        this._runners.set(key, runnerFn);
+        if (!this._remoteDescriptors) this._remoteDescriptors = new Map();
+        this._remoteDescriptors.set(key, descriptor);
+        return true;
+      }
+
+      throw new Error('MQRunnerRequiresSendFnOrAmqpDescriptor');
     }
 
     if (descriptor.type === 'grpc') {
