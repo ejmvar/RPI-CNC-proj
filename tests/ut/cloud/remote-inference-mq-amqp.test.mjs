@@ -64,7 +64,7 @@ describe('Remote runner (mq) AMQP adapter (mocked)', () => {
       inputs: { a: 3 },
       requestId: 'req1',
     });
-    expect(r.outputs).toEqual([{ res: { a: 3 } }]);
+    expect(r.outputs).toEqual({ res: { a: 3 } });
 
     await rim.shutdown();
   });
