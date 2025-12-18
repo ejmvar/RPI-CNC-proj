@@ -30,6 +30,36 @@ export class RemoteInferenceManager extends EventEmitter {
     this._runners.set(key, runnerFn);
   }
 
+  registerRemoteRunner(modelId, versionId, descriptor = {}) {
+    // descriptor: { type: 'http', endpoint: 'http://...', headers: { ... } }
+    const key = `${modelId}:${versionId}`;
+    if (!descriptor.type) throw new Error('RemoteRunnerDescriptorRequired');
+
+    if (descriptor.type === 'http') {
+      const runnerFn = async (inputs) => {
+        // POST { inputs } -> expect JSON { outputs: [...] }
+        const res = await fetch(descriptor.endpoint, {
+          method: 'POST',
+          headers: Object.assign({ 'content-type': 'application/json' }, descriptor.headers || {}),
+          body: JSON.stringify({ inputs }),
+        });
+        if (!res.ok) throw new Error(`RemoteRunnerError: ${res.status}`);
+        const body = await res.json();
+        if (Array.isArray(body.outputs)) return body.outputs;
+        // support direct array response for simplicity
+        if (Array.isArray(body)) return body;
+        throw new Error('InvalidRemoteRunnerResponse');
+      };
+      this._runners.set(key, runnerFn);
+      // store descriptor for introspection
+      if (!this._remoteDescriptors) this._remoteDescriptors = new Map();
+      this._remoteDescriptors.set(key, descriptor);
+      return true;
+    }
+
+    throw new Error('UnsupportedRemoteRunnerType');
+  }
+
   getMetrics() {
     const avgLatency =
       this._metrics.totalBatches === 0
