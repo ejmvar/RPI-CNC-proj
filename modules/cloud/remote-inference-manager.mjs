@@ -70,45 +70,114 @@ export class RemoteInferenceManager extends EventEmitter {
       }
 
       if (descriptor.amqpUrl && descriptor.requestQueue) {
+        // Add retry/backoff and optional dead-letter behavior for AMQP RPC calls
         const runnerFn = async (inputs) => {
           // allow injection of amqplib implementation for testing via descriptor.amqplibImpl
           const amqplib =
             descriptor.amqplibImpl || (await import('amqplib').then((m) => m.default || m));
-          // RPC style: send message with correlationId and wait for response on reply queue
-          const conn = await amqplib.connect(descriptor.amqpUrl);
-          const ch = await conn.createChannel();
-          const q = await ch.assertQueue('', { exclusive: true });
-          const correlationId = `${Date.now()}-${Math.random()}`;
 
-          return await new Promise((resolve, reject) => {
-            ch.consume(
-              q.queue,
-              (msg) => {
-                if (!msg) return;
-                if (msg.properties.correlationId !== correlationId) return;
-                try {
-                  const body = JSON.parse(msg.content.toString());
+          const maxAttempts = (descriptor.retry && descriptor.retry.maxAttempts) || 1;
+          const initialBackoffMs = (descriptor.retry && descriptor.retry.initialBackoffMs) || 100;
+          const backoffMultiplier = (descriptor.retry && descriptor.retry.multiplier) || 2;
+          const responseTimeoutMs = descriptor.responseTimeoutMs || 5000;
+
+          let attempt = 0;
+          let lastErr = null;
+
+          while (attempt < maxAttempts) {
+            attempt += 1;
+            const correlationId = `${Date.now()}-${Math.random()}-${attempt}`;
+            try {
+              const conn = await amqplib.connect(descriptor.amqpUrl);
+              const ch = await conn.createChannel();
+              const q = await ch.assertQueue('', { exclusive: true });
+
+              const payload = Buffer.from(JSON.stringify({ inputs, attempt }));
+
+              const result = await new Promise((resolve, reject) => {
+                let settled = false;
+
+                const cleanup = () => {
+                  settled = true;
                   ch.close().catch(() => {});
                   conn.close().catch(() => {});
-                  if (Array.isArray(body.outputs)) return resolve(body.outputs);
-                  return resolve([body]);
-                } catch (err) {
-                  ch.close().catch(() => {});
-                  conn.close().catch(() => {});
-                  return reject(err);
+                };
+
+                const timeout = setTimeout(() => {
+                  if (settled) return;
+                  cleanup();
+                  return reject(new Error('MQResponseTimeout'));
+                }, responseTimeoutMs);
+
+                ch.consume(
+                  q.queue,
+                  (msg) => {
+                    if (!msg) return;
+                    if (msg.properties.correlationId !== correlationId) return;
+                    clearTimeout(timeout);
+                    cleanup();
+                    try {
+                      const body = JSON.parse(msg.content.toString());
+                      if (Array.isArray(body.outputs)) return resolve(body.outputs);
+                      return resolve([body]);
+                    } catch (err) {
+                      return reject(err);
+                    }
+                  },
+                  { noAck: true }
+                )
+                  .then(() => {
+                    ch.sendToQueue(descriptor.requestQueue, payload, {
+                      correlationId,
+                      replyTo: q.queue,
+                      headers: { attempt },
+                    });
+                  })
+                  .catch((err) => {
+                    clearTimeout(timeout);
+                    cleanup();
+                    return reject(err);
+                  });
+              });
+
+              // successful response
+              return result;
+            } catch (err) {
+              lastErr = err;
+              // if this was the last attempt, optionally send to dead-letter queue
+              if (attempt >= maxAttempts) {
+                if (descriptor.deadLetterQueue) {
+                  try {
+                    const conn2 = await amqplib.connect(descriptor.amqpUrl);
+                    const ch2 = await conn2.createChannel();
+                    const payload2 = Buffer.from(
+                      JSON.stringify({ inputs, failedAtAttempt: attempt })
+                    );
+                    ch2.sendToQueue(descriptor.deadLetterQueue, payload2, {
+                      headers: { failed: true },
+                    });
+                    await ch2.close();
+                    await conn2.close();
+                  } catch (dlqErr) {
+                    // log and swallow; we still prefer returning the original error
+                    this.logger &&
+                      this.logger.warn &&
+                      this.logger.warn('FailedToSendDLQ', dlqErr.message);
+                  }
                 }
-              },
-              { noAck: true }
-            )
-              .then(() => {
-                const payload = Buffer.from(JSON.stringify({ inputs }));
-                ch.sendToQueue(descriptor.requestQueue, payload, {
-                  correlationId,
-                  replyTo: q.queue,
-                });
-              })
-              .catch(reject);
-          });
+                throw lastErr;
+              }
+
+              // backoff before retry
+              const backoff = Math.round(
+                initialBackoffMs * Math.pow(backoffMultiplier, attempt - 1)
+              );
+              await new Promise((r) => setTimeout(r, backoff));
+              continue;
+            }
+          }
+
+          throw lastErr || new Error('MQRetryFailed');
         };
 
         this._runners.set(key, runnerFn);
@@ -155,20 +224,68 @@ export class RemoteInferenceManager extends EventEmitter {
       const Service = grpcObj[descriptor.serviceName];
       if (!Service) throw new Error('GRPCServiceNotFound');
 
-      const client = new Service(descriptor.address, grpc.credentials.createInsecure());
+      // Build credentials (insecure by default, optional TLS)
+      let clientCreds = grpc.credentials.createInsecure();
+      if (descriptor.credentials && descriptor.credentials.type === 'tls') {
+        // allow passing PEM strings
+        const rootCert = descriptor.credentials.rootCert
+          ? Buffer.from(descriptor.credentials.rootCert)
+          : null;
+        const privateKey = descriptor.credentials.privateKey
+          ? Buffer.from(descriptor.credentials.privateKey)
+          : null;
+        const certChain = descriptor.credentials.certChain
+          ? Buffer.from(descriptor.credentials.certChain)
+          : null;
+        clientCreds = grpc.credentials.createSsl(rootCert, privateKey, certChain);
+      }
+
+      const client = new Service(descriptor.address, clientCreds, descriptor.channelOptions || {});
+
+      // metadata builder: supports descriptor.metadataProvider or simple bearer token in descriptor.credentials
+      const buildMetadata = async (inputs) => {
+        if (typeof descriptor.metadataProvider === 'function') {
+          const md = await descriptor.metadataProvider({ inputs });
+          if (!md) return null;
+          if (md instanceof grpc.Metadata) return md;
+          const meta = new grpc.Metadata();
+          Object.entries(md).forEach(([k, v]) => {
+            if (Array.isArray(v)) v.forEach((val) => meta.add(k, String(val)));
+            else meta.add(k, String(v));
+          });
+          return meta;
+        }
+
+        if (descriptor.credentials && descriptor.credentials.bearerToken) {
+          const meta = new grpc.Metadata();
+          meta.add('authorization', `Bearer ${descriptor.credentials.bearerToken}`);
+          return meta;
+        }
+
+        return null;
+      };
 
       const runnerFn = async (inputs) => {
         // Assume unary call where server returns { outputs: [...] } aligned
+        const metadata = await buildMetadata(inputs);
         return new Promise((resolve, reject) => {
-          client[descriptor.methodName]({ inputs }, (err, resp) => {
+          const cb = (err, resp) => {
             if (err) return reject(err);
             if (!resp) return reject(new Error('EmptyGRPCResponse'));
             if (Array.isArray(resp.outputs)) return resolve(resp.outputs);
-            // allow direct array
             if (Array.isArray(resp)) return resolve(resp);
-            // otherwise assume response itself is the output for single input
             return resolve([resp]);
-          });
+          };
+
+          try {
+            if (metadata) {
+              client[descriptor.methodName]({ inputs }, metadata, cb);
+            } else {
+              client[descriptor.methodName]({ inputs }, cb);
+            }
+          } catch (err) {
+            return reject(err);
+          }
         });
       };
 
