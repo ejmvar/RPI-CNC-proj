@@ -47,3 +47,9 @@
 - Remote runner descriptor example (HTTP): `{ type: 'http', endpoint: 'http://host:port/infer', headers: {...} }`.
 - For HTTP runners RIM will POST `{ inputs }` and expect JSON `{ outputs: [...] }` in response; this allows pluggable remote inference backends to be integrated without changing the batcher.
 - Future: add support for additional runner types (gRPC, message-queue dispatch, worker pools) and secure credentials management.
+- Supported runner descriptor types (MVP):
+  - `http` — `{ type: 'http', endpoint: 'http://host:port/infer', headers?: {...} }`
+  - `mq` — `{ type: 'mq', sendFn: async (inputs) => outputs }` (in-memory or adapter-based MQ send function)
+  - `grpc` — `{ type: 'grpc', mockCall: async (inputs) => outputs }` (MVP supports `mockCall` for testability; real gRPC client will be added later)
+- For `mq`, RIM will call the provided `sendFn(inputs)` and expect an array of outputs aligned with inputs.
+- For `grpc`, MVP accepts `mockCall` to keep tests hermetic; later phases will add a proper gRPC client integration.

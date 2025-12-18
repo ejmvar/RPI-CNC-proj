@@ -51,10 +51,36 @@ export class RemoteInferenceManager extends EventEmitter {
         throw new Error('InvalidRemoteRunnerResponse');
       };
       this._runners.set(key, runnerFn);
-      // store descriptor for introspection
       if (!this._remoteDescriptors) this._remoteDescriptors = new Map();
       this._remoteDescriptors.set(key, descriptor);
       return true;
+    }
+
+    if (descriptor.type === 'mq') {
+      // descriptor: { type: 'mq', sendFn: async (inputs) => outputs }
+      if (typeof descriptor.sendFn !== 'function') throw new Error('MQRunnerRequiresSendFn');
+      const runnerFn = async (inputs) => {
+        return descriptor.sendFn(inputs);
+      };
+      this._runners.set(key, runnerFn);
+      if (!this._remoteDescriptors) this._remoteDescriptors = new Map();
+      this._remoteDescriptors.set(key, descriptor);
+      return true;
+    }
+
+    if (descriptor.type === 'grpc') {
+      // descriptor: { type: 'grpc', address, service, method, mockCall }
+      // For MVP, allow a mockCall function for testing without grpc dependency.
+      if (typeof descriptor.mockCall === 'function') {
+        const runnerFn = async (inputs) => {
+          return descriptor.mockCall(inputs);
+        };
+        this._runners.set(key, runnerFn);
+        if (!this._remoteDescriptors) this._remoteDescriptors = new Map();
+        this._remoteDescriptors.set(key, descriptor);
+        return true;
+      }
+      throw new Error('GRPCRunnerRequiresMockForMVP');
     }
 
     throw new Error('UnsupportedRemoteRunnerType');
