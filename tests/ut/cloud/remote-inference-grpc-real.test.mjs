@@ -9,6 +9,8 @@ const PROTO_PATH = path.resolve('tests/ut/cloud/fixtures/grpc_test.proto');
 
 // write the proto file
 import fs from 'fs';
+// ensure fixtures folder exists
+fs.mkdirSync(path.dirname(PROTO_PATH), { recursive: true });
 fs.writeFileSync(
   PROTO_PATH,
   `syntax = "proto3";
@@ -83,7 +85,7 @@ describe('Remote runner (grpc) integration (real)', () => {
       inputs: ['a'],
       requestId: 'req1',
     });
-    expect(r.outputs).toEqual([{ value: 'out_0_a' }]);
+    expect(r.outputs).toEqual({ value: 'out_0_a' });
 
     server.forceShutdown();
     await rim.shutdown();
