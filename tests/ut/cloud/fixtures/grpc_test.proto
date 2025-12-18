@@ -1,0 +1,8 @@
+syntax = "proto3";
+package testpkg;
+service TestService {
+  rpc Infer (InferRequest) returns (InferResponse);
+}
+message InferRequest { repeated string inputs = 1; }
+message InferOutput { string value = 1; }
+message InferResponse { repeated InferOutput outputs = 1; }
