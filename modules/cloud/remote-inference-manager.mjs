@@ -127,11 +127,16 @@ export class RemoteInferenceManager extends EventEmitter {
                   { noAck: true }
                 )
                   .then(() => {
-                    ch.sendToQueue(descriptor.requestQueue, payload, {
+                    const sendOptions = {
                       correlationId,
                       replyTo: q.queue,
                       headers: { attempt },
-                    });
+                    };
+                    if (descriptor.visibilityTimeoutMs) {
+                      // AMQP message TTL/expiration expects a string in ms
+                      sendOptions.expiration = String(descriptor.visibilityTimeoutMs);
+                    }
+                    ch.sendToQueue(descriptor.requestQueue, payload, sendOptions);
                   })
                   .catch((err) => {
                     clearTimeout(timeout);

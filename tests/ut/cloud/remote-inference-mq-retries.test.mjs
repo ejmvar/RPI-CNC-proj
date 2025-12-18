@@ -51,6 +51,7 @@ describe('Remote runner (mq) retry/backoff behavior', () => {
       requestQueue: 'request-queue',
       deadLetterQueue: 'dead-letter-queue',
       responseTimeoutMs: 50,
+      visibilityTimeoutMs: 200,
       retry: { maxAttempts: 3, initialBackoffMs: 10, multiplier: 1 },
       amqplibImpl: fakeAmqplib,
     });
@@ -64,6 +65,9 @@ describe('Remote runner (mq) retry/backoff behavior', () => {
     expect(calls.sent.length).toBe(3);
     expect(calls.dlqSent.length).toBe(1);
 
+    // check that expiration header is set on sent messages (visibility timeout)
+    const first = calls.sent[0];
+    expect(first.props.expiration).toBe(String(200));
     await rim.shutdown();
   }, 10000);
 });
