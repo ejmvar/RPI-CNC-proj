@@ -1213,7 +1213,52 @@ Planned modules:
 **Roadmap / Milestones:**
 
 - Phase 22.1: Plan & scaffolding (this task)
-- Phase 22.2: Implement core model registry and remote inference (MVP)
+
+### Phase 22.2: Model Registry & Remote Inference (MVP) [IN-PROGRESS]
+
+**Goal:** Implement a production-ready Model Registry and a Remote Inference MVP that uses the registry for model metadata and supports low-latency batched inference for testing and integration.
+
+**Status:** In-progress — starting with Model Registry implementation
+
+**Deliverables:**
+
+- Model Registry (`modules/cloud/model-registry.mjs`)
+
+  - register(modelId, meta), getModel(modelId), listModels(), promoteModel(modelId, target)
+  - artifact checksum verification, basic metadata validation, and versioning
+  - unit tests: ~20 (registration, retrieval, promotion, validation)
+  - acceptance: registry persists models in-memory with well-documented API and passing tests
+
+- Remote Inference Manager (`modules/cloud/remote-inference-manager.mjs`) MVP
+
+  - registerModel(), infer(modelId, inputs) (batched stub inference), model routing by id
+  - per-request logging and basic metrics (latency, batch size)
+  - unit tests: ~30 (model routing, batching behavior, error cases)
+  - acceptance: simple low-latency stub that can be replaced with real runtime later; E2E smoke test with registry
+
+- Integration tests
+  - E2E: register model in registry → call inference endpoint → validate response
+  - acceptance: smoke test passes in CI for the MVP
+
+**Milestones & Timeline:**
+
+1. 22.2.1 — Design & API spec for Model Registry + Remote Inference (docs + tests) — 1 day
+2. 22.2.2 — Implement Model Registry + unit tests — 2 days
+3. 22.2.3 — Implement Remote Inference MVP + unit tests — 2 days
+4. 22.2.4 — Integration tests and small-scale performance smoke test — 1 day
+5. 22.2.5 — CI integration and documentation — 1 day
+
+**Test Expectations:**
+
+- Add 50+ unit tests for Phase 22.2 components
+- Aim for all new tests to pass before merging
+
+**Next actions (this session):**
+
+1. Implement Model Registry (in-memory with checksum validation) and its unit tests (task marked in-progress).
+2. Run unit tests, fix issues, format & lint, then commit.
+3. Proceed to Remote Inference MVP after registry is validated.
+
 - Phase 22.3: Add distributed training & multi-tenant features
 - Phase 22.4: Integration tests + staging deployment
 - Phase 22.5: Production readiness & documentation
