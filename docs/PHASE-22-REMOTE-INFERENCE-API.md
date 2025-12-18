@@ -40,3 +40,10 @@
 
 - This MVP uses in-process runners (no remote worker orchestration yet).
 - Keep implementation lightweight; design hooks for future distributed dispatching.
+
+## Pluggable Runners (Phase 22.3)
+
+- RIM supports registering both in-process runners (functions) via `registerLocalRunner()` and remote runners via `registerRemoteRunner()`.
+- Remote runner descriptor example (HTTP): `{ type: 'http', endpoint: 'http://host:port/infer', headers: {...} }`.
+- For HTTP runners RIM will POST `{ inputs }` and expect JSON `{ outputs: [...] }` in response; this allows pluggable remote inference backends to be integrated without changing the batcher.
+- Future: add support for additional runner types (gRPC, message-queue dispatch, worker pools) and secure credentials management.
