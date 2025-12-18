@@ -1,4 +1,6 @@
 import EventEmitter from 'events';
+import protoLoader from '@grpc/proto-loader';
+import grpc from '@grpc/grpc-js';
 
 export class RemoteInferenceManager extends EventEmitter {
   constructor({
@@ -69,18 +71,62 @@ export class RemoteInferenceManager extends EventEmitter {
     }
 
     if (descriptor.type === 'grpc') {
-      // descriptor: { type: 'grpc', address, service, method, mockCall }
-      // For MVP, allow a mockCall function for testing without grpc dependency.
+      // descriptor: { type: 'grpc', address, protoPath, packageName, serviceName, methodName }
+      // If mockCall provided, use it for tests; otherwise create a real gRPC client
       if (typeof descriptor.mockCall === 'function') {
-        const runnerFn = async (inputs) => {
-          return descriptor.mockCall(inputs);
-        };
+        const runnerFn = async (inputs) => descriptor.mockCall(inputs);
         this._runners.set(key, runnerFn);
         if (!this._remoteDescriptors) this._remoteDescriptors = new Map();
         this._remoteDescriptors.set(key, descriptor);
         return true;
       }
-      throw new Error('GRPCRunnerRequiresMockForMVP');
+
+      // require server address and protoPath
+      if (
+        !descriptor.address ||
+        !descriptor.protoPath ||
+        !descriptor.packageName ||
+        !descriptor.serviceName ||
+        !descriptor.methodName
+      ) {
+        throw new Error('GRPCRunnerDescriptorMissingFields');
+      }
+
+      // load proto and create client
+      const packageDef = protoLoader.loadSync(descriptor.protoPath, {
+        keepCase: true,
+        longs: String,
+        enums: String,
+        defaults: true,
+        oneofs: true,
+      });
+      const grpcObj = grpc.loadPackageDefinition(packageDef)[descriptor.packageName];
+      if (!grpcObj) throw new Error('GRPCPackageLoadFailed');
+      const Service = grpcObj[descriptor.serviceName];
+      if (!Service) throw new Error('GRPCServiceNotFound');
+
+      const client = new Service(descriptor.address, grpc.credentials.createInsecure());
+
+      const runnerFn = async (inputs) => {
+        // Assume unary call where server returns { outputs: [...] } aligned
+        return new Promise((resolve, reject) => {
+          client[descriptor.methodName]({ inputs }, (err, resp) => {
+            if (err) return reject(err);
+            if (!resp) return reject(new Error('EmptyGRPCResponse'));
+            if (Array.isArray(resp.outputs)) return resolve(resp.outputs);
+            // allow direct array
+            if (Array.isArray(resp)) return resolve(resp);
+            // otherwise assume response itself is the output for single input
+            return resolve([resp]);
+          });
+        });
+      };
+
+      // register and keep client reference for potential shutdown
+      this._runners.set(key, runnerFn);
+      if (!this._remoteDescriptors) this._remoteDescriptors = new Map();
+      this._remoteDescriptors.set(key, Object.assign({}, descriptor, { _grpcClient: client }));
+      return true;
     }
 
     throw new Error('UnsupportedRemoteRunnerType');
