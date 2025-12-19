@@ -214,10 +214,8 @@ export class CollaborationEngine {
 
     const { userId, projectId, text, lineNumber = 0 } = params;
 
-    const user = this.activeUsers.get(userId);
-    if (!user) {
-      throw new Error('User not in active session');
-    }
+    // Allow replies from users who may not be actively connected
+    const user = this.activeUsers.get(userId) || { userName: userId, userColor: null };
 
     const commentId = `cmt_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
@@ -268,7 +266,7 @@ export class CollaborationEngine {
     }
 
     const projectComments = this.comments.get(projectId);
-    const comment = projectComments.find((c) => c.id === commentId);
+    const comment = projectComments.find((c) => c.commentId === commentId);
     if (!comment) {
       throw new Error(`Comment not found: ${commentId}`);
     }
