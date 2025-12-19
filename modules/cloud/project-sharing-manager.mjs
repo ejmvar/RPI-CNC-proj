@@ -47,11 +47,13 @@ export class ProjectSharingManager {
    * Create new project
    */
   createProject(params) {
-    if (!params || !params.projectName || !params.ownerId) {
-      throw new Error('Project creation requires projectName and ownerId');
+    // Tests use `userId` as the owner param; accept either `ownerId` or `userId`.
+    const ownerId = (params && (params.ownerId || params.userId)) || null;
+    if (!params || !params.projectName || !ownerId) {
+      throw new Error('Project creation requires projectName and userId');
     }
 
-    const { projectName, ownerId, description = '', isPublic = false, tags = [] } = params;
+    const { projectName, description = '', isPublic = false, tags = [] } = params;
 
     const projectId = `proj_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
@@ -98,11 +100,15 @@ export class ProjectSharingManager {
    * Share project with user
    */
   shareProject(params) {
-    if (!params || !params.projectId || !params.targetUserId) {
-      throw new Error('Sharing requires projectId and targetUserId');
+    // Tests use `userId` and `inviterUserId` names; support both sets.
+    if (!params || !params.projectId || !(params.userId || params.targetUserId)) {
+      throw new Error('Sharing requires projectId and userId');
     }
 
-    const { projectId, targetUserId, role = 'VIEWER', grantedByUserId } = params;
+    const projectId = params.projectId;
+    const targetUserId = params.userId || params.targetUserId;
+    const role = params.role || 'VIEWER';
+    const invitedBy = params.inviterUserId || params.grantedByUserId || null;
 
     const project = this.projects.get(projectId);
     if (!project) {
@@ -144,23 +150,23 @@ export class ProjectSharingManager {
 
     this._logAudit({
       projectId,
-      action: 'PROJECT_SHARED',
-      userId: grantedByUserId,
+      action: 'SHARED',
+      userId: invitedBy,
+      performedBy: invitedBy,
       details: { targetUserId, role },
     });
 
     this.emit('project:shared', {
       projectId,
-      targetUserId,
       role,
-      permissions: rolePermissions[role],
+      userId: targetUserId,
     });
 
     return {
+      status: 'SHARED',
       projectId,
-      targetUserId,
-      role,
-      permissions: rolePermissions[role],
+      grantedRole: role,
+      grantedTo: targetUserId,
       grantedAt: Date.now(),
     };
   }
@@ -169,15 +175,22 @@ export class ProjectSharingManager {
    * Update user permissions
    */
   updateUserPermissions(params) {
+    // Support either `newRole` (tests) or full `permissions` array
     if (!params || !params.projectId || !params.userId) {
       throw new Error('Permission update requires projectId and userId');
     }
 
-    const { projectId, userId, permissions } = params;
+    const { projectId, userId, newRole, updatedBy, permissions } = params;
 
     const perms = this.permissions.get(projectId);
     if (!perms) {
       throw new Error(`Project not found: ${projectId}`);
+    }
+
+    // only ADMIN can update permissions
+    const updater = perms.find((p) => p.userId === updatedBy);
+    if (!updater || updater.role !== 'ADMIN') {
+      throw new Error('Only ADMIN can update permissions');
     }
 
     const userPerm = perms.find((p) => p.userId === userId);
@@ -185,26 +198,40 @@ export class ProjectSharingManager {
       throw new Error(`User not a member of project: ${userId}`);
     }
 
-    // Validate permissions
-    const validPermissions = ['READ', 'WRITE', 'DELETE', 'SHARE', 'INVITE', 'COMMENT'];
-    const invalidPerms = permissions.filter((p) => !validPermissions.includes(p));
-    if (invalidPerms.length > 0) {
-      throw new Error(`Invalid permissions: ${invalidPerms.join(', ')}`);
+    // If newRole provided, map to permissions
+    const rolePermissions = {
+      ADMIN: ['READ', 'WRITE', 'DELETE', 'SHARE', 'INVITE'],
+      EDITOR: ['READ', 'WRITE', 'INVITE'],
+      COMMENTER: ['READ', 'COMMENT'],
+      VIEWER: ['READ'],
+    };
+
+    if (newRole) {
+      if (!rolePermissions[newRole]) throw new Error(`Invalid role: ${newRole}`);
+      userPerm.role = newRole;
+      userPerm.permissions = rolePermissions[newRole];
+    } else if (permissions) {
+      const validPermissions = ['READ', 'WRITE', 'DELETE', 'SHARE', 'INVITE', 'COMMENT'];
+      const invalidPerms = permissions.filter((p) => !validPermissions.includes(p));
+      if (invalidPerms.length > 0) {
+        throw new Error(`Invalid permissions: ${invalidPerms.join(', ')}`);
+      }
+      userPerm.permissions = permissions;
     }
 
-    userPerm.permissions = permissions;
     userPerm.updatedAt = Date.now();
 
     this._logAudit({
       projectId,
-      action: 'PERMISSIONS_UPDATED',
-      userId,
-      details: { permissions },
+      action: 'UPDATED',
+      userId: updatedBy,
+      details: { userId, newRole: userPerm.role },
+      performedBy: updatedBy,
     });
 
-    this.emit('permissions:updated', { projectId, userId, permissions });
+    this.emit('permissions:updated', { projectId, userId, newRole: userPerm.role });
 
-    return { projectId, userId, permissions, updatedAt: Date.now() };
+    return { status: 'UPDATED', projectId, userId, newRole: userPerm.role };
   }
 
   /**
@@ -215,7 +242,7 @@ export class ProjectSharingManager {
       throw new Error('Revoke requires projectId and userId');
     }
 
-    const { projectId, userId, revokedByUserId } = params;
+    const { projectId, userId, revokedBy } = params;
 
     const project = this.projects.get(projectId);
     if (!project) {
@@ -227,6 +254,12 @@ export class ProjectSharingManager {
       return { message: 'No permissions to revoke' };
     }
 
+    // Only ADMIN can revoke
+    const revoker = perms.find((p) => p.userId === revokedBy);
+    if (!revoker || revoker.role !== 'ADMIN') {
+      throw new Error('Only ADMIN can revoke access');
+    }
+
     const index = perms.findIndex((p) => p.userId === userId);
     if (index > -1) {
       perms.splice(index, 1);
@@ -234,8 +267,9 @@ export class ProjectSharingManager {
 
       this._logAudit({
         projectId,
-        action: 'ACCESS_REVOKED',
-        userId: revokedByUserId,
+        action: 'REVOKED',
+        userId: revokedBy,
+        performedBy: revokedBy,
         details: { targetUserId: userId },
       });
 
@@ -264,19 +298,18 @@ export class ProjectSharingManager {
 
     const perms = this.permissions.get(projectId) || [];
 
-    return {
-      projectId,
-      projectName: project.projectName,
-      memberCount: perms.length,
-      members: perms.map((p) => ({
+    // Return an array of members (owner first)
+    const members = perms
+      .map((p) => ({
         userId: p.userId,
         role: p.role,
         permissions: p.permissions,
         grantedAt: p.grantedAt,
         isOwner: p.userId === project.ownerId,
-      })),
-      timestamp: Date.now(),
-    };
+      }))
+      .sort((a, b) => (b.isOwner === true ? 1 : 0) - (a.isOwner === true ? 1 : 0));
+
+    return members;
   }
 
   /**
@@ -304,12 +337,8 @@ export class ProjectSharingManager {
         };
       });
 
-    return {
-      userId,
-      projectCount: userProjects.length,
-      projects: userProjects,
-      timestamp: Date.now(),
-    };
+    // Return an array of projects (tests expect array)
+    return userProjects;
   }
 
   /**
@@ -323,12 +352,8 @@ export class ProjectSharingManager {
       logs = logs.filter((l) => l.projectId === projectId);
     }
 
-    return {
-      projectId: projectId || 'all',
-      totalEntries: logs.length,
-      entries: logs.slice(-limit).reverse(),
-      timestamp: Date.now(),
-    };
+    // Return array of entries (tests expect array)
+    return logs.slice(-limit).reverse();
   }
 
   /**
@@ -341,6 +366,7 @@ export class ProjectSharingManager {
 
     const logEntry = {
       ...event,
+      performedBy: event.userId || event.performedBy || null,
       timestamp: Date.now(),
       id: `audit_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     };
@@ -360,6 +386,13 @@ export class ProjectSharingManager {
     this.auditLog = [];
   }
 
+  // Helper used by tests
+  _getUserRoleForProject(userId, projectId) {
+    const perms = this.permissions.get(projectId) || [];
+    const p = perms.find((x) => x.userId === userId);
+    return p ? p.role : null;
+  }
+
   /**
    * Statistics
    */
@@ -371,12 +404,20 @@ export class ProjectSharingManager {
     const memberCounts = Array.from(this.projects.values()).map((p) => p.memberCount);
     const avgMembers = memberCounts.reduce((a, b) => a + b, 0) / memberCounts.length;
 
+    // compute unique users across projects
+    const allUsers = new Set();
+    for (const perms of this.permissions.values()) {
+      perms.forEach((p) => allUsers.add(p.userId));
+    }
+
     return {
       totalProjects: this.projects.size,
+      totalUsers: allUsers.size,
       totalMembers: memberCounts.reduce((a, b) => a + b, 0),
       averageMembersPerProject: parseFloat(avgMembers.toFixed(1)),
       maxMembersInProject: Math.max(...memberCounts),
       auditLogEntries: this.auditLog.length,
+      timestamp: Date.now(),
     };
   }
 }
