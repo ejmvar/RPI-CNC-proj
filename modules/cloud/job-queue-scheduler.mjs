@@ -71,7 +71,7 @@ export class JobQueueScheduler {
 
     // Validate priority
     const priorityLevels = { CRITICAL: 0, HIGH: 1, NORMAL: 2, LOW: 3 };
-    if (!priorityLevels[priority]) {
+    if (priorityLevels[priority] === undefined) {
       throw new Error(`Invalid priority: ${priority}`);
     }
 
@@ -358,28 +358,26 @@ export class JobQueueScheduler {
   getStatistics() {
     const allCompleted = this.completedJobs;
     const durations = allCompleted.map((j) => j.duration || 0);
+    const totalJobs =
+      this.queue.length + this.executingJobs.size + allCompleted.length + this.failedJobs.length;
 
-    if (durations.length === 0) {
-      return {
-        totalJobs: this.queue.length + this.executingJobs.size + allCompleted.length,
-        successRate: 0,
-        message: 'No completed jobs',
-      };
-    }
-
-    const avgDuration = durations.reduce((a, b) => a + b, 0) / durations.length;
+    const avgDuration =
+      durations.length > 0 ? durations.reduce((a, b) => a + b, 0) / durations.length : 0;
     const successRate =
-      (allCompleted.length / (allCompleted.length + this.failedJobs.length)) * 100;
+      allCompleted.length + this.failedJobs.length > 0
+        ? (allCompleted.length / (allCompleted.length + this.failedJobs.length)) * 100
+        : 0;
 
     return {
+      totalJobs,
       queuedJobs: this.queue.length,
       executingJobs: this.executingJobs.size,
       completedJobs: allCompleted.length,
       failedJobs: this.failedJobs.length,
       successRate: parseFloat(successRate.toFixed(1)),
       averageDurationMs: parseFloat(avgDuration.toFixed(0)),
-      maxDurationMs: Math.max(...durations),
-      minDurationMs: Math.min(...durations),
+      maxDurationMs: durations.length > 0 ? Math.max(...durations) : 0,
+      minDurationMs: durations.length > 0 ? Math.min(...durations) : 0,
       scheduledJobs: this.scheduledJobs.size,
     };
   }
