@@ -159,10 +159,8 @@ export class CollaborationEngine {
       };
     }
 
-    const user = this.activeUsers.get(userId);
-    if (!user) {
-      throw new Error('User not in active session');
-    }
+    // Allow replies from users who may not be actively connected
+    const user = this.activeUsers.get(userId) || { userName: userId, userColor: null };
 
     const docState = this.documentStates.get(projectId);
     if (!docState) {
