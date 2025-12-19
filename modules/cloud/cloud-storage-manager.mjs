@@ -193,11 +193,12 @@ export class CloudStorageManager {
    * Restore file from version
    */
   restoreFileVersion(params) {
-    if (!params || !params.uploadPath || !params.versionId) {
-      throw new Error('Restore requires uploadPath and versionId');
-    }
+    const uploadPath = params?.uploadPath || params?.filePath;
+    const versionId = params?.versionId;
 
-    const { uploadPath, versionId } = params;
+    if (!uploadPath || !versionId) {
+      throw new Error('Restore requires filePath and versionId');
+    }
 
     const versions = this.versionHistory[uploadPath];
     if (!versions) {
