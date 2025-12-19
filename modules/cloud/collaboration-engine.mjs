@@ -260,10 +260,7 @@ export class CollaborationEngine {
 
     const { userId, projectId, commentId, text } = params;
 
-    const user = this.activeUsers.get(userId);
-    if (!user) {
-      throw new Error('User not in active session');
-    }
+    const user = this.activeUsers.get(userId) || { userName: userId, userColor: null };
 
     const projectComments = this.comments.get(projectId);
     const comment = projectComments.find((c) => c.commentId === commentId);
