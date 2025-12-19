@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Phase 22.3: Remote Inference — gRPC auth/metadata and TLS client credential support; AMQP retries/backoff, visibility timeout (message expiration) and dead-letter queue behavior; unit & integration tests added.
 - G-Code example library with 6 working examples (basic-square, circle-test, auto-leveling-demo, multi-tool-demo, complex-pocket, 3d-print-multi-material)
 - Integration tests for all example files (38 tests)
 - Unit tests for logger module (16 tests)

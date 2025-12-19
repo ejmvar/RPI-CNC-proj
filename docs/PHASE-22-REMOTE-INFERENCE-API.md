@@ -53,3 +53,10 @@
 - `grpc` — `{ type: 'grpc', mockCall: async (inputs) => outputs }` (MVP supports `mockCall` for testability) or `{ type: 'grpc', address, protoPath, packageName, serviceName, methodName, credentials?: { type: 'tls', rootCert?, privateKey?, certChain? } , bearerToken?, metadataProvider?: async ({inputs}) => ({ k: v }) }` when using a real gRPC client. Metadata provider (or bearerToken) allows per-call authorization headers to be sent to the gRPC server.
 - For `mq`, RIM will call the provided `sendFn(inputs)` and expect an array of outputs aligned with inputs. When using AMQP, RIM supports configurable retry/backoff and optional dead-letter semantics.
 - For `grpc`, RIM supports `mockCall` for hermetic tests and now supports creating a real gRPC client with optional TLS credentials and per-call metadata for authentication/authorization.
+
+### Phase 22.3 — What changed
+
+- **gRPC:** added per-call metadata support via `metadataProvider`, bearer-token support, and TLS client credentials (`credentials.type='tls'` with PEM strings).
+- **AMQP:** added retry/backoff, response timeout handling, `visibilityTimeoutMs` (sets queue message `expiration`) and optional dead-letter queue behavior.
+- **Tests:** added unit & integration tests covering gRPC auth, TLS, and AMQP retry behavior.
+- **Docs:** API docs updated to include new descriptor fields and guidance on usage.
