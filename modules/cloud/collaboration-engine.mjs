@@ -51,14 +51,14 @@ export class CollaborationEngine {
    */
   joinSession(params) {
     if (!params || !params.userId || !params.projectId) {
-      throw new Error('Join session requires userId and projectId');
+      throw new Error('Session join requires projectId and userId');
     }
 
     const { userId, projectId, userName = 'User', userColor = this._generateColor() } = params;
 
     // Check concurrent user limit
     if (this.activeUsers.size >= this.options.maxConcurrentUsers) {
-      throw new Error('Session at capacity');
+      throw new Error('Max concurrent users reached');
     }
 
     const userData = {
@@ -87,10 +87,14 @@ export class CollaborationEngine {
       this.comments.set(projectId, []);
     }
 
+    const sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
     const joinEvent = {
+      sessionId,
       userId,
+      userName,
       projectId,
-      action: 'USER_JOINED',
+      status: 'ACTIVE',
       activeUsers: this.activeUsers.size,
       userList: this._getUserList(projectId),
       documentVersion: this.documentStates.get(projectId).version,
@@ -98,7 +102,7 @@ export class CollaborationEngine {
     };
 
     this.messageQueue.push(joinEvent);
-    this.emit('user:joined', joinEvent);
+    this.emit('session:joined', joinEvent);
 
     return joinEvent;
   }
@@ -124,13 +128,13 @@ export class CollaborationEngine {
     const leaveEvent = {
       userId,
       projectId,
-      action: 'USER_LEFT',
+      status: 'LEFT',
       activeUsers: this.activeUsers.size,
       timestamp: Date.now(),
     };
 
     this.messageQueue.push(leaveEvent);
-    this.emit('user:left', leaveEvent);
+    this.emit('session:left', leaveEvent);
 
     return leaveEvent;
   }
@@ -143,7 +147,17 @@ export class CollaborationEngine {
       throw new Error('Edit submission requires userId, projectId, and operation');
     }
 
-    const { userId, projectId, operation } = params;
+    const { userId, projectId } = params;
+    let operation = params.operation;
+
+    // Accept both test-friendly shape and internal OT shape
+    if (operation.type === 'INSERT' || operation.type === 'insert') {
+      operation = {
+        type: 'insert',
+        position: operation.pos ?? operation.position,
+        content: operation.text ?? operation.content,
+      };
+    }
 
     const user = this.activeUsers.get(userId);
     if (!user) {
@@ -158,7 +172,10 @@ export class CollaborationEngine {
     // Apply Operational Transformation
     const transformedOp = this._applyOperationalTransform(projectId, operation);
 
+    const operationId = `op_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
     const opEntry = {
+      operationId,
       userId,
       projectId,
       operation: transformedOp,
@@ -174,6 +191,7 @@ export class CollaborationEngine {
     docState.lastModified = Date.now();
 
     const editEvent = {
+      operationId,
       userId,
       projectId,
       operation: transformedOp,
@@ -192,11 +210,11 @@ export class CollaborationEngine {
    * Add comment
    */
   addComment(params) {
-    if (!params || !params.userId || !params.projectId || !params.content) {
-      throw new Error('Comment requires userId, projectId, and content');
+    if (!params || !params.userId || !params.projectId || !params.text) {
+      throw new Error('Comment requires text');
     }
 
-    const { userId, projectId, content, position = 0 } = params;
+    const { userId, projectId, text, lineNumber = 0 } = params;
 
     const user = this.activeUsers.get(userId);
     if (!user) {
@@ -206,13 +224,13 @@ export class CollaborationEngine {
     const commentId = `cmt_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
     const comment = {
-      id: commentId,
+      commentId,
       userId,
       userName: user.userName,
       userColor: user.userColor,
       projectId,
-      content,
-      position,
+      text,
+      lineNumber,
       createdAt: Date.now(),
       replies: [],
       resolved: false,
@@ -223,7 +241,10 @@ export class CollaborationEngine {
 
     const commentEvent = {
       action: 'COMMENT_ADDED',
-      comment,
+      commentId,
+      userId,
+      text,
+      lineNumber,
       timestamp: Date.now(),
     };
 
@@ -237,11 +258,11 @@ export class CollaborationEngine {
    * Reply to comment
    */
   replyToComment(params) {
-    if (!params || !params.userId || !params.projectId || !params.commentId || !params.content) {
-      throw new Error('Reply requires userId, projectId, commentId, and content');
+    if (!params || !params.userId || !params.projectId || !params.commentId || !params.text) {
+      throw new Error('Reply requires text');
     }
 
-    const { userId, projectId, commentId, content } = params;
+    const { userId, projectId, commentId, text } = params;
 
     const user = this.activeUsers.get(userId);
     if (!user) {
@@ -254,11 +275,14 @@ export class CollaborationEngine {
       throw new Error(`Comment not found: ${commentId}`);
     }
 
+    const replyId = `rpl_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
     const reply = {
+      replyId,
       userId,
       userName: user.userName,
       userColor: user.userColor,
-      content,
+      text,
       createdAt: Date.now(),
     };
 
@@ -267,7 +291,9 @@ export class CollaborationEngine {
     const replyEvent = {
       action: 'COMMENT_REPLY_ADDED',
       commentId,
-      reply,
+      replyId,
+      userId,
+      text,
       timestamp: Date.now(),
     };
 
@@ -291,11 +317,15 @@ export class CollaborationEngine {
         userColor: u.userColor,
         status: u.status,
         cursorPosition: u.cursorPosition,
-        connectedFor: Math.floor((Date.now() - u.joinedAt) / 1000),
+        lastPresence: Date.now() - u.lastSeen,
       }));
 
+    if (projectId) {
+      return users;
+    }
+
     return {
-      projectId: projectId || 'all',
+      projectId: 'all',
       activeUserCount: users.length,
       users,
       timestamp: Date.now(),
@@ -314,17 +344,13 @@ export class CollaborationEngine {
 
     const ops = this.operations.get(projectId) || [];
 
-    return {
-      projectId,
-      totalChanges: ops.length,
-      changes: ops.slice(-limit).map((op) => ({
-        userId: op.userId,
-        version: op.version,
-        operation: op.operation,
-        timestamp: op.timestamp,
-      })),
-      timestamp: Date.now(),
-    };
+    return ops.slice(-limit).map((op) => ({
+      operationId: op.operationId,
+      userId: op.userId,
+      version: op.version,
+      operation: op.operation,
+      timestamp: op.timestamp,
+    }));
   }
 
   /**
@@ -339,21 +365,17 @@ export class CollaborationEngine {
 
     const comments = (this.comments.get(projectId) || []).filter((c) => c.resolved === resolved);
 
-    return {
-      projectId,
-      commentCount: comments.length,
-      comments: comments.map((c) => ({
-        id: c.id,
-        userId: c.userId,
-        userName: c.userName,
-        content: c.content,
-        position: c.position,
-        createdAt: c.createdAt,
-        replyCount: c.replies.length,
-        resolved: c.resolved,
-      })),
-      timestamp: Date.now(),
-    };
+    return comments.map((c) => ({
+      commentId: c.commentId,
+      userId: c.userId,
+      userName: c.userName,
+      text: c.text,
+      lineNumber: c.lineNumber,
+      createdAt: c.createdAt,
+      replyCount: c.replies.length,
+      resolved: c.resolved,
+      replies: c.replies,
+    }));
   }
 
   /**
@@ -420,10 +442,6 @@ export class CollaborationEngine {
    * Statistics
    */
   getStatistics() {
-    if (this.activeUsers.size === 0) {
-      return { message: 'No active users' };
-    }
-
     let totalOps = 0;
     let totalComments = 0;
 
@@ -435,13 +453,13 @@ export class CollaborationEngine {
       totalComments += comments.length;
     });
 
+    const activeProjects = new Set();
+    this.activeUsers.forEach((u) => activeProjects.add(u.projectId));
+
     return {
+      activeSessions: activeProjects.size,
       activeUsers: this.activeUsers.size,
-      maxConcurrentUsers: this.options.maxConcurrentUsers,
-      capacityUsed: parseFloat(
-        ((this.activeUsers.size / this.options.maxConcurrentUsers) * 100).toFixed(1)
-      ),
-      totalOperations: totalOps,
+      totalEdits: totalOps,
       totalComments,
       queuedMessages: this.messageQueue.length,
     };
