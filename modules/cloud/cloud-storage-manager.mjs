@@ -58,112 +58,112 @@ export class CloudStorageManager {
    * Upload project file to cloud storage
    */
   uploadFile(params) {
-    if (!params || !params.filePath || !params.fileName) {
-      throw new Error('Upload requires filePath and fileName');
+    // Accept test-friendly params: projectId, fileName, fileContent, fileSize, provider
+    if (!params || !params.projectId || !params.fileName || !params.fileContent) {
+      throw new Error('File upload requires projectId, fileName, and fileContent');
     }
 
-    const { filePath, fileName, projectId, metadata = {} } = params;
+    const {
+      projectId,
+      fileName,
+      fileContent,
+      fileSize = 0,
+      provider = this.options.provider,
+    } = params;
 
-    // Validate file size
-    const fileSize = metadata.size || 0;
     if (fileSize > this.options.maxFileSize) {
       throw new Error(`File exceeds maximum size of ${this.options.maxFileSize} bytes`);
     }
 
-    // Generate upload ID and track progress
     const uploadId = `upload_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    const uploadPath = `projects/${projectId || 'default'}/${fileName}`;
+    const uploadPath = `projects/${projectId}/${fileName}`;
 
-    const uploadData = {
+    const uploadResult = {
       uploadId,
-      fileName,
-      filePath,
-      uploadPath,
       projectId,
+      fileName,
+      fileContent,
       fileSize,
+      uploadPath,
       status: 'IN_PROGRESS',
       progress: 0,
       startTime: Date.now(),
-      provider: this.options.provider,
-      encryption: this.options.encryptionEnabled ? 'AES-256' : 'none',
-      compression: this.options.compressionEnabled ? 'gzip' : 'none',
-      metadata,
-    };
-
-    this.activeUploads[uploadId] = uploadData;
-
-    // Simulate upload progress
-    const uploadResult = {
-      ...uploadData,
-      progress: 100,
-      status: 'COMPLETED',
-      completionTime: Date.now(),
-      endTime: Date.now(),
-      cloudUrl: `${this.providerConfigs[this.options.provider].endpoint}/${uploadPath}`,
+      provider,
+      cloudUrl: `${this.providerConfigs[provider || this.options.provider].endpoint}/${uploadPath}`,
       versionId: `v_${Date.now()}`,
       checksum: this._generateChecksum(fileName),
       timestamp: Date.now(),
     };
 
-    // Store in version history
+    // Track active upload (tests expect entry to exist after upload)
+    this.activeUploads[uploadId] = { ...uploadResult, progress: 100, status: 'COMPLETED' };
+
+    // Store version history
     if (!this.versionHistory[uploadPath]) {
       this.versionHistory[uploadPath] = [];
     }
     this.versionHistory[uploadPath].push({
       versionId: uploadResult.versionId,
-      uploadTime: uploadResult.endTime,
-      fileSize,
+      uploadTime: uploadResult.timestamp,
+      fileSize: uploadResult.fileSize,
       checksum: uploadResult.checksum,
+      fileContent: uploadResult.fileContent,
     });
 
-    this.storageHistory.push(uploadResult);
-    delete this.activeUploads[uploadId];
+    this.storageHistory.push({ ...this.activeUploads[uploadId] });
 
-    this.emit('upload:completed', uploadResult);
+    this.emit('file:uploaded', { fileName, projectId, uploadId });
 
-    return uploadResult;
+    return this.activeUploads[uploadId];
   }
 
   /**
    * Download file from cloud storage
    */
   downloadFile(params) {
-    if (!params || !params.uploadPath) {
-      throw new Error('Download requires uploadPath');
+    // Accept projectId + fileName or uploadPath
+    const { uploadPath, projectId, fileName, versionId, targetPath } = params || {};
+
+    let path = uploadPath;
+    if (!path) {
+      if (!projectId || !fileName) {
+        throw new Error('File download requires projectId and fileName');
+      }
+      path = `projects/${projectId}/${fileName}`;
     }
 
-    const { uploadPath, versionId, targetPath } = params;
-
-    // Check if file exists in history
-    const versions = this.versionHistory[uploadPath];
+    const versions = this.versionHistory[path];
     if (!versions || versions.length === 0) {
-      throw new Error(`File not found: ${uploadPath}`);
+      throw new Error(`File not found: ${path}`);
     }
 
-    // Get specific version or latest
     const version = versionId
       ? versions.find((v) => v.versionId === versionId)
       : versions[versions.length - 1];
-
     if (!version) {
       throw new Error(`Version not found: ${versionId}`);
     }
 
     const downloadData = {
-      uploadPath,
+      fileName: path.split('/').pop(),
+      uploadPath: path,
       versionId: version.versionId,
-      targetPath: targetPath || uploadPath,
+      fileContent: version.fileContent,
+      targetPath: targetPath || path,
       fileSize: version.fileSize,
       downloadTime: Date.now(),
       status: 'COMPLETED',
       checksum: version.checksum,
       provider: this.options.provider,
-      cloudUrl: `${this.providerConfigs[this.options.provider].endpoint}/${uploadPath}`,
+      cloudUrl: `${this.providerConfigs[this.options.provider].endpoint}/${path}`,
       timestamp: Date.now(),
     };
 
     this.storageHistory.push(downloadData);
-    this.emit('download:completed', downloadData);
+    this.emit('file:downloaded', {
+      fileName: downloadData.fileName,
+      projectId: projectId || path.split('/')[1],
+    });
 
     return downloadData;
   }
@@ -172,27 +172,21 @@ export class CloudStorageManager {
    * Get version history for a file
    */
   getVersionHistory(params) {
-    if (!params || !params.uploadPath) {
-      throw new Error('Version history requires uploadPath');
-    }
+    // Tests expect to pass { filePath } and receive an array of versions
+    const { filePath, limit = 10 } = params || {};
+    if (!filePath) return [];
 
-    const { uploadPath, limit = 10 } = params;
+    const versions = this.versionHistory[filePath] || [];
 
-    const versions = this.versionHistory[uploadPath] || [];
-
-    return {
-      uploadPath,
-      totalVersions: versions.length,
-      versions: versions.slice(-limit).map((v, idx) => ({
-        versionNumber: versions.length - idx,
+    return versions
+      .slice(-limit)
+      .reverse()
+      .map((v) => ({
         versionId: v.versionId,
-        uploadTime: v.uploadTime,
+        uploadedAt: v.uploadTime,
         fileSize: v.fileSize,
         checksum: v.checksum,
-        age: Math.floor((Date.now() - v.uploadTime) / 1000 / 60),
-      })),
-      timestamp: Date.now(),
-    };
+      }));
   }
 
   /**
@@ -244,48 +238,47 @@ export class CloudStorageManager {
         const versions = this.versionHistory[path];
         const latest = versions[versions.length - 1];
         return {
-          path,
+          filePath: path,
           fileName: path.split('/').pop(),
+          uploadedAt: latest.uploadTime,
           fileSize: latest.fileSize,
-          lastModified: latest.uploadTime,
           versionCount: versions.length,
           checksum: latest.checksum,
         };
       });
 
-    return {
-      projectId,
-      prefix,
-      fileCount: files.length,
-      files,
-      totalSize: files.reduce((sum, f) => sum + f.fileSize, 0),
-      timestamp: Date.now(),
-    };
+    // Tests expect an array of files
+    return files;
   }
 
   /**
    * Configure auto-backup
    */
   configureAutoBackup(params) {
-    if (!params || params.enabled === undefined) {
-      throw new Error('Auto-backup configuration requires enabled flag');
+    // Tests expect projectId and other settings; require projectId
+    if (!params || !params.projectId) {
+      throw new Error('Auto-backup requires projectId');
     }
 
-    const { enabled, intervalMinutes = 60, retentionDays = 90 } = params;
+    const {
+      projectId,
+      intervalHours = 24,
+      retentionDays = 90,
+      compressionEnabled = false,
+    } = params;
 
-    const backupConfig = {
-      enabled,
-      intervalMinutes: enabled ? intervalMinutes : null,
-      retentionDays: enabled ? retentionDays : null,
-      nextBackupTime: enabled ? Date.now() + intervalMinutes * 60000 : null,
-      status: enabled ? 'ACTIVE' : 'DISABLED',
-      provider: this.options.provider,
+    const result = {
+      projectId,
+      status: 'CONFIGURED',
+      intervalHours,
+      retentionDays,
+      compressionEnabled,
       timestamp: Date.now(),
     };
 
-    this.emit('backup:configured', backupConfig);
+    this.emit('backup:configured', result);
 
-    return backupConfig;
+    return result;
   }
 
   /**
@@ -303,16 +296,16 @@ export class CloudStorageManager {
         versionCount: versions.length,
       }));
 
-    const totalSize = projectFiles.reduce((sum, f) => sum + f.size, 0);
-    const totalVersions = projectFiles.reduce((sum, f) => sum + f.versionCount, 0);
+    const totalUsageBytes = projectFiles.reduce((sum, f) => sum + f.size, 0);
+    const versionCount = projectFiles.reduce((sum, f) => sum + f.versionCount, 0);
 
     return {
       projectId,
-      totalStorageUsed: totalSize,
+      totalUsageBytes,
       maxStorageLimit: this.options.maxFileSize * 100,
-      usagePercent: (totalSize / (this.options.maxFileSize * 100)) * 100,
+      usagePercent: (totalUsageBytes / (this.options.maxFileSize * 100)) * 100,
       fileCount: projectFiles.length,
-      versionCount: totalVersions,
+      versionCount,
       provider: this.options.provider,
       compression: this.options.compressionEnabled ? 'enabled' : 'disabled',
       encryption: this.options.encryptionEnabled ? 'enabled' : 'disabled',
@@ -347,28 +340,21 @@ export class CloudStorageManager {
    * Statistics
    */
   getStatistics() {
-    if (this.storageHistory.length === 0) {
-      return { message: 'No storage history available' };
-    }
+    const uploads = this.storageHistory.filter((h) => h.status === 'COMPLETED' && h.fileName);
+    const downloads = this.storageHistory.filter(
+      (h) => h.status === 'COMPLETED' && h.fileContent === undefined && h.fileName
+    );
 
-    const uploads = this.storageHistory.filter((h) => h.status === 'COMPLETED' && h.cloudUrl);
-    const uploadSizes = uploads.map((u) => u.fileSize || 0);
-
-    if (uploadSizes.length === 0) {
-      return { message: 'No upload data in history' };
-    }
-
-    const totalSize = uploadSizes.reduce((a, b) => a + b, 0);
-    const avgSize = totalSize / uploadSizes.length;
+    const totalVersions = Object.values(this.versionHistory).reduce(
+      (sum, versions) => sum + versions.length,
+      0
+    );
 
     return {
-      totalOperations: this.storageHistory.length,
       totalUploads: uploads.length,
-      totalStorageUsed: totalSize,
-      averageFileSize: parseFloat(avgSize.toFixed(0)),
-      maxFileSize: Math.max(...uploadSizes),
-      minFileSize: Math.min(...uploadSizes),
-      provider: this.options.provider,
+      totalDownloads: downloads.length,
+      totalVersions,
+      timestamp: Date.now(),
     };
   }
 }
