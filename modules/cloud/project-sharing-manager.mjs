@@ -93,7 +93,8 @@ export class ProjectSharingManager {
 
     this.emit('project:created', project);
 
-    return project;
+    // Provide backwards-compatible alias expected by tests
+    return Object.assign({}, project, { owner: project.ownerId });
   }
 
   /**
@@ -391,6 +392,17 @@ export class ProjectSharingManager {
     const perms = this.permissions.get(projectId) || [];
     const p = perms.find((x) => x.userId === userId);
     return p ? p.role : null;
+  }
+
+  userHasPermission({ userId, projectId, permission } = {}) {
+    if (!userId || !projectId || !permission) return false;
+    const project = this.projects.get(projectId);
+    if (!project) return false;
+    if (project.ownerId === userId) return true;
+    const perms = this.permissions.get(projectId) || [];
+    const userPerm = perms.find((p) => p.userId === userId);
+    if (!userPerm) return false;
+    return (userPerm.permissions || []).includes(permission);
   }
 
   /**
